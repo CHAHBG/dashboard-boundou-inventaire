@@ -532,7 +532,11 @@ function exportToCSV() {
 // Initialize modal
 function initializeModal() {
   const modal = document.getElementById('fullscreenModal');
-  document.getElementById('closeModal').addEventListener('click', closeModal);
+  const closeModalBtn = document.getElementById('closeModal');
+  const overlay = document.querySelector('.modal-overlay');
+
+  closeModalBtn.addEventListener('click', closeModal);
+  overlay.addEventListener('click', closeModal);
   modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 }
