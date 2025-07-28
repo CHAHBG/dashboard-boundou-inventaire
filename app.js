@@ -41,8 +41,8 @@ let currentPage = 1;
 let rowsPerPage = 10;
 let searchTerm = '';
 
-// Color scheme for charts
-const colors = ['#4ade80', '#22d3ee', '#f472b6', '#34d399', '#f87171', '#fbbf24', '#6b7280', '#e2e8f0', '#94a3b8', '#3b82f6'];
+// Soft color scheme for charts
+const colors = ['#8A9A5B', '#A3BFFA', '#D4A373', '#A3B18A', '#DDA0DD', '#E9B872', '#9BA4B5', '#E0E7E9', '#F5F5F0', '#4A4E69'];
 
 // Initialize the dashboard
 document.addEventListener('DOMContentLoaded', initializeDashboard);
@@ -79,15 +79,16 @@ function initializeSidebarToggle() {
 
 // Initialize filters
 function initializeFilters() {
-  const communeSelect = document.getElementById('communeFilter');
+  const communeFilters = document.getElementById('communeFilters');
   const seuilSlider = document.getElementById('seuilFilter');
   const seuilValue = document.getElementById('seuilValue');
 
+  // Populate commune checkboxes
   appData.communes_data.forEach(commune => {
-    const option = document.createElement('option');
-    option.value = commune.commune;
-    option.textContent = commune.commune;
-    communeSelect.appendChild(option);
+    const label = document.createElement('label');
+    label.className = 'checkbox-label';
+    label.innerHTML = `<input type="checkbox" name="commune" value="${commune.commune}"> ${commune.commune}`;
+    communeFilters.appendChild(label);
   });
 
   seuilSlider.addEventListener('input', () => {
@@ -100,17 +101,20 @@ function initializeFilters() {
 
 // Apply filters
 function applyFilters() {
-  const communeSelect = document.getElementById('communeFilter');
+  const communeCheckboxes = document.querySelectorAll('input[name="commune"]');
+  const selectedCommunes = Array.from(communeCheckboxes)
+    .filter(cb => cb.checked)
+    .map(cb => cb.value);
   const seuilSlider = document.getElementById('seuilFilter');
   const performanceFilter = document.getElementById('performanceFilter').value;
   const quarantineFilter = document.getElementById('quarantineFilter').checked;
   const jointureFilter = document.getElementById('jointureFilter').checked;
 
-  const selectedCommunes = Array.from(communeSelect.selectedOptions).map(option => option.value);
   const seuilMin = parseInt(seuilSlider.value);
 
   filteredData = appData.communes_data.filter(commune => {
-    if (selectedCommunes.length > 0 && !selectedCommunes.includes(commune.commune) && !selectedCommunes.includes('all')) return false;
+    const isCommuneSelected = selectedCommunes.length === 0 || selectedCommunes.includes(commune.commune) || selectedCommunes.includes('all');
+    if (!isCommuneSelected) return false;
     if (commune.parcelles_brutes < seuilMin) return false;
     const taux = commune.taux_jointure_ok;
     if (performanceFilter === 'high' && taux <= 20) return false;
@@ -129,7 +133,7 @@ function applyFilters() {
 
 // Reset filters
 function resetFilters() {
-  document.getElementById('communeFilter').selectedIndex = -1;
+  document.querySelectorAll('input[name="commune"]').forEach(cb => cb.checked = false);
   document.getElementById('seuilFilter').value = 0;
   document.getElementById('seuilValue').textContent = '0';
   document.getElementById('performanceFilter').value = 'all';
@@ -174,6 +178,7 @@ function initializeCharts() {
 // Create pipeline chart
 function createPipelineChart() {
   const ctx = document.getElementById('pipelineChart').getContext('2d');
+  if (charts.pipeline) charts.pipeline.destroy();
   charts.pipeline = new Chart(ctx, {
     type: 'bar',
     data: {
@@ -188,7 +193,7 @@ function createPipelineChart() {
           appData.kpi_data.total_jointure_ok
         ],
         backgroundColor: colors.slice(0, 5),
-        borderColor: colors.slice(0, 5),
+        borderColor: colors.slice(0, 5).map(c => shadeColor(c, -10)),
         borderWidth: 1
       }]
     },
@@ -196,7 +201,8 @@ function createPipelineChart() {
       responsive: true,
       maintainAspectRatio: false,
       scales: {
-        y: { beginAtZero: true, ticks: { callback: formatNumber } }
+        y: { beginAtZero: true, ticks: { callback: formatNumber } },
+        x: { beginAtZero: true }
       },
       plugins: {
         zoom: {
@@ -211,21 +217,23 @@ function createPipelineChart() {
 // Create communes chart
 function createCommunesChart() {
   const ctx = document.getElementById('communesChart').getContext('2d');
+  if (charts.communes) charts.communes.destroy();
   charts.communes = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: [],
       datasets: [
-        { label: 'Parcelles Brutes', data: [], backgroundColor: colors[0], borderColor: colors[0], borderWidth: 1 },
-        { label: 'Sans Doublons', data: [], backgroundColor: colors[1], borderColor: colors[1], borderWidth: 1 },
-        { label: 'Post-traitées', data: [], backgroundColor: colors[2], borderColor: colors[2], borderWidth: 1 }
+        { label: 'Parcelles Brutes', data: [], backgroundColor: colors[0], borderColor: shadeColor(colors[0], -10), borderWidth: 1 },
+        { label: 'Sans Doublons', data: [], backgroundColor: colors[1], borderColor: shadeColor(colors[1], -10), borderWidth: 1 },
+        { label: 'Post-traitées', data: [], backgroundColor: colors[2], borderColor: shadeColor(colors[2], -10), borderWidth: 1 }
       ]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
       scales: {
-        y: { beginAtZero: true, ticks: { callback: formatNumber } }
+        y: { beginAtZero: true, ticks: { callback: formatNumber } },
+        x: { beginAtZero: true }
       },
       plugins: {
         zoom: {
@@ -241,6 +249,7 @@ function createCommunesChart() {
 // Create performance chart
 function createPerformanceChart() {
   const ctx = document.getElementById('performanceChart').getContext('2d');
+  if (charts.performance) charts.performance.destroy();
   charts.performance = new Chart(ctx, {
     type: 'radar',
     data: {
@@ -248,7 +257,7 @@ function createPerformanceChart() {
       datasets: [{
         label: 'Taux de Jointure (%)',
         data: [],
-        backgroundColor: 'rgba(34, 211, 238, 0.2)',
+        backgroundColor: 'rgba(163, 191, 250, 0.2)',
         borderColor: colors[1],
         borderWidth: 2,
         pointBackgroundColor: colors[1],
@@ -277,6 +286,7 @@ function createPerformanceChart() {
 // Create repartition chart
 function createRepartitionChart() {
   const ctx = document.getElementById('repartitionChart').getContext('2d');
+  if (charts.repartition) charts.repartition.destroy();
   charts.repartition = new Chart(ctx, {
     type: 'doughnut',
     data: {
@@ -289,7 +299,7 @@ function createRepartitionChart() {
           appData.kpi_data.total_parcelles_restantes
         ],
         backgroundColor: colors.slice(0, 4),
-        borderColor: colors.slice(0, 4),
+        borderColor: colors.slice(0, 4).map(c => shadeColor(c, -10)),
         borderWidth: 2
       }]
     },
@@ -314,6 +324,7 @@ function updateCharts() {
 
 // Update communes chart
 function updateCommunesChart() {
+  if (!charts.communes || !Array.isArray(filteredData)) return;
   charts.communes.data.labels = filteredData.map(c => c.commune);
   charts.communes.data.datasets[0].data = filteredData.map(c => c.parcelles_brutes);
   charts.communes.data.datasets[1].data = filteredData.map(c => c.parcelles_sans_doublons);
@@ -323,6 +334,7 @@ function updateCommunesChart() {
 
 // Update performance chart
 function updatePerformanceChart() {
+  if (!charts.performance || !Array.isArray(filteredData)) return;
   charts.performance.data.labels = filteredData.map(c => c.commune);
   charts.performance.data.datasets[0].data = filteredData.map(c => c.taux_jointure_ok);
   charts.performance.update();
@@ -472,6 +484,7 @@ function initializeTooltips() {
 // Show tooltip
 function showTooltip(e, text) {
   const tooltip = document.getElementById('tooltip');
+  if (typeof text !== 'string') text = 'Tooltip data unavailable';
   tooltip.textContent = text;
   tooltip.classList.remove('hidden');
   updateTooltipPosition(e);
@@ -548,6 +561,10 @@ function openFullscreenChart(chartId) {
   const fullscreenCanvas = document.getElementById('fullscreenChart');
   const originalChart = charts[chartId.replace('Chart', '')];
 
+  if (modal.fullscreenChart) {
+    modal.fullscreenChart.destroy();
+  }
+
   modalTitle.textContent = `Graphique en Plein Écran - ${originalChart.options.plugins?.title?.text || 'Graphique'}`;
   modal.classList.remove('hidden');
 
@@ -582,4 +599,15 @@ function showNotification(message, type = 'info') {
 // Format number
 function formatNumber(num) {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+// Helper function to shade color (simplified)
+function shadeColor(color, percent) {
+  let R = parseInt(color.substring(1,3),16);
+  let G = parseInt(color.substring(3,5),16);
+  let B = parseInt(color.substring(5,7),16);
+  R = Math.max(0, Math.min(255, R + (R * percent / 100)));
+  G = Math.max(0, Math.min(255, G + (G * percent / 100)));
+  B = Math.max(0, Math.min(255, B + (B * percent / 100)));
+  return `rgb(${R}, ${G}, ${B})`;
 }
