@@ -1,271 +1,248 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Interactif - Inventaires Fonciers Boundou</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Interactif - Inventaires Fonciers Boundou</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <header class="dashboard-header">
-            <h1>Dashboard Interactif - Inventaires Fonciers Boundou</h1>
-            <p class="date">02 Juillet 2025</p>
-        </header>
+  <div class="container">
+    <header class="dashboard-header">
+      <h1>Dashboard Interactif - Inventaires Fonciers Boundou</h1>
+      <p class="date">02 Juillet 2025</p>
+    </header>
 
-        <!-- Filters Panel -->
-        <section class="filters-panel">
-            <h3>Système de Filtres</h3>
-            <div class="filters-grid">
-                <div class="filter-group">
-                    <label for="communeFilter" class="form-label">Filtre par Commune</label>
-                    <select id="communeFilter" class="form-control" multiple>
-                        <option value="">Toutes les communes</option>
-                    </select>
-                </div>
-                
-                <div class="filter-group">
-                    <label for="seuilFilter" class="form-label">Seuil Min. Parcelles: <span id="seuilValue">0</span></label>
-                    <input type="range" id="seuilFilter" class="form-control" min="0" max="10000" value="0">
-                </div>
-                
-                <div class="filter-group">
-                    <label class="form-label">Niveau de Performance</label>
-                    <div class="performance-filters">
-                        <button class="btn btn--sm filter-btn active" data-performance="all">Tous</button>
-                        <button class="btn btn--sm filter-btn" data-performance="high">Élevé >20%</button>
-                        <button class="btn btn--sm filter-btn" data-performance="medium">Moyen 10-20%</button>
-                        <button class="btn btn--sm filter-btn" data-performance="low">Faible <10%</button>
-                    </div>
-                </div>
-                
-                <div class="filter-group">
-                    <label class="form-label">Filtres Problèmes</label>
-                    <div class="problem-filters">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="quarantineFilter"> Avec Quarantaines
-                        </label>
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="jointureFilter"> Échecs Jointure
-                        </label>
-                    </div>
-                </div>
-                
-                <div class="filter-group">
-                    <button class="btn btn--secondary" id="resetFilters">Reset Filtres</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- KPI Cards -->
-        <section class="kpi-section">
-            <div class="kpi-grid">
-                <div class="kpi-card" data-tooltip="Nombre total de parcelles dans l'inventaire de Boundou">
-                    <div class="kpi-icon">📊</div>
-                    <div class="kpi-content">
-                        <h3>Total Parcelles Brutes</h3>
-                        <p class="kpi-value" id="kpi-brutes">51,799</p>
-                    </div>
-                </div>
-                <div class="kpi-card" data-tooltip="Nombre de communes dans la région de Boundou">
-                    <div class="kpi-icon">🏘️</div>
-                    <div class="kpi-content">
-                        <h3>Total Communes</h3>
-                        <p class="kpi-value" id="kpi-communes">11</p>
-                    </div>
-                </div>
-                <div class="kpi-card" data-tooltip="Pourcentage de parcelles uniques par rapport au total des parcelles brutes">
-                    <div class="kpi-icon">🔄</div>
-                    <div class="kpi-content">
-                        <h3>Taux de Dédoublonnage</h3>
-                        <p class="kpi-value" id="kpi-dedoublonnage">50.5%</p>
-                    </div>
-                </div>
-                <div class="kpi-card" data-tooltip="Pourcentage de parcelles ayant subi le post-traitement">
-                    <div class="kpi-icon">⚙️</div>
-                    <div class="kpi-content">
-                        <h3>Taux Post-traitement</h3>
-                        <p class="kpi-value" id="kpi-post-traitement">70.8%</p>
-                    </div>
-                </div>
-                <div class="kpi-card" data-tooltip="Pourcentage de parcelles validées après post-traitement">
-                    <div class="kpi-icon">✅</div>
-                    <div class="kpi-content">
-                        <h3>Taux OK Post-traitement</h3>
-                        <p class="kpi-value" id="kpi-ok-post-traitement">82.7%</p>
-                    </div>
-                </div>
-                <div class="kpi-card" data-tooltip="Parcelles inventoriées dans la forêt de Gouloumbou à Netteboulou">
-                    <div class="kpi-icon">⚠️</div>
-                    <div class="kpi-content">
-                        <h3>Parcelles en Quarantaine</h3>
-                        <p class="kpi-value" id="kpi-quarantaine">337</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Charts Section -->
-        <section class="charts-section">
-            <h2>Graphiques Interactifs</h2>
-            <div class="charts-grid">
-                <div class="chart-card">
-                    <div class="chart-header">
-                        <h3>Pipeline de Traitement</h3>
-                        <div class="chart-controls">
-                            <button class="btn btn--sm chart-btn" data-action="zoom-in">+</button>
-                            <button class="btn btn--sm chart-btn" data-action="zoom-out">-</button>
-                            <button class="btn btn--sm chart-btn" data-action="reset-zoom">Reset</button>
-                            <button class="btn btn--sm chart-btn" data-action="fullscreen">📱</button>
-                        </div>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="pipelineChart"></canvas>
-                    </div>
-                </div>
-                
-                <div class="chart-card">
-                    <div class="chart-header">
-                        <h3>Comparaison par Commune</h3>
-                        <div class="chart-controls">
-                            <button class="btn btn--sm chart-btn" data-action="zoom-in">+</button>
-                            <button class="btn btn--sm chart-btn" data-action="zoom-out">-</button>
-                            <button class="btn btn--sm chart-btn" data-action="reset-zoom">Reset</button>
-                            <button class="btn btn--sm chart-btn" data-action="fullscreen">📱</button>
-                        </div>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="communesChart"></canvas>
-                    </div>
-                </div>
-                
-                <div class="chart-card">
-                    <div class="chart-header">
-                        <h3>Taux de Performance</h3>
-                        <div class="chart-controls">
-                            <button class="btn btn--sm chart-btn" data-action="zoom-in">+</button>
-                            <button class="btn btn--sm chart-btn" data-action="zoom-out">-</button>
-                            <button class="btn btn--sm chart-btn" data-action="reset-zoom">Reset</button>
-                            <button class="btn btn--sm chart-btn" data-action="fullscreen">📱</button>
-                        </div>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="performanceChart"></canvas>
-                    </div>
-                </div>
-                
-                <div class="chart-card">
-                    <div class="chart-header">
-                        <h3>Répartition des Parcelles</h3>
-                        <div class="chart-controls">
-                            <button class="btn btn--sm chart-btn" data-action="zoom-in">+</button>
-                            <button class="btn btn--sm chart-btn" data-action="zoom-out">-</button>
-                            <button class="btn btn--sm chart-btn" data-action="reset-zoom">Reset</button>
-                            <button class="btn btn--sm chart-btn" data-action="fullscreen">📱</button>
-                        </div>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="repartitionChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Table Section -->
-        <section class="table-section">
-            <div class="table-header">
-                <h2>Données Détaillées par Commune</h2>
-                <div class="table-controls">
-                    <input type="text" id="searchTable" class="form-control" placeholder="Rechercher dans le tableau...">
-                    <button class="btn btn--secondary" id="exportBtn">Exporter CSV</button>
-                </div>
-            </div>
-            
-            <div class="table-container">
-                <table id="communeTable">
-                    <thead>
-                        <tr>
-                            <th class="sortable" data-column="commune" data-tooltip="Nom de la commune dans la région de Boundou">Commune</th>
-                            <th class="sortable" data-column="parcelles_brutes" data-tooltip="Nombre total de parcelles dans l'inventaire initial avant traitement">Parcelles Brutes</th>
-                            <th class="sortable" data-column="parcelles_sans_doublons" data-tooltip="Parcelles restantes après suppression des doublons identifiés">Sans Doublons</th>
-                            <th class="sortable" data-column="parcelles_post_traitees" data-tooltip="Parcelles ayant subi le processus de post-traitement">Post-traitées</th>
-                            <th class="sortable" data-column="parcelles_ok_post_traitement" data-tooltip="Parcelles okay pour la jointure">OK Post-traitement</th>
-                            <th class="sortable" data-column="parcelles_restantes" data-tooltip="Parcelles envoyées et non post-traitées ou transmises à l'URM">Restantes</th>
-                            <th class="sortable" data-column="parcelles_jointure_ok" data-tooltip="Parcelles dont la jointure a marché">Jointure OK</th>
-                            <th class="sortable" data-column="parcelles_jointure_pas_ok" data-tooltip="Parcelles dont la jointure n'a pas marché (enquêtes non soumises ou supprimées par erreur - nécessitent une nouvelle enquête socio-foncière)">Jointure PAS OK</th>
-                            <th class="sortable" data-column="parcelles_quarantaines" data-tooltip="Parcelles inventoriées dans la forêt de Gouloumbou à Netteboulou">Quarantaines</th>
-                            <th class="sortable" data-column="taux_jointure_ok" data-tooltip="Pourcentage de parcelles dont la jointure a réussi">Taux Jointure</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody">
-                        <!-- Data will be populated by JavaScript -->
-                    </tbody>
-                </table>
-            </div>
-            
-            <div class="table-pagination">
-                <div class="pagination-info">
-                    <span id="paginationInfo">Affichage de 0 à 0 sur 0 entrées</span>
-                </div>
-                <div class="pagination-controls">
-                    <button class="btn btn--sm" id="prevPage">Précédent</button>
-                    <span id="pageNumbers"></span>
-                    <button class="btn btn--sm" id="nextPage">Suivant</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- Légende -->
-        <section class="legend-section">
-            <h2>Légende et Définitions</h2>
-            <div class="legend-grid">
-                <div class="legend-item">
-                    <strong>Parcelles Quarantaines:</strong> Parcelles inventoriées dans la forêt de Gouloumbou à Netteboulou
-                </div>
-                <div class="legend-item">
-                    <strong>Parcelles OK Post-traitement:</strong> Parcelles okay pour la jointure
-                </div>
-                <div class="legend-item">
-                    <strong>Parcelles Restantes:</strong> Parcelles envoyées et non post-traitées ou transmises à l'URM
-                </div>
-                <div class="legend-item">
-                    <strong>Parcelles Jointure OK:</strong> Parcelles dont la jointure a marché
-                </div>
-                <div class="legend-item">
-                    <strong>Parcelles Jointure PAS OK:</strong> Parcelles dont la jointure n'a pas marché (enquêtes non soumises ou supprimées par erreur - nécessitent une nouvelle enquête socio-foncière)
-                </div>
-            </div>
-        </section>
-
-        <!-- Footer -->
-        <footer class="dashboard-footer">
-            <p>© 2025 - Dashboard Interactif Inventaire Foncier Boundou - Données au 02 Juillet 2025</p>
-        </footer>
-    </div>
-
-    <!-- Fullscreen Modal -->
-    <div id="fullscreenModal" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="modalTitle">Graphique en Plein Écran</h3>
-                <button class="btn btn--sm" id="closeModal">×</button>
-            </div>
-            <div class="modal-body">
-                <canvas id="fullscreenChart"></canvas>
-            </div>
+    <section class="filters-panel card">
+      <h3>Système de Filtres</h3>
+      <div class="filters-row">
+        <div class="filter-group">
+          <label class="form-label" for="communeFilter">Commune</label>
+          <select id="communeFilter" class="form-control" multiple>
+            <option value="all">Toutes les communes</option>
+          </select>
         </div>
+        <div class="filter-group">
+          <label class="form-label" for="seuilFilter">Seuil Min. Parcelles</label>
+          <input type="range" id="seuilFilter" class="form-control" min="0" max="12000" value="0">
+          <span id="seuilValue">0</span>
+        </div>
+        <div class="filter-group">
+          <label class="form-label" for="performanceFilter">Niveau de Performance</label>
+          <select id="performanceFilter" class="form-control">
+            <option value="all">Tous</option>
+            <option value="high">Élevé (>20%)</option>
+            <option value="medium">Moyen (10-20%)</option>
+            <option value="low">Faible (<10%)</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label class="form-label">Problèmes</label>
+          <div class="problem-filters">
+            <label class="checkbox-label">
+              <input type="checkbox" id="quarantineFilter"> Quarantaines
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="jointureFilter"> Échecs Jointure
+            </label>
+          </div>
+        </div>
+        <div class="filter-group filter-actions">
+          <button id="applyFilters" class="btn btn--primary">Appliquer</button>
+          <button id="resetFilters" class="btn btn--outline">Réinitialiser</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="kpi-section">
+      <div class="kpi-grid">
+        <div class="kpi-card card">
+          <span class="kpi-icon">📊</span>
+          <div class="kpi-content">
+            <h3>Total Parcelles Brutes</h3>
+            <p class="kpi-value" id="kpi-brutes">51,799</p>
+          </div>
+        </div>
+        <div class="kpi-card card">
+          <span class="kpi-icon">🏘️</span>
+          <div class="kpi-content">
+            <h3>Total Communes</h3>
+            <p class="kpi-value" id="kpi-communes">11</p>
+          </div>
+        </div>
+        <div class="kpi-card card">
+          <span class="kpi-icon">🔄</span>
+          <div class="kpi-content">
+            <h3>Taux de Dédoublonnage</h3>
+            <p class="kpi-value" id="kpi-dedoublonnage">50.5%</p>
+          </div>
+        </div>
+        <div class="kpi-card card">
+          <span class="kpi-icon">⚙️</span>
+          <div class="kpi-content">
+            <h3>Taux Post-traitement</h3>
+            <p class="kpi-value" id="kpi-post-traitement">70.8%</p>
+          </div>
+        </div>
+        <div class="kpi-card card">
+          <span class="kpi-icon">✅</span>
+          <div class="kpi-content">
+            <h3>Taux OK Post-traitement</h3>
+            <p class="kpi-value" id="kpi-ok-post-traitement">82.7%</p>
+          </div>
+        </div>
+        <div class="kpi-card card">
+          <span class="kpi-icon">⚠️</span>
+          <div class="kpi-content">
+            <h3>Parcelles en Quarantaine</h3>
+            <p class="kpi-value" id="kpi-quarantaine">337</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="charts-section">
+      <h2>Graphiques Interactifs</h2>
+      <div class="charts-grid">
+        <div class="chart-card card">
+          <div class="chart-header">
+            <h3>Pipeline de Traitement</h3>
+            <div class="chart-controls">
+              <button class="btn btn--sm chart-btn" data-action="zoom-in">+</button>
+              <button class="btn btn--sm chart-btn" data-action="zoom-out">-</button>
+              <button class="btn btn--sm chart-btn" data-action="reset-zoom">Reset</button>
+              <button class="btn btn--sm chart-btn" data-action="fullscreen">📱</button>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="pipelineChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card card">
+          <div class="chart-header">
+            <h3>Comparaison par Commune</h3>
+            <div class="chart-controls">
+              <button class="btn btn--sm chart-btn" data-action="zoom-in">+</button>
+              <button class="btn btn--sm chart-btn" data-action="zoom-out">-</button>
+              <button class="btn btn--sm chart-btn" data-action="reset-zoom">Reset</button>
+              <button class="btn btn--sm chart-btn" data-action="fullscreen">📱</button>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="communesChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card card">
+          <div class="chart-header">
+            <h3>Taux de Performance</h3>
+            <div class="chart-controls">
+              <button class="btn btn--sm chart-btn" data-action="zoom-in">+</button>
+              <button class="btn btn--sm chart-btn" data-action="zoom-out">-</button>
+              <button class="btn btn--sm chart-btn" data-action="reset-zoom">Reset</button>
+              <button class="btn btn--sm chart-btn" data-action="fullscreen">📱</button>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="performanceChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card card">
+          <div class="chart-header">
+            <h3>Répartition des Parcelles</h3>
+            <div class="chart-controls">
+              <button class="btn btn--sm chart-btn" data-action="zoom-in">+</button>
+              <button class="btn btn--sm chart-btn" data-action="zoom-out">-</button>
+              <button class="btn btn--sm chart-btn" data-action="reset-zoom">Reset</button>
+              <button class="btn btn--sm chart-btn" data-action="fullscreen">📱</button>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="repartitionChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="table-section">
+      <div class="table-header">
+        <h2>Données Détaillées par Commune</h2>
+        <div class="table-controls">
+          <input type="text" id="searchTable" class="form-control" placeholder="Rechercher...">
+          <button id="exportBtn" class="btn btn--primary">Exporter CSV</button>
+        </div>
+      </div>
+      <div class="table-container card">
+        <table id="communeTable">
+          <thead>
+            <tr>
+              <th data-column="commune" class="sortable" data-tooltip="Nom de la commune">Commune</th>
+              <th data-column="parcelles_brutes" class="sortable" data-tooltip="Nombre total de parcelles brutes">Parcelles Brutes</th>
+              <th data-column="parcelles_sans_doublons" class="sortable" data-tooltip="Parcelles après dédoublonnage">Sans Doublons</th>
+              <th data-column="parcelles_post_traitees" class="sortable" data-tooltip="Parcelles après traitement">Post-traitées</th>
+              <th data-column="parcelles_ok_post_traitement" class="sortable" data-tooltip="Parcelles validées après traitement">OK Post-traitement</th>
+              <th data-column="parcelles_restantes" class="sortable" data-tooltip="Parcelles non traitées ou en attente">Restantes</th>
+              <th data-column="parcelles_jointure_ok" class="sortable" data-tooltip="Parcelles avec jointure réussie">Jointure OK</th>
+              <th data-column="parcelles_jointure_pas_ok" class="sortable" data-tooltip="Parcelles avec jointure échouée">Jointure PAS OK</th>
+              <th data-column="parcelles_quarantaines" class="sortable" data-tooltip="Parcelles en quarantaine">Quarantaines</th>
+              <th data-column="taux_jointure_ok" class="sortable" data-tooltip="Pourcentage de jointures réussies">Taux Jointure</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+      <div class="table-pagination">
+        <span id="paginationInfo">Affichage de 0 à 0 sur 0 entrées</span>
+        <div class="pagination-controls">
+          <button id="prevPage" class="btn page-btn">Précédent</button>
+          <div id="pageNumbers"></div>
+          <button id="nextPage" class="btn page-btn">Suivant</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="legend-section card">
+      <h2>Légende et Définitions</h2>
+      <div class="legend-grid">
+        <div class="legend-item">
+          <strong>Parcelles Quarantaines:</strong> Parcelles inventoriées dans la forêt de Gouloumbou à Netteboulou
+        </div>
+        <div class="legend-item">
+          <strong>Parcelles OK Post-traitement:</strong> Parcelles validées pour la jointure
+        </div>
+        <div class="legend-item">
+          <strong>Parcelles Restantes:</strong> Parcelles envoyées et non post-traitées ou transmises à l'URM
+        </div>
+        <div class="legend-item">
+          <strong>Parcelles Jointure OK:</strong> Parcelles dont la jointure a réussi
+        </div>
+        <div class="legend-item">
+          <strong>Parcelles Jointure PAS OK:</strong> Parcelles dont la jointure a échoué (enquêtes non soumises ou supprimées par erreur - nécessitent une nouvelle enquête socio-foncière)
+        </div>
+      </div>
+    </section>
+
+    <footer class="dashboard-footer">
+      <p>© 2025 - Dashboard Interactif Inventaire Foncier Boundou - Données au 02 Juillet 2025</p>
+    </footer>
+  </div>
+
+  <div id="fullscreenModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modalTitle">Graphique en Plein Écran</h3>
+        <button id="closeModal" class="btn btn--sm">×</button>
+      </div>
+      <div class="modal-body">
+        <canvas id="fullscreenChart"></canvas>
+      </div>
     </div>
+  </div>
 
-    <!-- Tooltip -->
-    <div id="tooltip" class="tooltip hidden"></div>
+  <div id="notifications" class="notifications"></div>
+  <div id="tooltip" class="tooltip hidden"></div>
 
-    <!-- Notifications -->
-    <div id="notifications" class="notifications"></div>
-
-    <script src="app.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
