@@ -42,7 +42,7 @@ let rowsPerPage = 10;
 let searchTerm = '';
 
 // Color scheme for charts
-const colors = ['#0ea5e9', '#f59e0b', '#ef4444', '#10b981', '#8b5cf6', '#ec4899', '#facc15', '#6b7280', '#22c55e', '#3b82f6'];
+const colors = ['#4ade80', '#22d3ee', '#f472b6', '#34d399', '#f87171', '#fbbf24', '#6b7280', '#e2e8f0', '#94a3b8', '#3b82f6'];
 
 // Initialize the dashboard
 document.addEventListener('DOMContentLoaded', initializeDashboard);
@@ -60,8 +60,21 @@ function initializeDashboard() {
   initializeTooltips();
   initializeExport();
   initializeModal();
+  initializeSidebarToggle();
   updateKPIs();
   showNotification('Dashboard chargé avec succès!', 'success');
+}
+
+// Initialize sidebar toggle for mobile
+function initializeSidebarToggle() {
+  const sidebar = document.querySelector('.sidebar');
+  const hamburger = document.createElement('button');
+  hamburger.className = 'btn btn--primary btn--sm hamburger';
+  hamburger.textContent = '☰';
+  sidebar.parentElement.insertBefore(hamburger, sidebar);
+  hamburger.addEventListener('click', () => {
+    sidebar.classList.toggle('open');
+  });
 }
 
 // Initialize filters
@@ -235,13 +248,13 @@ function createPerformanceChart() {
       datasets: [{
         label: 'Taux de Jointure (%)',
         data: [],
-        backgroundColor: 'rgba(14, 165, 233, 0.2)',
-        borderColor: colors[0],
+        backgroundColor: 'rgba(34, 211, 238, 0.2)',
+        borderColor: colors[1],
         borderWidth: 2,
-        pointBackgroundColor: colors[0],
+        pointBackgroundColor: colors[1],
         pointBorderColor: '#fff',
         pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: colors[0]
+        pointHoverBorderColor: colors[1]
       }]
     },
     options: {
