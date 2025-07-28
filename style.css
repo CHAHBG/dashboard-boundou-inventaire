@@ -1,20 +1,20 @@
-/* Modern Explorative Dashboard Styles for Boundou */
+/* Soft Nature-Inspired Dashboard Styles for Boundou */
 
 /* Define CSS custom properties */
 :root {
-  /* Color Palette */
-  --color-primary: #4ade80; /* Vibrant green for nature/land theme */
-  --color-secondary: #22d3ee; /* Bright cyan for exploration */
-  --color-accent: #f472b6; /* Playful pink for highlights */
-  --color-background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); /* Dark gradient sky */
-  --color-surface: rgba(255, 255, 255, 0.05); /* Translucent cards */
-  --color-text: #e2e8f0; /* Light text for contrast */
-  --color-text-secondary: #94a3b8; /* Subtle secondary text */
-  --color-border: rgba(255, 255, 255, 0.1); /* Faint border */
-  --color-shadow: rgba(0, 0, 0, 0.3); /* Soft shadow */
-  --color-success: #34d399; /* Success green */
-  --color-error: #f87171; /* Error red */
-  --color-warning: #fbbf24; /* Warning yellow */
+  /* Soft Color Palette */
+  --color-primary: #8A9A5B; /* Muted green */
+  --color-secondary: #A3BFFA; /* Light blue */
+  --color-accent: #D4A373; /* Warm beige */
+  --color-background: linear-gradient(135deg, #F5F5F0 0%, #E0E7E9 100%); /* Soft gradient */
+  --color-surface: rgba(255, 255, 245, 0.1); /* Light translucent cards */
+  --color-text: #4A4E69; /* Dark muted text */
+  --color-text-secondary: #9BA4B5; /* Light gray text */
+  --color-border: rgba(74, 78, 105, 0.2); /* Faint border */
+  --color-shadow: rgba(0, 0, 0, 0.1); /* Very soft shadow */
+  --color-success: #A3B18A; /* Soft success green */
+  --color-error: #DDA0DD; /* Soft lavender for errors */
+  --color-warning: #E9B872; /* Soft yellow */
 
   /* Typography */
   --font-family-base: 'Poppins', sans-serif;
@@ -80,7 +80,7 @@ body {
 
 .sidebar {
   width: var(--sidebar-width);
-  background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.9));
+  background: linear-gradient(135deg, rgba(160, 191, 165, 0.9), rgba(163, 191, 250, 0.9));
   padding: var(--space-6);
   position: sticky;
   top: 0;
@@ -120,7 +120,7 @@ body {
   font-size: var(--font-size-3xl);
   font-weight: var(--font-weight-bold);
   color: var(--color-text);
-  text-shadow: 0 0 var(--space-1) rgba(0, 0, 0, 0.2);
+  text-shadow: 0 0 var(--space-1) rgba(0, 0, 0, 0.1);
 }
 
 .dashboard-header .date {
@@ -153,13 +153,31 @@ body {
   display: grid;
   grid-template-columns: 1fr;
   gap: var(--space-4);
-  align-items: flex-end;
+  align-items: flex-start;
 }
 
 .filter-group {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+}
+
+.commune-filters {
+  max-height: 150px;
+  overflow-y: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2);
+  background: rgba(255, 255, 245, 0.05);
+}
+
+.commune-filters label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  margin-bottom: var(--space-1);
 }
 
 .form-label {
@@ -169,7 +187,7 @@ body {
 }
 
 .form-control {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 245, 0.1);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   padding: var(--space-2) var(--space-3);
@@ -251,7 +269,7 @@ body {
   padding: var(--space-4);
   text-align: center;
   border-radius: var(--radius-md);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.05));
+  background: linear-gradient(135deg, rgba(255, 255, 245, 0.03), rgba(255, 255, 245, 0.05));
 }
 
 .kpi-icon {
@@ -337,7 +355,7 @@ body {
 }
 
 #communeTable th {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 245, 0.05);
   font-weight: var(--font-weight-medium);
   position: sticky;
   top: 0;
@@ -393,7 +411,7 @@ body {
 
 .legend-item {
   padding: var(--space-3);
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 245, 0.03);
   border-radius: var(--radius-md);
 }
 
@@ -416,7 +434,7 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(74, 78, 105, 0.3);
   cursor: pointer;
 }
 
@@ -487,7 +505,7 @@ body {
 .dashboard-footer {
   text-align: center;
   padding: var(--space-4);
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 245, 0.03);
   border-radius: var(--radius-md);
   margin-top: var(--space-8);
 }
