@@ -256,10 +256,25 @@ function openFullscreenChart(chart) {
   if (modal.fullscreenChart) modal.fullscreenChart.destroy();
   modalTitle.textContent = `Graphique en Plein Écran - ${chart.options.plugins?.title?.text || 'Graphique'}`;
   modal.classList.remove('hidden');
-  modal.fullscreenChart = new Chart(fullscreenCanvas, { type: chart.config.type, data: JSON.parse(JSON.stringify(chart.data)), options: { ...chart.options, responsive: true, maintainAspectRatio: false, aspectRatio: 1.5 } });
+  modal.fullscreenChart = new Chart(fullscreenCanvas, {
+    type: chart.config.type,
+    data: JSON.parse(JSON.stringify(chart.data)),
+    options: {
+      ...chart.options,
+      responsive: true,
+      maintainAspectRatio: false,
+      aspectRatio: 1.5,
+      plugins: { ...chart.options.plugins, title: { display: true, text: modalTitle.textContent } }
+    }
+  });
+  modal.fullscreenChart.update();
 }
 
-function closeModal() { const modal = document.getElementById('fullscreenModal'); if (modal.fullscreenChart) { modal.fullscreenChart.destroy(); modal.fullscreenChart = null; } modal.classList.add('hidden'); }
+function closeModal() {
+  const modal = document.getElementById('fullscreenModal');
+  if (modal.fullscreenChart) { modal.fullscreenChart.destroy(); modal.fullscreenChart = null; }
+  modal.classList.add('hidden');
+}
 
 function showNotification(message, type = 'info') {
   const notif = document.createElement('div'); notif.className = `notification ${type}`; notif.textContent = message;
