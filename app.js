@@ -1,696 +1,1393 @@
-// Optimized Dashboard JS for Boundou Land Inventory
+// Dashboard EDL Post-Traitement - Application JavaScript
 
-async function loadData() {
+// Données EDL Post-Traitement (chargées depuis le fichier JSON)
+const EDL_DATA = [
+  {"commune": "Bala", "donnees_brutes": 912, "sans_doublons_attributaire_et_geometriqu": 907, "post_traitees": 842, "valideespar_urm_nicad": 0},
+  {"commune": "Ballou", "donnees_brutes": 1551, "sans_doublons_attributaire_et_geometriqu": 659, "post_traitees": 1964, "valideespar_urm_nicad": 1294},
+  {"commune": "Bandafassi", "donnees_brutes": 11731, "sans_doublons_attributaire_et_geometriqu": 3832, "post_traitees": 4121, "valideespar_urm_nicad": 2883},
+  {"commune": "Bembou", "donnees_brutes": 5885, "sans_doublons_attributaire_et_geometriqu": 2083, "post_traitees": 2024, "valideespar_urm_nicad": 1805},
+  {"commune": "Dimboli", "donnees_brutes": 6474, "sans_doublons_attributaire_et_geometriqu": 3075, "post_traitees": 3014, "valideespar_urm_nicad": 2852},
+  {"commune": "Dindefello", "donnees_brutes": 5725, "sans_doublons_attributaire_et_geometriqu": 1845, "post_traitees": 2124, "valideespar_urm_nicad": 492},
+  {"commune": "Fongolembi", "donnees_brutes": 5001, "sans_doublons_attributaire_et_geometriqu": 1542, "post_traitees": 1579, "valideespar_urm_nicad": 1374},
+  {"commune": "Gabou", "donnees_brutes": 1999, "sans_doublons_attributaire_et_geometriqu": 947, "post_traitees": 1633, "valideespar_urm_nicad": 1609},
+  {"commune": "Koar", "donnees_brutes": 101, "sans_doublons_attributaire_et_geometriqu": 93, "post_traitees": 92, "valideespar_urm_nicad": 0},
+  {"commune": "Missirah", "donnees_brutes": 7371, "sans_doublons_attributaire_et_geometriqu": 5383, "post_traitees": 5905, "valideespar_urm_nicad": 3261},
+  {"commune": "Moudery", "donnees_brutes": 1009, "sans_doublons_attributaire_et_geometriqu": 4973, "post_traitees": 1006, "valideespar_urm_nicad": 983},
+  {"commune": "Ndoga Babacar", "donnees_brutes": 4759, "sans_doublons_attributaire_et_geometriqu": 2451, "post_traitees": 4035, "valideespar_urm_nicad": 2604},
+  {"commune": "Netteboulou", "donnees_brutes": 3919, "sans_doublons_attributaire_et_geometriqu": 1775, "post_traitees": 2564, "valideespar_urm_nicad": 2026},
+  {"commune": "Sinthiou Maleme", "donnees_brutes": 2449, "sans_doublons_attributaire_et_geometriqu": 1391, "post_traitees": 0, "valideespar_urm_nicad": 0},
+  {"commune": "Tomboronkoto", "donnees_brutes": 56834, "sans_doublons_attributaire_et_geometriqu": 10674, "post_traitees": 9236, "valideespar_urm_nicad": 2330}
+];
+
+// Constantes de l'application
+const QUARANTINE_PARCELS = 337; // Parcelles en quarantaine à Netteboulou
+const COLORS = {
+  primary: '#2E8B57',
+  secondary: '#4682B4',
+  accent: '#CD853F',
+  success: '#228B22',
+  warning: '#FF8C00',
+  error: '#DC143C',
+  info: '#1E90FF',
+  chart: ['#2E8B57', '#4682B4', '#CD853F', '#228B22', '#FF8C00', '#DC143C', '#1E90FF', '#32CD32', '#FF6347', '#9370DB']
+};
+
+// Variables globales
+let charts = {};
+let filteredData = [...EDL_DATA];
+let currentSort = { column: null, direction: 'asc' };
+let currentPage = 1;
+let rowsPerPage = 10;
+let searchTerm = '';
+
+// Initialisation de l'application
+document.addEventListener('DOMContentLoaded', function() {
+  // Vérifier si Chart.js est chargé
+  if (typeof Chart === 'undefined') {
+    console.error('Chart.js n\'est pas chargé');
+    setTimeout(() => window.location.reload(), 1000);
+    return;
+  }
+
+  // Enregistrer les plugins Chart.js
   try {
-    const response = await fetch('dashboard_data_complete.json');
-    if (!response.ok) throw new Error('Failed to load data');
-    return await response.json();
+    Chart.register(ChartZoom);
   } catch (error) {
-    console.error('Error loading data:', error);
-    showNotification('Erreur lors du chargement des données. Utilisation des données par défaut.', 'error');
-    // Fallback to hard-coded data if fetch fails
-    return {
-      "kpi_data": {
-        "total_parcelles_brutes": 115720,
-        "total_parcelles_sans_doublons": 41293,
-        "total_parcelles_post_traitees": 40139,
-        "total_parcelles_ok_post_traitement": 40139,
-        "total_parcelles_quarantaines": 337,
-        "total_jointure_ok": 23513,
-        "total_jointure_pas_ok": 16626,
-        "total_parcelles_restantes": 1491,
-        "total_retour_urm": 0,
-        "total_communes": 15,
-        "taux_dedoublonnage": 35.7,
-        "taux_post_traitement": 97.2,
-        "taux_ok_post_traitement": 100.0,
-        "taux_jointure_ok": 58.6
-      },
-      "communes_data": [
-        {
-          "Commune": "Bala",
-          "parcelles_brutes": 912,
-          "parcelles_sans_doublons": 907,
-          "parcelles_post_traitees": 842,
-          "retour_urm": 0,
-          "parcelles_non_traitees": 65,
-          "parcelles_intersectees_nicad": 0,
-          "parcelles_restantes": 65,
-          "parcelles_sans_idup": 0,
-          "parcelles_ok_post_traitement": 842,
-          "parcelles_jointure_ok": 0,
-          "parcelles_jointure_pas_ok": 842,
-          "parcelles_quarantaines": 0,
-          "taux_dedoublonnage": 99.5,
-          "taux_post_traitement": 92.8,
-          "taux_ok_post_traitement": 100.0,
-          "taux_jointure_ok": 0.0
-        },
-        {
-          "Commune": "Ballou",
-          "parcelles_brutes": 1551,
-          "parcelles_sans_doublons": 659,
-          "parcelles_post_traitees": 1964,
-          "retour_urm": 0,
-          "parcelles_non_traitees": 0,
-          "parcelles_intersectees_nicad": 0,
-          "parcelles_restantes": 0,
-          "parcelles_sans_idup": 0,
-          "parcelles_ok_post_traitement": 1964,
-          "parcelles_jointure_ok": 1294,
-          "parcelles_jointure_pas_ok": 670,
-          "parcelles_quarantaines": 0,
-          "taux_dedoublonnage": 42.5,
-          "taux_post_traitement": 298.0,
-          "taux_ok_post_traitement": 100.0,
-          "taux_jointure_ok": 65.9
-        },
-        {
-          "Commune": "Bandafassi",
-          "parcelles_brutes": 11731,
-          "parcelles_sans_doublons": 3832,
-          "parcelles_post_traitees": 4121,
-          "retour_urm": 0,
-          "parcelles_non_traitees": 0,
-          "parcelles_intersectees_nicad": 0,
-          "parcelles_restantes": 0,
-          "parcelles_sans_idup": 0,
-          "parcelles_ok_post_traitement": 4121,
-          "parcelles_jointure_ok": 2883,
-          "parcelles_jointure_pas_ok": 1238,
-          "parcelles_quarantaines": 0,
-          "taux_dedoublonnage": 32.7,
-          "taux_post_traitement": 107.5,
-          "taux_ok_post_traitement": 100.0,
-          "taux_jointure_ok": 70.0
-        },
-        {
-          "Commune": "Bembou",
-          "parcelles_brutes": 5885,
-          "parcelles_sans_doublons": 2083,
-          "parcelles_post_traitees": 2024,
-          "retour_urm": 0,
-          "parcelles_non_traitees": 59,
-          "parcelles_intersectees_nicad": 0,
-          "parcelles_restantes": 59,
-          "parcelles_sans_idup": 0,
-          "parcelles_ok_post_traitement": 2024,
-          "parcelles_jointure_ok": 1805,
-          "parcelles_jointure_pas_ok": 219,
-          "parcelles_quarantaines": 0,
-          "taux_dedoublonnage": 35.4,
-          "taux_post_traitement": 97.2,
-          "taux_ok_post_traitement": 100.0,
-          "taux_jointure_ok": 89.2
-        },
-        {
-          "Commune": "Dimboli",
-          "parcelles_brutes": 6474,
-          "parcelles_sans_doublons": 3075,
-          "parcelles_post_traitees": 3014,
-          "retour_urm": 0,
-          "parcelles_non_traitees": 61,
-          "parcelles_intersectees_nicad": 0,
-          "parcelles_restantes": 61,
-          "parcelles_sans_idup": 0,
-          "parcelles_ok_post_traitement": 3014,
-          "parcelles_jointure_ok": 2852,
-          "parcelles_jointure_pas_ok": 162,
-          "parcelles_quarantaines": 0,
-          "taux_dedoublonnage": 47.5,
-          "taux_post_traitement": 98.0,
-          "taux_ok_post_traitement": 100.0,
-          "taux_jointure_ok": 94.6
-        },
-        {
-          "Commune": "Dindefello",
-          "parcelles_brutes": 5725,
-          "parcelles_sans_doublons": 1845,
-          "parcelles_post_traitees": 2124,
-          "retour_urm": 0,
-          "parcelles_non_traitees": 0,
-          "parcelles_intersectees_nicad": 0,
-          "parcelles_restantes": 0,
-          "parcelles_sans_idup": 0,
-          "parcelles_ok_post_traitement": 2124,
-          "parcelles_jointure_ok": 492,
-          "parcelles_jointure_pas_ok": 1632,
-          "parcelles_quarantaines": 0,
-          "taux_dedoublonnage": 32.2,
-          "taux_post_traitement": 115.1,
-          "taux_ok_post_traitement": 100.0,
-          "taux_jointure_ok": 23.2
-        },
-        {
-          "Commune": "Fongolembi",
-          "parcelles_brutes": 5001,
-          "parcelles_sans_doublons": 1542,
-          "parcelles_post_traitees": 1579,
-          "retour_urm": 0,
-          "parcelles_non_traitees": 0,
-          "parcelles_intersectees_nicad": 0,
-          "parcelles_restantes": 0,
-          "parcelles_sans_idup": 0,
-          "parcelles_ok_post_traitement": 1579,
-          "parcelles_jointure_ok": 1374,
-          "parcelles_jointure_pas_ok": 205,
-          "parcelles_quarantaines": 0,
-          "taux_dedoublonnage": 30.8,
-          "taux_post_traitement": 102.4,
-          "taux_ok_post_traitement": 100.0,
-          "taux_jointure_ok": 87.0
-        },
-        {
-          "Commune": "Gabou",
-          "parcelles_brutes": 1999,
-          "parcelles_sans_doublons": 947,
-          "parcelles_post_traitees": 1633,
-          "retour_urm": 0,
-          "parcelles_non_traitees": 0,
-          "parcelles_intersectees_nicad": 0,
-          "parcelles_restantes": 0,
-          "parcelles_sans_idup": 0,
-          "parcelles_ok_post_traitement": 1633,
-          "parcelles_jointure_ok": 1609,
-          "parcelles_jointure_pas_ok": 24,
-          "parcelles_quarantaines": 0,
-          "taux_dedoublonnage": 47.4,
-          "taux_post_traitement": 172.4,
-          "taux_ok_post_traitement": 100.0,
-          "taux_jointure_ok": 98.5
-        },
-        {
-          "Commune": "Koar",
-          "parcelles_brutes": 101,
-          "parcelles_sans_doublons": 93,
-          "parcelles_post_traitees": 92,
-          "retour_urm": 0,
-          "parcelles_non_traitees": 1,
-          "parcelles_intersectees_nicad": 0,
-          "parcelles_restantes": 1,
-          "parcelles_sans_idup": 0,
-          "parcelles_ok_post_traitement": 92,
-          "parcelles_jointure_ok": 0,
-          "parcelles_jointure_pas_ok": 92,
-          "parcelles_quarantaines": 0,
-          "taux_dedoublonnage": 92.1,
-          "taux_post_traitement": 98.9,
-          "taux_ok_post_traitement": 100.0,
-          "taux_jointure_ok": 0.0
-        },
-        {
-          "Commune": "Missirah",
-          "parcelles_brutes": 7371,
-          "parcelles_sans_doublons": 5383,
-          "parcelles_post_traitees": 5905,
-          "retour_urm": 0,
-          "parcelles_non_traitees": 0,
-          "parcelles_intersectees_nicad": 0,
-          "parcelles_restantes": 0,
-          "parcelles_sans_idup": 0,
-          "parcelles_ok_post_traitement": 5905,
-          "parcelles_jointure_ok": 3261,
-          "parcelles_jointure_pas_ok": 2644,
-          "parcelles_quarantaines": 0,
-          "taux_dedoublonnage": 73.0,
-          "taux_post_traitement": 109.7,
-          "taux_ok_post_traitement": 100.0,
-          "taux_jointure_ok": 55.2
-        },
-        {
-          "Commune": "Moudery",
-          "parcelles_brutes": 1009,
-          "parcelles_sans_doublons": 4973,
-          "parcelles_post_traitees": 1006,
-          "retour_urm": 0,
-          "parcelles_non_traitees": 3967,
-          "parcelles_intersectees_nicad": 0,
-          "parcelles_restantes": 3967,
-          "parcelles_sans_idup": 0,
-          "parcelles_ok_post_traitement": 1006,
-          "parcelles_jointure_ok": 983,
-          "parcelles_jointure_pas_ok": 23,
-          "parcelles_quarantaines": 0,
-          "taux_dedoublonnage": 492.9,
-          "taux_post_traitement": 20.2,
-          "taux_ok_post_traitement": 100.0,
-          "taux_jointure_ok": 97.7
-        },
-        {
-          "Commune": "Ndoga Babacar",
-          "parcelles_brutes": 4759,
-          "parcelles_sans_doublons": 2451,
-          "parcelles_post_traitees": 4035,
-          "retour_urm": 0,
-          "parcelles_non_traitees": 0,
-          "parcelles_intersectees_nicad": 0,
-          "parcelles_restantes": 0,
-          "parcelles_sans_idup": 0,
-          "parcelles_ok_post_traitement": 4035,
-          "parcelles_jointure_ok": 2604,
-          "parcelles_jointure_pas_ok": 1431,
-          "parcelles_quarantaines": 0,
-          "taux_dedoublonnage": 51.5,
-          "taux_post_traitement": 164.6,
-          "taux_ok_post_traitement": 100.0,
-          "taux_jointure_ok": 64.5
-        },
-        {
-          "Commune": "Netteboulou",
-          "parcelles_brutes": 3919,
-          "parcelles_sans_doublons": 1438,
-          "parcelles_post_traitees": 2564,
-          "retour_urm": 0,
-          "parcelles_non_traitees": 0,
-          "parcelles_intersectees_nicad": 0,
-          "parcelles_restantes": 0,
-          "parcelles_sans_idup": 0,
-          "parcelles_ok_post_traitement": 2564,
-          "parcelles_jointure_ok": 2026,
-          "parcelles_jointure_pas_ok": 538,
-          "parcelles_quarantaines": 337,
-          "taux_dedoublonnage": 36.7,
-          "taux_post_traitement": 178.3,
-          "taux_ok_post_traitement": 100.0,
-          "taux_jointure_ok": 79.0
-        },
-        {
-          "Commune": "Sinthiou Maleme",
-          "parcelles_brutes": 2449,
-          "parcelles_sans_doublons": 1391,
-          "parcelles_post_traitees": 0,
-          "retour_urm": 0,
-          "parcelles_non_traitees": 1391,
-          "parcelles_intersectees_nicad": 0,
-          "parcelles_restantes": 1391,
-          "parcelles_sans_idup": 0,
-          "parcelles_ok_post_traitement": 0,
-          "parcelles_jointure_ok": 0,
-          "parcelles_jointure_pas_ok": 0,
-          "parcelles_quarantaines": 0,
-          "taux_dedoublonnage": 56.8,
-          "taux_post_traitement": 0.0,
-          "taux_ok_post_traitement": 100.0,
-          "taux_jointure_ok": 0.0
-        },
-        {
-          "Commune": "Tomboronkoto",
-          "parcelles_brutes": 56834,
-          "parcelles_sans_doublons": 10674,
-          "parcelles_post_traitees": 9236,
-          "retour_urm": 0,
-          "parcelles_non_traitees": 1438,
-          "parcelles_intersectees_nicad": 0,
-          "parcelles_restantes": 1438,
-          "parcelles_sans_idup": 0,
-          "parcelles_ok_post_traitement": 9236,
-          "parcelles_jointure_ok": 2330,
-          "parcelles_jointure_pas_ok": 6906,
-          "parcelles_quarantaines": 0,
-          "taux_dedoublonnage": 18.8,
-          "taux_post_traitement": 86.5,
-          "taux_ok_post_traitement": 100.0,
-          "taux_jointure_ok": 25.2
-        }
-      ],
-      "pipeline_data": {
-        "labels": [
-          "Parcelles Brutes",
-          "Sans Doublons",
-          "Post-traitées",
-          "OK Post-traitement",
-          "Jointure OK"
-        ],
-        "values": [
-          115720,
-          41293,
-          40139,
-          40139,
-          23513
-        ]
-      },
-      "communes_chart_data": {
-        "communes": [
-          "Bala",
-          "Ballou",
-          "Bandafassi",
-          "Bembou",
-          "Dimboli",
-          "Dindefello",
-          "Fongolembi",
-          "Gabou",
-          "Koar",
-          "Missirah",
-          "Moudery",
-          "Ndoga Babacar",
-          "Netteboulou",
-          "Sinthiou Maleme",
-          "Tomboronkoto"
-        ],
-        "parcelles_brutes": [
-          912,
-          1551,
-          11731,
-          5885,
-          6474,
-          5725,
-          5001,
-          1999,
-          101,
-          7371,
-          1009,
-          4759,
-          3919,
-          2449,
-          56834
-        ],
-        "parcelles_sans_doublons": [
-          907,
-          659,
-          3832,
-          2083,
-          3075,
-          1845,
-          1542,
-          947,
-          93,
-          5383,
-          4973,
-          2451,
-          1438,
-          1391,
-          10674
-        ],
-        "parcelles_post_traitees": [
-          842,
-          1964,
-          4121,
-          2024,
-          3014,
-          2124,
-          1579,
-          1633,
-          92,
-          5905,
-          1006,
-          4035,
-          2564,
-          0,
-          9236
-        ],
-        "parcelles_ok_post_traitement": [
-          842,
-          1964,
-          4121,
-          2024,
-          3014,
-          2124,
-          1579,
-          1633,
-          92,
-          5905,
-          1006,
-          4035,
-          2564,
-          0,
-          9236
-        ],
-        "parcelles_quarantaines": [
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          337,
-          0,
-          0
-        ],
-        "taux_ok_post_traitement": [
-          100.0,
-          100.0,
-          100.0,
-          100.0,
-          100.0,
-          100.0,
-          100.0,
-          100.0,
-          100.0,
-          100.0,
-          100.0,
-          100.0,
-          100.0,
-          100.0,
-          100.0
-        ]
-      },
-      "column_definitions": {
-        "parcelles_quarantaines": "Parcelles inventoriées dans la forêt de Gouloumbou à Netteboulou et mises en quarantaine.",
-        "parcelles_ok_post_traitement": "Parcelles post-traitées (assumées OK).",
-        "parcelles_restantes": "Parcelles envoyées et non post-traitées ou transmises à l'URM.",
-        "parcelles_jointure_ok": "Parcelles dont la jointure a réussi (validées par URM/NICAD).",
-        "parcelles_jointure_pas_ok": "Parcelles dont la jointure a échoué (enquêtes non soumises ou supprimées par erreur - nécessitent une nouvelle enquête socio-foncière)."
-      }
-    };
+    console.warn('Plugin ChartZoom non disponible:', error);
+  }
+
+  // Initialiser le dashboard
+  initializeDashboard();
+});
+
+/**
+ * Initialisation principale du dashboard
+ */
+function initializeDashboard() {
+  try {
+    // Traitement des données
+    processData();
+    
+    // Initialisation des composants
+    initializeFilters();
+    initializeCharts();
+    initializeTable();
+    initializeTooltips();
+    initializeModal();
+    initializeEventHandlers();
+    initializeDarkMode();
+    initializeMobileMenu();
+    
+    // Mise à jour initiale
+    updateAllComponents();
+    
+    // Mise à jour de la date
+    updateLastUpdateTime();
+    
+    showNotification('Dashboard initialisé avec succès!', 'success');
+    
+  } catch (error) {
+    console.error('Erreur lors de l\'initialisation:', error);
+    showNotification('Erreur lors du chargement du dashboard', 'error');
   }
 }
 
-let appData;
-let filteredData = [];
-let charts = {};
-let currentPage = 1;
-const pageSize = 10;
+/**
+ * Traitement et enrichissement des données
+ */
+function processData() {
+  filteredData = EDL_DATA.filter(commune => commune.commune !== 'Total').map(commune => {
+    // Calcul des taux
+    const taux_dedoublonnage = commune.donnees_brutes > 0 ? 
+      (commune.sans_doublons_attributaire_et_geometriqu / commune.donnees_brutes * 100) : 0;
+    
+    const taux_post_traitement = commune.sans_doublons_attributaire_et_geometriqu > 0 ? 
+      (commune.post_traitees / commune.sans_doublons_attributaire_et_geometriqu * 100) : 0;
+    
+    const taux_validation = commune.post_traitees > 0 ? 
+      (commune.valideespar_urm_nicad / commune.post_traitees * 100) : 0;
 
-async function initDashboard() {
-  appData = await loadData();
-  filteredData = appData.communes_data;
-  populateFilters();
-  updateKPIs();
-  createCharts();
-  updateTable();
-  initializeEvents();
-  initializeDarkMode();
-  initializeModal();
-}
+    // Ajout des quarantaines pour Netteboulou
+    const sans_doublons_ajuste = commune.commune === 'Netteboulou' ? 
+      commune.sans_doublons_attributaire_et_geometriqu - QUARANTINE_PARCELS : 
+      commune.sans_doublons_attributaire_et_geometriqu;
 
-function populateFilters() {
-  const communeSelect = document.getElementById('communeFilter');
-  appData.communes_data.forEach(c => {
-    const option = document.createElement('option');
-    option.value = c.Commune;
-    option.textContent = c.Commune;
-    communeSelect.appendChild(option);
+    const quarantaines = commune.commune === 'Netteboulou' ? QUARANTINE_PARCELS : 0;
+
+    return {
+      ...commune,
+      sans_doublons_ajuste,
+      quarantaines,
+      taux_dedoublonnage: Math.round(taux_dedoublonnage * 10) / 10,
+      taux_post_traitement: Math.round(taux_post_traitement * 10) / 10,
+      taux_validation: Math.round(taux_validation * 10) / 10
+    };
   });
 }
 
-function updateKPIs() {
-  const kpi = appData.kpi_data;
-  document.getElementById('totalBrutes').textContent = formatNumber(kpi.total_parcelles_brutes);
-  document.getElementById('totalCommunes').textContent = kpi.total_communes;
-  document.getElementById('tauxDedoublonnage').textContent = `${kpi.taux_dedoublonnage}%`;
-  document.getElementById('tauxPostTraitement').textContent = `${kpi.taux_post_traitement}%`;
-  document.getElementById('tauxOkPostTraitement').textContent = `${kpi.taux_ok_post_traitement}%`;
-  document.getElementById('totalQuarantaines').textContent = formatNumber(kpi.total_parcelles_quarantaines);
+/**
+ * Initialisation des filtres
+ */
+function initializeFilters() {
+  const communeFilters = document.getElementById('communeFilters');
+  const seuilSlider = document.getElementById('seuilFilter');
+  const seuilValue = document.getElementById('seuilValue');
+
+  // Création des checkboxes pour les communes
+  if (communeFilters) {
+    communeFilters.innerHTML = '';
+    filteredData.forEach(commune => {
+      const label = document.createElement('label');
+      label.className = 'checkbox-label';
+      label.innerHTML = `
+        <input type="checkbox" name="commune" value="${commune.commune}">
+        ${commune.commune}
+      `;
+      communeFilters.appendChild(label);
+    });
+  }
+
+  // Événement pour le slider de seuil
+  if (seuilSlider && seuilValue) {
+    seuilSlider.addEventListener('input', () => {
+      seuilValue.textContent = formatNumber(parseInt(seuilSlider.value));
+    });
+  }
+
+  // Événements pour les boutons de filtrage
+  const applyFiltersBtn = document.getElementById('applyFilters');
+  const resetFiltersBtn = document.getElementById('resetFilters');
+
+  if (applyFiltersBtn) {
+    applyFiltersBtn.addEventListener('click', debounce(applyFilters, 300));
+  }
+
+  if (resetFiltersBtn) {
+    resetFiltersBtn.addEventListener('click', resetFilters);
+  }
 }
 
-function createCharts() {
-  const pipelineCtx = document.getElementById('pipelineChart').getContext('2d');
-  charts.pipeline = new Chart(pipelineCtx, {
-    type: 'funnel',
-    data: {
-      labels: appData.pipeline_data.labels,
-      datasets: [{
-        data: appData.pipeline_data.values,
-        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF']
-      }]
-    },
-    options: { responsive: true, maintainAspectRatio: false }
-  });
-
-  const communesCtx = document.getElementById('communesChart').getContext('2d');
-  charts.communes = new Chart(communesCtx, {
-    type: 'bar',
-    data: {
-      labels: appData.communes_chart_data.communes,
-      datasets: [
-        { label: 'Brutes', data: appData.communes_chart_data.parcelles_brutes, backgroundColor: '#FF6384' },
-        { label: 'Sans Doublons', data: appData.communes_chart_data.parcelles_sans_doublons, backgroundColor: '#36A2EB' },
-        { label: 'Post-traitées', data: appData.communes_chart_data.parcelles_post_traitees, backgroundColor: '#FFCE56' }
-      ]
-    },
-    options: { responsive: true, scales: { y: { beginAtZero: true } } }
-  });
-
-  const performanceCtx = document.getElementById('performanceChart').getContext('2d');
-  charts.performance = new Chart(performanceCtx, {
-    type: 'radar',
-    data: {
-      labels: appData.communes_chart_data.communes,
-      datasets: [{
-        label: 'Taux OK Post-traitement',
-        data: appData.communes_chart_data.taux_ok_post_traitement,
-        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-        borderColor: 'rgba(75, 192, 192, 1)'
-      }]
-    },
-    options: { responsive: true }
-  });
-
-  const repartitionCtx = document.getElementById('repartitionChart').getContext('2d');
-  charts.repartition = new Chart(repartitionCtx, {
-    type: 'pie',
-    data: {
-      labels: ['Brutes', 'Sans Doublons', 'Post-traitées', 'Quarantaines'],
-      datasets: [{
-        data: [
-          appData.kpi_data.total_parcelles_brutes,
-          appData.kpi_data.total_parcelles_sans_doublons,
-          appData.kpi_data.total_parcelles_post_traitees,
-          appData.kpi_data.total_parcelles_quarantaines
-        ],
-        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#FF9F40']
-      }]
-    },
-    options: { responsive: true }
-  });
-}
-
-function updateTable() {
-  const tbody = document.querySelector('#dataTable tbody');
-  tbody.innerHTML = '';
-  const start = (currentPage - 1) * pageSize;
-  const end = start + pageSize;
-  const paginatedData = filteredData.slice(start, end);
-  paginatedData.forEach(c => {
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>${c.Commune}</td>
-      <td>${formatNumber(c.parcelles_brutes)}</td>
-      <td>${formatNumber(c.parcelles_sans_doublons)}</td>
-      <td>${formatNumber(c.parcelles_post_traitees)}</td>
-      <td>${formatNumber(c.parcelles_ok_post_traitement)}</td>
-      <td>${formatNumber(c.parcelles_restantes)}</td>
-      <td>${formatNumber(c.parcelles_jointure_ok)}</td>
-      <td>${formatNumber(c.parcelles_jointure_pas_ok)}</td>
-      <td>${formatNumber(c.parcelles_quarantaines)}</td>
-      <td><span class="taux-performance ${getPerformanceClass(c.taux_jointure_ok)}">${c.taux_jointure_ok}%</span></td>
-    `;
-    tbody.appendChild(row);
-  });
-  document.getElementById('tableInfo').textContent = `Affichage de ${start + 1} à ${Math.min(end, filteredData.length)} sur ${filteredData.length} entrées`;
-}
-
-function getPerformanceClass(taux) {
-  if (taux > 20) return 'high';
-  if (taux >= 10) return 'medium';
-  return 'low';
-}
-
-function initializeEvents() {
-  document.getElementById('applyFilters').addEventListener('click', applyFilters);
-  document.getElementById('resetFilters').addEventListener('click', resetFilters);
-  document.getElementById('prevPage').addEventListener('click', () => { if (currentPage > 1) { currentPage--; updateTable(); } });
-  document.getElementById('nextPage').addEventListener('click', () => { if (currentPage * pageSize < filteredData.length) { currentPage++; updateTable(); } });
-  document.querySelectorAll('.fullscreen-btn').forEach(btn => btn.addEventListener('click', () => openFullscreenChart(charts[btn.closest('.chart-card').querySelector('canvas').id])));
-  document.querySelectorAll('.download-btn').forEach(btn => btn.addEventListener('click', () => saveChartAsImage(charts[btn.closest('.chart-card').querySelector('canvas').id])));
-}
-
+/**
+ * Application des filtres
+ */
 function applyFilters() {
-  const selectedCommunes = Array.from(document.getElementById('communeFilter').selectedOptions).map(opt => opt.value);
-  const minParcelles = parseInt(document.getElementById('minParcelles').value) || 0;
-  const performanceLevel = document.getElementById('performanceLevel').value;
-  const quarantainesFilter = document.getElementById('quarantainesFilter').checked;
-  const echecsJointureFilter = document.getElementById('echecsJointureFilter').checked;
+  const communeCheckboxes = document.querySelectorAll('input[name="commune"]:checked');
+  const selectedCommunes = Array.from(communeCheckboxes).map(cb => cb.value);
+  
+  const seuilSlider = document.getElementById('seuilFilter');
+  const performanceFilter = document.getElementById('performanceFilter');
+  const quarantineFilter = document.getElementById('quarantineFilter');
+  const noValidationFilter = document.getElementById('noValidationFilter');
 
-  filteredData = appData.communes_data.filter(c => {
-    if (selectedCommunes.length > 0 && !selectedCommunes.includes(c.Commune)) return false;
-    if (c.parcelles_brutes < minParcelles) return false;
-    if (performanceLevel !== 'all') {
-      if (performanceLevel === 'high' && c.taux_jointure_ok <= 20) return false;
-      if (performanceLevel === 'medium' && (c.taux_jointure_ok < 10 || c.taux_jointure_ok > 20)) return false;
-      if (performanceLevel === 'low' && c.taux_jointure_ok >= 10) return false;
+  const seuil = seuilSlider ? parseInt(seuilSlider.value) : 0;
+  const performance = performanceFilter ? performanceFilter.value : 'all';
+  const showQuarantine = quarantineFilter ? quarantineFilter.checked : false;
+  const showNoValidation = noValidationFilter ? noValidationFilter.checked : false;
+
+  // Application des filtres
+  const originalData = EDL_DATA.filter(commune => commune.commune !== 'Total').map(commune => {
+    const taux_validation = commune.post_traitees > 0 ? 
+      (commune.valideespar_urm_nicad / commune.post_traitees * 100) : 0;
+    
+    return {
+      ...commune,
+      taux_validation: Math.round(taux_validation * 10) / 10,
+      quarantaines: commune.commune === 'Netteboulou' ? QUARANTINE_PARCELS : 0
+    };
+  });
+
+  filteredData = originalData.filter(commune => {
+    // Filtre par commune sélectionnée
+    if (selectedCommunes.length > 0 && !selectedCommunes.includes(commune.commune)) {
+      return false;
     }
-    if (quarantainesFilter && c.parcelles_quarantaines === 0) return false;
-    if (echecsJointureFilter && c.parcelles_jointure_pas_ok === 0) return false;
+
+    // Filtre par seuil de données brutes
+    if (commune.donnees_brutes < seuil) {
+      return false;
+    }
+
+    // Filtre par performance
+    const taux = commune.taux_validation;
+    switch (performance) {
+      case 'high':
+        if (taux <= 70) return false;
+        break;
+      case 'medium':
+        if (taux < 30 || taux > 70) return false;
+        break;
+      case 'low':
+        if (taux >= 30) return false;
+        break;
+      case 'zero':
+        if (taux > 0) return false;
+        break;
+    }
+
+    // Filtre par quarantaines
+    if (showQuarantine && commune.quarantaines === 0) {
+      return false;
+    }
+
+    // Filtre par absence de validation
+    if (showNoValidation && commune.valideespar_urm_nicad > 0) {
+      return false;
+    }
+
     return true;
   });
+
+  // Réinitialiser la pagination
   currentPage = 1;
-  updateTable();
-  showNotification('Filtres appliqués avec succès!', 'success');
+
+  // Mettre à jour les composants
+  updateAllComponents();
+
+  showNotification(`Filtres appliqués - ${filteredData.length} commune(s) affichée(s)`, 'info');
 }
 
+/**
+ * Réinitialisation des filtres
+ */
 function resetFilters() {
-  document.getElementById('communeFilter').selectedIndex = -1;
-  document.getElementById('minParcelles').value = 0;
-  document.getElementById('performanceLevel').value = 'all';
-  document.getElementById('quarantainesFilter').checked = false;
-  document.getElementById('echecsJointureFilter').checked = false;
-  filteredData = appData.communes_data;
+  // Décocher toutes les communes
+  document.querySelectorAll('input[name="commune"]').forEach(cb => cb.checked = false);
+  
+  // Réinitialiser les autres filtres
+  const seuilSlider = document.getElementById('seuilFilter');
+  const seuilValue = document.getElementById('seuilValue');
+  const performanceFilter = document.getElementById('performanceFilter');
+  const quarantineFilter = document.getElementById('quarantineFilter');
+  const noValidationFilter = document.getElementById('noValidationFilter');
+
+  if (seuilSlider) seuilSlider.value = 0;
+  if (seuilValue) seuilValue.textContent = '0';
+  if (performanceFilter) performanceFilter.value = 'all';
+  if (quarantineFilter) quarantineFilter.checked = false;
+  if (noValidationFilter) noValidationFilter.checked = false;
+
+  // Réinitialiser les données
+  processData();
   currentPage = 1;
+  searchTerm = '';
+
+  // Vider la recherche
+  const searchInput = document.getElementById('searchTable');
+  if (searchInput) searchInput.value = '';
+
+  updateAllComponents();
+  showNotification('Filtres réinitialisés', 'info');
+}
+
+/**
+ * Initialisation des graphiques
+ */
+function initializeCharts() {
+  createPipelineChart();
+  createCommunesChart();
+  createValidationChart();
+  createEfficaciteChart();
+}
+
+/**
+ * Création du graphique de pipeline de traitement
+ */
+function createPipelineChart() {
+  const canvas = document.getElementById('pipelineChart');
+  if (!canvas) return;
+
+  const ctx = canvas.getContext('2d');
+  
+  // Détruire le graphique existant
+  if (charts.pipeline) {
+    charts.pipeline.destroy();
+  }
+
+  // Calcul des totaux
+  const totals = filteredData.reduce((acc, commune) => ({
+    brutes: acc.brutes + commune.donnees_brutes,
+    sansDoublons: acc.sansDoublons + commune.sans_doublons_attributaire_et_geometriqu,
+    postTraitees: acc.postTraitees + commune.post_traitees,
+    validees: acc.validees + commune.valideespar_urm_nicad
+  }), { brutes: 0, sansDoublons: 0, postTraitees: 0, validees: 0 });
+
+  const data = [
+    totals.brutes,
+    totals.sansDoublons,
+    totals.postTraitees,
+    totals.validees
+  ];
+
+  charts.pipeline = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['📋 Données Brutes', '🔄 Sans Doublons', '⚙️ Post-traitées', '✅ Validées URM/NICAD'],
+      datasets: [{
+        label: 'Nombre de parcelles',
+        data: data,
+        backgroundColor: COLORS.chart.slice(0, 4),
+        borderColor: COLORS.chart.slice(0, 4).map(color => darkenColor(color, 20)),
+        borderWidth: 2,
+        borderRadius: 8,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: {
+        duration: 1000,
+        easing: 'easeOutQuart'
+      },
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          titleColor: 'white',
+          bodyColor: 'white',
+          borderColor: COLORS.primary,
+          borderWidth: 1,
+          cornerRadius: 8,
+          callbacks: {
+            label: function(context) {
+              const percentage = data[0] > 0 ? (context.raw / data[0] * 100).toFixed(1) : '0';
+              return `${formatNumber(context.raw)} parcelles (${percentage}%)`;
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          grid: {
+            color: 'rgba(46, 139, 87, 0.1)'
+          },
+          ticks: {
+            callback: function(value) {
+              return formatNumber(value);
+            }
+          }
+        },
+        x: {
+          grid: {
+            display: false
+          }
+        }
+      }
+    }
+  });
+}
+
+/**
+ * Création du graphique de comparaison par commune
+ */
+function createCommunesChart() {
+  const canvas = document.getElementById('communesChart');
+  if (!canvas) return;
+
+  const ctx = canvas.getContext('2d');
+  
+  if (charts.communes) {
+    charts.communes.destroy();
+  }
+
+  const communes = filteredData.map(c => c.commune);
+  const donneesData = filteredData.map(c => c.donnees_brutes);
+  const sansDoublonsData = filteredData.map(c => c.sans_doublons_attributaire_et_geometriqu);
+  const postTraiteesData = filteredData.map(c => c.post_traitees);
+  const valideesData = filteredData.map(c => c.valideespar_urm_nicad);
+
+  charts.communes = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: communes,
+      datasets: [
+        {
+          label: '📋 Données Brutes',
+          data: donneesData,
+          backgroundColor: COLORS.chart[0] + '80',
+          borderColor: COLORS.chart[0],
+          borderWidth: 1
+        },
+        {
+          label: '🔄 Sans Doublons',
+          data: sansDoublonsData,
+          backgroundColor: COLORS.chart[1] + '80',
+          borderColor: COLORS.chart[1],
+          borderWidth: 1
+        },
+        {
+          label: '⚙️ Post-traitées',
+          data: postTraiteesData,
+          backgroundColor: COLORS.chart[2] + '80',
+          borderColor: COLORS.chart[2],
+          borderWidth: 1
+        },
+        {
+          label: '✅ Validées',
+          data: valideesData,
+          backgroundColor: COLORS.chart[3] + '80',
+          borderColor: COLORS.chart[3],
+          borderWidth: 1
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: {
+        duration: 1000,
+        easing: 'easeOutQuart'
+      },
+      plugins: {
+        legend: {
+          position: 'top'
+        },
+        tooltip: {
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          titleColor: 'white',
+          bodyColor: 'white',
+          borderColor: COLORS.primary,
+          borderWidth: 1,
+          cornerRadius: 8,
+          callbacks: {
+            label: function(context) {
+              return `${context.dataset.label}: ${formatNumber(context.raw)}`;
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          stacked: false,
+          grid: {
+            color: 'rgba(46, 139, 87, 0.1)'
+          },
+          ticks: {
+            callback: function(value) {
+              return formatNumber(value);
+            }
+          }
+        },
+        x: {
+          grid: {
+            display: false
+          },
+          ticks: {
+            maxRotation: 45
+          }
+        }
+      }
+    }
+  });
+}
+
+/**
+ * Création du graphique des taux de validation
+ */
+function createValidationChart() {
+  const canvas = document.getElementById('validationChart');
+  if (!canvas) return;
+
+  const ctx = canvas.getContext('2d');
+  
+  if (charts.validation) {
+    charts.validation.destroy();
+  }
+
+  const communes = filteredData.map(c => c.commune);
+  const tauxValidation = filteredData.map(c => c.taux_validation || 0);
+
+  // Couleurs selon le taux de validation
+  const backgroundColors = tauxValidation.map(taux => {
+    if (taux >= 70) return COLORS.success + '80';
+    if (taux >= 30) return COLORS.warning + '80';
+    if (taux > 0) return COLORS.error + '80';
+    return '#808080' + '80';
+  });
+
+  const borderColors = tauxValidation.map(taux => {
+    if (taux >= 70) return COLORS.success;
+    if (taux >= 30) return COLORS.warning;
+    if (taux > 0) return COLORS.error;
+    return '#808080';
+  });
+
+  charts.validation = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: communes,
+      datasets: [{
+        data: tauxValidation,
+        backgroundColor: backgroundColors,
+        borderColor: borderColors,
+        borderWidth: 2,
+        hoverBorderWidth: 3
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: {
+        duration: 1000,
+        easing: 'easeOutQuart'
+      },
+      plugins: {
+        legend: {
+          position: 'right',
+          labels: {
+            generateLabels: function(chart) {
+              const data = chart.data;
+              return data.labels.map((label, i) => ({
+                text: `${label}: ${data.datasets[0].data[i].toFixed(1)}%`,
+                fillStyle: data.datasets[0].backgroundColor[i],
+                strokeStyle: data.datasets[0].borderColor[i],
+                lineWidth: 2,
+                hidden: false,
+                index: i
+              }));
+            }
+          }
+        },
+        tooltip: {
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          titleColor: 'white',
+          bodyColor: 'white',
+          borderColor: COLORS.primary,
+          borderWidth: 1,
+          cornerRadius: 8,
+          callbacks: {
+            label: function(context) {
+              return `${context.label}: ${context.raw.toFixed(1)}%`;
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+/**
+ * Création du graphique d'efficacité du traitement
+ */
+function createEfficaciteChart() {
+  const canvas = document.getElementById('efficaciteChart');
+  if (!canvas) return;
+
+  const ctx = canvas.getContext('2d');
+  
+  if (charts.efficacite) {
+    charts.efficacite.destroy();
+  }
+
+  const communes = filteredData.map(c => c.commune);
+  const efficacite = filteredData.map(commune => {
+    // Efficacité = (Validées / Données brutes) * 100
+    return commune.donnees_brutes > 0 ? 
+      (commune.valideespar_urm_nicad / commune.donnees_brutes * 100) : 0;
+  });
+
+  charts.efficacite = new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels: communes,
+      datasets: [{
+        label: 'Efficacité Globale (%)',
+        data: efficacite,
+        backgroundColor: COLORS.primary + '20',
+        borderColor: COLORS.primary,
+        borderWidth: 2,
+        pointBackgroundColor: COLORS.primary,
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: COLORS.primary,
+        pointRadius: 6,
+        pointHoverRadius: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: {
+        duration: 1000,
+        easing: 'easeOutQuart'
+      },
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          titleColor: 'white',
+          bodyColor: 'white',
+          borderColor: COLORS.primary,
+          borderWidth: 1,
+          cornerRadius: 8,
+          callbacks: {
+            label: function(context) {
+              return `${context.label}: ${context.raw.toFixed(1)}%`;
+            }
+          }
+        }
+      },
+      scales: {
+        r: {
+          angleLines: {
+            color: 'rgba(46, 139, 87, 0.2)'
+          },
+          grid: {
+            color: 'rgba(46, 139, 87, 0.2)'
+          },
+          pointLabels: {
+            font: {
+              size: 11
+            }
+          },
+          ticks: {
+            beginAtZero: true,
+            max: 100,
+            stepSize: 20,
+            callback: function(value) {
+              return value + '%';
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+/**
+ * Mise à jour de tous les composants
+ */
+function updateAllComponents() {
+  updateKPIs();
+  updateCharts();
   updateTable();
-  showNotification('Filtres réinitialisés!', 'info');
 }
 
-function initializeDarkMode() {
-  const toggle = document.getElementById('darkModeToggle');
-  toggle.addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode');
-    toggle.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
-    Object.values(charts).forEach(chart => chart.update());
+/**
+ * Mise à jour des KPIs
+ */
+function updateKPIs() {
+  const totals = filteredData.reduce((acc, commune) => ({
+    brutes: acc.brutes + commune.donnees_brutes,
+    sansDoublons: acc.sansDoublons + commune.sans_doublons_attributaire_et_geometriqu,
+    postTraitees: acc.postTraitees + commune.post_traitees,
+    validees: acc.validees + commune.valideespar_urm_nicad
+  }), { brutes: 0, sansDoublons: 0, postTraitees: 0, validees: 0 });
+
+  // Calcul des taux
+  const tauxDedoublonnage = totals.brutes > 0 ? (totals.sansDoublons / totals.brutes * 100) : 0;
+  const tauxPostTraitement = totals.sansDoublons > 0 ? (totals.postTraitees / totals.sansDoublons * 100) : 0;
+  const tauxValidation = totals.postTraitees > 0 ? (totals.validees / totals.postTraitees * 100) : 0;
+
+  // Mise à jour des éléments DOM
+  updateElement('kpi-brutes', formatNumber(totals.brutes));
+  updateElement('kpi-communes', filteredData.length.toString());
+  updateElement('kpi-dedoublonnage', `${tauxDedoublonnage.toFixed(1)}%`);
+  updateElement('kpi-post-traitement', `${tauxPostTraitement.toFixed(1)}%`);
+  updateElement('kpi-validation', `${tauxValidation.toFixed(1)}%`);
+  updateElement('kpi-quarantaine', QUARANTINE_PARCELS.toString());
+}
+
+/**
+ * Mise à jour des graphiques
+ */
+function updateCharts() {
+  createPipelineChart();
+  createCommunesChart();
+  createValidationChart();
+  createEfficaciteChart();
+}
+
+/**
+ * Initialisation du tableau
+ */
+function initializeTable() {
+  const searchInput = document.getElementById('searchTable');
+  if (searchInput) {
+    searchInput.addEventListener('input', debounce(() => {
+      searchTerm = searchInput.value.toLowerCase();
+      currentPage = 1;
+      updateTable();
+    }, 300));
+  }
+
+  // Événements de tri
+  document.querySelectorAll('.sortable').forEach(header => {
+    header.addEventListener('click', () => {
+      sortTable(header.dataset.column);
+    });
+  });
+
+  // Événements de pagination
+  const prevBtn = document.getElementById('prevPage');
+  const nextBtn = document.getElementById('nextPage');
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        updateTable();
+      }
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      const totalPages = Math.ceil(getFilteredTableData().length / rowsPerPage);
+      if (currentPage < totalPages) {
+        currentPage++;
+        updateTable();
+      }
+    });
+  }
+
+  updateTable();
+}
+
+/**
+ * Obtention des données filtrées pour le tableau
+ */
+function getFilteredTableData() {
+  if (!searchTerm) return filteredData;
+  
+  return filteredData.filter(commune => {
+    return Object.values(commune).some(value => 
+      value.toString().toLowerCase().includes(searchTerm)
+    );
   });
 }
 
-function openFullscreenChart(chart) {
-  const modal = document.getElementById('fullscreenModal');
-  const modalTitle = document.getElementById('modalTitle');
-  const fullscreenCanvas = document.getElementById('fullscreenChart');
-  if (modal.fullscreenChart) modal.fullscreenChart.destroy();
-  modalTitle.textContent = `Graphique en Plein Écran - ${chart.options.plugins.title.text}`;
-  modal.classList.remove('hidden');
-  modal.fullscreenChart = new Chart(fullscreenCanvas, {
-    type: chart.type,
-    data: JSON.parse(JSON.stringify(chart.data)),
-    options: JSON.parse(JSON.stringify(chart.options))
+/**
+ * Tri du tableau
+ */
+function sortTable(column) {
+  const direction = (currentSort.column === column && currentSort.direction === 'asc') ? 'desc' : 'asc';
+  
+  // Mise à jour visuelle des en-têtes
+  document.querySelectorAll('.sortable').forEach(header => {
+    header.classList.remove('asc', 'desc');
+  });
+  
+  const currentHeader = document.querySelector(`[data-column="${column}"]`);
+  if (currentHeader) {
+    currentHeader.classList.add(direction);
+  }
+
+  // Tri des données
+  filteredData.sort((a, b) => {
+    let aValue = a[column];
+    let bValue = b[column];
+
+    // Conversion en nombre si possible
+    if (!isNaN(aValue) && !isNaN(bValue)) {
+      aValue = parseFloat(aValue);
+      bValue = parseFloat(bValue);
+    }
+
+    if (direction === 'asc') {
+      return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+    } else {
+      return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+    }
+  });
+
+  currentSort = { column, direction };
+  updateTable();
+  
+  showNotification(`Tableau trié par ${column} (${direction === 'asc' ? 'croissant' : 'décroissant'})`, 'info');
+}
+
+/**
+ * Mise à jour du tableau
+ */
+function updateTable() {
+  const tableBody = document.getElementById('tableBody');
+  if (!tableBody) return;
+
+  const tableData = getFilteredTableData();
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const endIndex = startIndex + rowsPerPage;
+  const currentData = tableData.slice(startIndex, endIndex);
+
+  // Génération des lignes du tableau
+  tableBody.innerHTML = currentData.map(commune => {
+    const tauxValidationClass = getPerformanceClass(commune.taux_validation);
+    const quarantaineDisplay = commune.quarantaines > 0 ? 
+      `<span class="quarantine-indicator">${commune.quarantaines}</span>` : 
+      commune.quarantaines;
+
+    return `
+      <tr>
+        <td><strong>${commune.commune}</strong></td>
+        <td>${formatNumber(commune.donnees_brutes)}</td>
+        <td>${formatNumber(commune.sans_doublons_attributaire_et_geometriqu)}</td>
+        <td>${formatNumber(commune.post_traitees)}</td>
+        <td>${formatNumber(commune.valideespar_urm_nicad)}</td>
+        <td><span class="taux-performance ${getPerformanceClass(commune.taux_dedoublonnage)}">${commune.taux_dedoublonnage}%</span></td>
+        <td><span class="taux-performance ${tauxValidationClass}">${commune.taux_validation}%</span></td>
+        <td>${quarantaineDisplay}</td>
+      </tr>
+    `;
+  }).join('');
+
+  // Mise à jour de l'info de pagination
+  updatePaginationInfo(tableData.length, startIndex, Math.min(endIndex, tableData.length));
+  
+  // Mise à jour des contrôles de pagination
+  updatePaginationControls(tableData.length);
+}
+
+/**
+ * Classification de performance selon le taux
+ */
+function getPerformanceClass(taux) {
+  if (taux >= 70) return 'high';
+  if (taux >= 30) return 'medium';
+  if (taux > 0) return 'low';
+  return 'zero';
+}
+
+/**
+ * Mise à jour de l'information de pagination
+ */
+function updatePaginationInfo(total, start, end) {
+  const paginationInfo = document.getElementById('paginationInfo');
+  if (paginationInfo) {
+    paginationInfo.textContent = `Affichage de ${start + 1} à ${end} sur ${total} entrées`;
+  }
+}
+
+/**
+ * Mise à jour des contrôles de pagination
+ */
+function updatePaginationControls(totalItems) {
+  const totalPages = Math.ceil(totalItems / rowsPerPage);
+  const pageNumbers = document.getElementById('pageNumbers');
+  const prevBtn = document.getElementById('prevPage');
+  const nextBtn = document.getElementById('nextPage');
+
+  // Mise à jour des boutons précédent/suivant
+  if (prevBtn) prevBtn.disabled = currentPage <= 1;
+  if (nextBtn) nextBtn.disabled = currentPage >= totalPages;
+
+  // Génération des numéros de page
+  if (pageNumbers) {
+    pageNumbers.innerHTML = '';
+    for (let i = 1; i <= totalPages; i++) {
+      const button = document.createElement('button');
+      button.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+      button.textContent = i;
+      button.addEventListener('click', () => {
+        currentPage = i;
+        updateTable();
+      });
+      pageNumbers.appendChild(button);
+    }
+  }
+}
+
+/**
+ * Initialisation des tooltips
+ */
+function initializeTooltips() {
+  const tooltip = document.getElementById('tooltip');
+  if (!tooltip) return;
+
+  document.querySelectorAll('[data-tooltip]').forEach(element => {
+    element.addEventListener('mouseenter', (e) => {
+      showTooltip(e, element.dataset.tooltip);
+    });
+    
+    element.addEventListener('mouseleave', hideTooltip);
+    element.addEventListener('mousemove', updateTooltipPosition);
   });
 }
 
-function closeModal() {
-  const modal = document.getElementById('fullscreenModal');
-  if (modal.fullscreenChart) modal.fullscreenChart.destroy();
-  modal.classList.add('hidden');
+/**
+ * Affichage du tooltip
+ */
+function showTooltip(e, text) {
+  const tooltip = document.getElementById('tooltip');
+  if (!tooltip) return;
+  
+  tooltip.textContent = text;
+  tooltip.classList.remove('hidden');
+  updateTooltipPosition(e);
 }
 
+/**
+ * Masquage du tooltip
+ */
+function hideTooltip() {
+  const tooltip = document.getElementById('tooltip');
+  if (tooltip) {
+    tooltip.classList.add('hidden');
+  }
+}
+
+/**
+ * Mise à jour de la position du tooltip
+ */
+function updateTooltipPosition(e) {
+  const tooltip = document.getElementById('tooltip');
+  if (!tooltip) return;
+
+  const rect = tooltip.getBoundingClientRect();
+  tooltip.style.left = `${e.clientX + 10}px`;
+  tooltip.style.top = `${e.clientY - rect.height - 10}px`;
+}
+
+/**
+ * Initialisation de la modal
+ */
 function initializeModal() {
   const modal = document.getElementById('fullscreenModal');
   const closeBtn = document.getElementById('closeModal');
-  const overlay = modal.querySelector('.modal-overlay');
-  closeBtn.addEventListener('click', closeModal);
-  overlay.addEventListener('click', closeModal);
+  const overlay = document.querySelector('.modal-overlay');
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', closeModal);
+  }
+
+  if (overlay) {
+    overlay.addEventListener('click', closeModal);
+  }
+
+  if (modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
+    });
+  }
+
+  // Fermeture avec Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeModal();
+  });
 }
 
-function saveChartAsImage(chart) {
-  const a = document.createElement('a');
-  a.href = chart.toBase64Image();
-  a.download = 'chart.png';
-  a.click();
+/**
+ * Ouverture de la modal en plein écran
+ */
+function openFullscreenChart(chartInstance, title) {
+  const modal = document.getElementById('fullscreenModal');
+  const modalTitle = document.getElementById('modalTitle');
+  const fullscreenCanvas = document.getElementById('fullscreenChart');
+
+  if (!modal || !modalTitle || !fullscreenCanvas) return;
+
+  // Nettoyer le graphique existant
+  if (modal.fullscreenChart) {
+    modal.fullscreenChart.destroy();
+    modal.fullscreenChart = null;
+  }
+
+  modalTitle.textContent = title || 'Graphique en Plein Écran';
+  modal.classList.remove('hidden');
+
+  // Créer le nouveau graphique
+  setTimeout(() => {
+    const ctx = fullscreenCanvas.getContext('2d');
+    modal.fullscreenChart = new Chart(ctx, {
+      type: chartInstance.config.type,
+      data: JSON.parse(JSON.stringify(chartInstance.data)),
+      options: {
+        ...chartInstance.options,
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          ...chartInstance.options.plugins,
+          title: {
+            display: true,
+            text: title,
+            font: {
+              size: 18,
+              weight: 'bold'
+            },
+            padding: 20
+          }
+        }
+      }
+    });
+  }, 100);
 }
 
-function showNotification(message, type) {
+/**
+ * Fermeture de la modal
+ */
+function closeModal() {
+  const modal = document.getElementById('fullscreenModal');
+  if (!modal) return;
+
+  // Nettoyer le graphique
+  if (modal.fullscreenChart) {
+    modal.fullscreenChart.destroy();
+    modal.fullscreenChart = null;
+  }
+
+  modal.classList.add('hidden');
+}
+
+/**
+ * Initialisation des gestionnaires d'événements
+ */
+function initializeEventHandlers() {
+  // Gestionnaire pour les boutons de contrôle des graphiques
+  document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('chart-btn')) {
+      handleChartButtonClick(e.target);
+    }
+  });
+
+  // Gestionnaire pour l'export CSV
+  const exportBtn = document.getElementById('exportBtn');
+  if (exportBtn) {
+    exportBtn.addEventListener('click', exportToCSV);
+  }
+
+  // Gestionnaire pour l'actualisation
+  const refreshBtn = document.getElementById('refreshBtn');
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', () => {
+      processData();
+      updateAllComponents();
+      showNotification('Données actualisées!', 'success');
+    });
+  }
+}
+
+/**
+ * Gestion des clics sur les boutons de contrôle des graphiques
+ */
+function handleChartButtonClick(button) {
+  const action = button.dataset.action;
+  const chartType = button.dataset.chart;
+  const chart = charts[chartType];
+
+  if (!chart) return;
+
+  switch (action) {
+    case 'zoom-in':
+      if (chart.zoom) chart.zoom(1.2);
+      break;
+    case 'zoom-out':
+      if (chart.zoom) chart.zoom(0.8);
+      break;
+    case 'reset-zoom':
+      if (chart.resetZoom) chart.resetZoom();
+      break;
+    case 'fullscreen':
+      const chartTitles = {
+        pipeline: '🔄 Pipeline de Traitement des Données',
+        communes: '🏘️ Performance par Commune',
+        validation: '🎯 Taux de Validation URM/NICAD',
+        efficacite: '⚡ Efficacité du Traitement'
+      };
+      openFullscreenChart(chart, chartTitles[chartType]);
+      break;
+    case 'save-image':
+      saveChartAsImage(chart, chartType);
+      break;
+  }
+}
+
+/**
+ * Sauvegarde d'un graphique comme image
+ */
+function saveChartAsImage(chart, chartType) {
+  try {
+    const link = document.createElement('a');
+    link.href = chart.toBase64Image('image/png', 1.0);
+    link.download = `EDL_${chartType}_${new Date().toISOString().split('T')[0]}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    showNotification('Graphique sauvegardé avec succès!', 'success');
+  } catch (error) {
+    console.error('Erreur lors de la sauvegarde:', error);
+    showNotification('Erreur lors de la sauvegarde du graphique', 'error');
+  }
+}
+
+/**
+ * Export des données en CSV
+ */
+function exportToCSV() {
+  try {
+    const headers = [
+      'Commune',
+      'Données Brutes',
+      'Sans Doublons',
+      'Post-traitées', 
+      'Validées URM/NICAD',
+      'Taux Dédoublonnage (%)',
+      'Taux Post-traitement (%)',
+      'Taux Validation (%)',
+      'Quarantaines'
+    ];
+
+    const csvData = filteredData.map(commune => [
+      commune.commune,
+      commune.donnees_brutes,
+      commune.sans_doublons_attributaire_et_geometriqu,
+      commune.post_traitees,
+      commune.valideespar_urm_nicad,
+      commune.taux_dedoublonnage.toFixed(1),
+      commune.taux_post_traitement.toFixed(1),
+      commune.taux_validation.toFixed(1),
+      commune.quarantaines
+    ]);
+
+    const csv = [
+      headers.join(','),
+      ...csvData.map(row => row.join(','))
+    ].join('\n');
+
+    const link = document.createElement('a');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    link.href = URL.createObjectURL(blob);
+    link.download = `EDL_PostTraitement_${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    showNotification('Données exportées avec succès!', 'success');
+  } catch (error) {
+    console.error('Erreur lors de l\'export:', error);
+    showNotification('Erreur lors de l\'export des données', 'error');
+  }
+}
+
+/**
+ * Initialisation du mode sombre
+ */
+function initializeDarkMode() {
+  const toggle = document.getElementById('darkModeToggle');
+  if (!toggle) return;
+
+  // Charger la préférence sauvegardée ou utiliser la préférence système
+  const savedMode = localStorage.getItem('darkMode');
+  const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const shouldUseDark = savedMode === 'true' || (savedMode === null && systemPrefersDark);
+
+  if (shouldUseDark) {
+    document.body.classList.add('dark-mode');
+    toggle.textContent = '☀️';
+  }
+
+  toggle.addEventListener('click', () => {
+    const isDark = document.body.classList.toggle('dark-mode');
+    toggle.textContent = isDark ? '☀️' : '🌙';
+    localStorage.setItem('darkMode', isDark.toString());
+
+    // Mettre à jour les graphiques pour s'adapter au nouveau thème
+    setTimeout(() => {
+      Object.values(charts).forEach(chart => {
+        if (chart && chart.update) chart.update();
+      });
+    }, 100);
+
+    showNotification(`Mode ${isDark ? 'sombre' : 'clair'} activé`, 'info');
+  });
+}
+
+/**
+ * Initialisation du menu mobile
+ */
+function initializeMobileMenu() {
+  const hamburger = document.getElementById('hamburger');
+  const sidebar = document.querySelector('.sidebar');
+
+  if (!hamburger || !sidebar) return;
+
+  hamburger.addEventListener('click', () => {
+    sidebar.classList.toggle('open');
+  });
+
+  // Fermer le menu en cliquant à l'extérieur
+  document.addEventListener('click', (e) => {
+    if (!sidebar.contains(e.target) && !hamburger.contains(e.target)) {
+      sidebar.classList.remove('open');
+    }
+  });
+}
+
+/**
+ * Affichage des notifications
+ */
+function showNotification(message, type = 'info', duration = 3000) {
+  const notificationsContainer = document.getElementById('notifications');
+  if (!notificationsContainer) return;
+
   const notification = document.createElement('div');
   notification.className = `notification ${type}`;
   notification.textContent = message;
-  document.getElementById('notifications').appendChild(notification);
-  setTimeout(() => notification.remove(), 3000);
+
+  notificationsContainer.appendChild(notification);
+
+  // Animation d'entrée
+  setTimeout(() => {
+    notification.style.opacity = '1';
+    notification.style.transform = 'translateX(0)';
+  }, 10);
+
+  // Suppression automatique
+  setTimeout(() => {
+    notification.style.opacity = '0';
+    notification.style.transform = 'translateX(100%)';
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.parentNode.removeChild(notification);
+      }
+    }, 300);
+  }, duration);
 }
 
+/**
+ * Mise à jour de l'heure de dernière actualisation
+ */
+function updateLastUpdateTime() {
+  const lastUpdateElement = document.getElementById('lastUpdate');
+  if (lastUpdateElement) {
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('fr-FR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+    const timeStr = now.toLocaleTimeString('fr-FR', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+    lastUpdateElement.textContent = `${dateStr} à ${timeStr}`;
+  }
+}
+
+/**
+ * Mise à jour d'un élément DOM
+ */
+function updateElement(id, value) {
+  const element = document.getElementById(id);
+  if (element) {
+    element.textContent = value;
+  }
+}
+
+/**
+ * Formatage des nombres avec séparateurs de milliers
+ */
 function formatNumber(num) {
-  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  if (num === null || num === undefined) return '0';
+  return parseInt(num).toLocaleString('fr-FR');
 }
 
-initDashboard();
+/**
+ * Assombrissement d'une couleur
+ */
+function darkenColor(color, percent) {
+  // Conversion hex vers RGB
+  const hex = color.replace('#', '');
+  const r = parseInt(hex.substr(0, 2), 16);
+  const g = parseInt(hex.substr(2, 2), 16);
+  const b = parseInt(hex.substr(4, 2), 16);
+
+  // Assombrissement
+  const newR = Math.max(0, Math.floor(r * (1 - percent / 100)));
+  const newG = Math.max(0, Math.floor(g * (1 - percent / 100)));
+  const newB = Math.max(0, Math.floor(b * (1 - percent / 100)));
+
+  // Conversion RGB vers hex
+  return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
+}
+
+/**
+ * Fonction de debounce pour limiter les appels répétés
+ */
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
+/**
+ * Détection des changements de données (pour mise à jour automatique)
+ */
+function setupAutoRefresh() {
+  // Vérifier les changements toutes les 30 secondes (à adapter selon vos besoins)
+  setInterval(() => {
+    // Ici vous pourriez implémenter la logique pour recharger le fichier JSON
+    // Par exemple, via fetch() si le fichier est accessible via HTTP
+    checkForDataUpdates();
+  }, 30000);
+}
+
+/**
+ * Vérification des mises à jour de données
+ */
+function checkForDataUpdates() {
+  // Cette fonction peut être implémentée pour vérifier
+  // si le fichier EDL_PostTraitement.json a été mis à jour
+  // et recharger les données automatiquement
+  
+  // Exemple d'implémentation :
+  /*
+  fetch('EDL_PostTraitement.json')
+    .then(response => response.json())
+    .then(newData => {
+      if (JSON.stringify(newData) !== JSON.stringify(EDL_DATA)) {
+        // Données mises à jour détectées
+        EDL_DATA = newData;
+        processData();
+        updateAllComponents();
+        updateLastUpdateTime();
+        showNotification('Nouvelles données détectées et chargées!', 'success');
+      }
+    })
+    .catch(error => {
+      console.warn('Impossible de vérifier les mises à jour:', error);
+    });
+  */
+}
+
+/**
+ * Gestion des erreurs globales
+ */
+window.addEventListener('error', (e) => {
+  console.error('Erreur globale:', e.error);
+  showNotification('Une erreur inattendue s\'est produite', 'error');
+});
+
+/**
+ * Gestion des promesses rejetées
+ */
+window.addEventListener('unhandledrejection', (e) => {
+  console.error('Promesse rejetée:', e.reason);
+  showNotification('Erreur de traitement des données', 'error');
+});
+
+/**
+ * Nettoyage lors du déchargement de la page
+ */
+window.addEventListener('beforeunload', () => {
+  // Nettoyer les graphiques
+  Object.values(charts).forEach(chart => {
+    if (chart && chart.destroy) {
+      chart.destroy();
+    }
+  });
+});
+
+// Démarrage de l'actualisation automatique (optionnel)
+// setupAutoRefresh();
