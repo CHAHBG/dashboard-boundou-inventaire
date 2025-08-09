@@ -1,11 +1,11 @@
 {
-  "total_parcelles_brutes": 51799,
-  "total_parcelles_sans_doublons": 26134,
-  "total_parcelles_post_traitees": 18515,
-  "total_parcelles_ok_post_traitement": 4306,
+  "total_parcelles_brutes": 115720,
+  "total_parcelles_sans_doublons": 41293,
+  "total_parcelles_post_traitees": 40139,
+  "total_parcelles_ok_post_traitement": 40139,
   "total_parcelles_quarantaines": 337,
-  "total_communes": 11,
-  "taux_dedoublonnage": 50.5,
-  "taux_post_traitement": 70.8,
-  "taux_ok_post_traitement": 82.7
+  "total_communes": 15,
+  "taux_dedoublonnage": 35.7,
+  "taux_post_traitement": 97.2,
+  "taux_ok_post_traitement": 100.0
 }
