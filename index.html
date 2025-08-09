@@ -4,171 +4,212 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard Interactif - Inventaires Fonciers Boundou</title>
-  <link rel="icon" type="image/x-icon" href="/favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&family=Fira+Code&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="dashboard">
     <aside class="sidebar">
       <div class="sidebar-header">
         <h2>Contrôles</h2>
-        <button id="darkModeToggle" class="btn btn--sm">🌙</button>
+        <button id="darkModeToggle">🌙</button>
       </div>
-      <section class="filters-panel card">
+      <div class="filters">
         <h3>Filtres</h3>
-        <div class="filters-row">
-          <div class="filter-group">
-            <label class="form-label">Communes</label>
-            <div class="commune-filters" id="communeFilters"></div>
-          </div>
-          <div class="filter-group">
-            <label class="form-label" for="seuilFilter">Seuil Min. Parcelles</label>
-            <input type="range" id="seuilFilter" class="form-control" min="0" max="12000" value="0">
-            <span id="seuilValue">0</span>
-          </div>
-          <div class="filter-group">
-            <label class="form-label" for="performanceFilter">Niveau de Performance</label>
-            <select id="performanceFilter" class="form-control">
-              <option value="all">Tous</option>
-              <option value="high">Élevé (>20%)</option>
-              <option value="medium">Moyen (10-20%)</option>
-              <option value="low">Faible (<10%)</option>
-            </select>
-          </div>
-          <div class="filter-group">
-            <label class="form-label">Problèmes</label>
-            <div class="problem-filters">
-              <label class="checkbox-label"><input type="checkbox" id="quarantineFilter"> Quarantaines</label>
-              <label class="checkbox-label"><input type="checkbox" id="jointureFilter"> Échecs Jointure</label>
-            </div>
-          </div>
-          <div class="filter-actions">
-            <button id="applyFilters" class="btn btn--primary">Appliquer</button>
-            <button id="resetFilters" class="btn btn--outline">Réinitialiser</button>
+        <div class="filter-group">
+          <label for="communeFilter" class="form-label">Communes</label>
+          <select id="communeFilter" class="form-control" multiple>
+            <!-- Options will be populated dynamically -->
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="minParcelles" class="form-label">Seuil Min. Parcelles</label>
+          <input type="number" id="minParcelles" class="form-control" value="0" min="0">
+        </div>
+        <div class="filter-group">
+          <label class="form-label">Niveau de Performance</label>
+          <select id="performanceLevel" class="form-control">
+            <option value="all">Tous</option>
+            <option value="high">Élevé (>20%)</option>
+            <option value="medium">Moyen (10-20%)</option>
+            <option value="low">Faible (<10%)</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label class="form-label">Problèmes</label>
+          <div class="checkbox-group">
+            <label><input type="checkbox" id="quarantainesFilter"> Quarantaines</label>
+            <label><input type="checkbox" id="echecsJointureFilter"> Échecs Jointure</label>
           </div>
         </div>
-      </section>
-      <div class="sidebar-footer">
-        <button id="exportBtn" class="btn btn--primary">Exporter CSV</button>
+        <div class="filter-actions">
+          <button id="applyFilters" class="btn btn--primary">Appliquer</button>
+          <button id="resetFilters" class="btn btn--outline">Réinitialiser</button>
+        </div>
       </div>
     </aside>
     <main class="main-content">
       <header class="dashboard-header">
         <h1>Dashboard Interactif - Inventaires Fonciers Boundou</h1>
-        <p class="date">01 Juillet 2025</p>
+        <p class="date">09 Août 2025</p>
       </header>
       <section class="kpi-section">
         <h2>Indicateurs Clés</h2>
         <div class="kpi-grid">
-          <div class="kpi-card card"><span class="kpi-icon">📊</span><div class="kpi-content"><h3>Total Parcelles Brutes</h3><p class="kpi-value" id="kpi-brutes">51,799</p></div></div>
-          <div class="kpi-card card"><span class="kpi-icon">🏘️</span><div class="kpi-content"><h3>Total Communes</h3><p class="kpi-value" id="kpi-communes">11</p></div></div>
-          <div class="kpi-card card"><span class="kpi-icon">🔄</span><div class="kpi-content"><h3>Taux de Dédoublonnage</h3><p class="kpi-value" id="kpi-dedoublonnage">50.5%</p></div></div>
-          <div class="kpi-card card"><span class="kpi-icon">⚙️</span><div class="kpi-content"><h3>Taux Post-traitement</h3><p class="kpi-value" id="kpi-post-traitement">70.8%</p></div></div>
-          <div class="kpi-card card"><span class="kpi-icon">✅</span><div class="kpi-content"><h3>Taux OK Post-traitement</h3><p class="kpi-value" id="kpi-ok-post-traitement">82.7%</p></div></div>
-          <div class="kpi-card card"><span class="kpi-icon">⚠️</span><div class="kpi-content"><h3>Parcelles en Quarantaine</h3><p class="kpi-value" id="kpi-quarantaine">337</p></div></div>
+          <div class="kpi-card">
+            <span class="kpi-icon">📊</span>
+            <div class="kpi-content">
+              <h3>Total Parcelles Brutes</h3>
+              <p id="totalBrutes"></p>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-icon">🏘️</span>
+            <div class="kpi-content">
+              <h3>Total Communes</h3>
+              <p id="totalCommunes"></p>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-icon">🔄</span>
+            <div class="kpi-content">
+              <h3>Taux de Dédoublonnage</h3>
+              <p id="tauxDedoublonnage"></p>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-icon">⚙️</span>
+            <div class="kpi-content">
+              <h3>Taux Post-traitement</h3>
+              <p id="tauxPostTraitement"></p>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-icon">✅</span>
+            <div class="kpi-content">
+              <h3>Taux OK Post-traitement</h3>
+              <p id="tauxOkPostTraitement"></p>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-icon">⚠️</span>
+            <div class="kpi-content">
+              <h3>Parcelles en Quarantaine</h3>
+              <p id="totalQuarantaines"></p>
+            </div>
+          </div>
         </div>
       </section>
       <section class="charts-section">
         <h2>Graphiques Interactifs</h2>
         <div class="charts-grid">
-          <div class="chart-card card">
-            <div class="chart-header">
-              <h3>Pipeline de Traitement</h3>
-              <div class="chart-controls">
-                <button class="btn btn--sm chart-btn" data-action="zoom-in">+</button>
-                <button class="btn btn--sm chart-btn" data-action="zoom-out">-</button>
-                <button class="btn btn--sm chart-btn" data-action="reset-zoom">Reset</button>
-                <button class="btn btn--sm chart-btn" data-action="fullscreen">📱</button>
-                <button class="btn btn--sm chart-btn" data-action="save-image">💾</button>
-              </div>
+          <div class="chart-card">
+            <h3>Pipeline de Traitement</h3>
+            <canvas id="pipelineChart"></canvas>
+            <div class="chart-actions">
+              <button class="chart-btn fullscreen-btn">+</button>
+              <button class="chart-btn zoom-out-btn">-</button>
+              <button class="chart-btn reset-zoom-btn">Reset</button>
+              <button class="chart-btn mobile-btn">📱</button>
+              <button class="chart-btn download-btn">💾</button>
             </div>
-            <div class="chart-container"><canvas id="pipelineChart"></canvas></div>
           </div>
-          <div class="chart-card card">
-            <div class="chart-header">
-              <h3>Comparaison par Commune</h3>
-              <div class="chart-controls">
-                <button class="btn btn--sm chart-btn" data-action="zoom-in">+</button>
-                <button class="btn btn--sm chart-btn" data-action="zoom-out">-</button>
-                <button class="btn btn--sm chart-btn" data-action="reset-zoom">Reset</button>
-                <button class="btn btn--sm chart-btn" data-action="fullscreen">📱</button>
-                <button class="btn btn--sm chart-btn" data-action="save-image">💾</button>
-              </div>
+          <div class="chart-card">
+            <h3>Comparaison par Commune</h3>
+            <canvas id="communesChart"></canvas>
+            <div class="chart-actions">
+              <button class="chart-btn fullscreen-btn">+</button>
+              <button class="chart-btn zoom-out-btn">-</button>
+              <button class="chart-btn reset-zoom-btn">Reset</button>
+              <button class="chart-btn mobile-btn">📱</button>
+              <button class="chart-btn download-btn">💾</button>
             </div>
-            <div class="chart-container"><canvas id="communesChart"></canvas></div>
           </div>
-          <div class="chart-card card">
-            <div class="chart-header">
-              <h3>Taux de Performance</h3>
-              <div class="chart-controls">
-                <button class="btn btn--sm chart-btn" data-action="zoom-in">+</button>
-                <button class="btn btn--sm chart-btn" data-action="zoom-out">-</button>
-                <button class="btn btn--sm chart-btn" data-action="reset-zoom">Reset</button>
-                <button class="btn btn--sm chart-btn" data-action="fullscreen">📱</button>
-                <button class="btn btn--sm chart-btn" data-action="save-image">💾</button>
-              </div>
+          <div class="chart-card">
+            <h3>Taux de Performance</h3>
+            <canvas id="performanceChart"></canvas>
+            <div class="chart-actions">
+              <button class="chart-btn fullscreen-btn">+</button>
+              <button class="chart-btn zoom-out-btn">-</button>
+              <button class="chart-btn reset-zoom-btn">Reset</button>
+              <button class="chart-btn mobile-btn">📱</button>
+              <button class="chart-btn download-btn">💾</button>
             </div>
-            <div class="chart-container"><canvas id="performanceChart"></canvas></div>
           </div>
-          <div class="chart-card card">
-            <div class="chart-header">
-              <h3>Répartition des Parcelles</h3>
-              <div class="chart-controls">
-                <button class="btn btn--sm chart-btn" data-action="zoom-in">+</button>
-                <button class="btn btn--sm chart-btn" data-action="zoom-out">-</button>
-                <button class="btn btn--sm chart-btn" data-action="reset-zoom">Reset</button>
-                <button class="btn btn--sm chart-btn" data-action="fullscreen">📱</button>
-                <button class="btn btn--sm chart-btn" data-action="save-image">💾</button>
-              </div>
+          <div class="chart-card">
+            <h3>Répartition des Parcelles</h3>
+            <canvas id="repartitionChart"></canvas>
+            <div class="chart-actions">
+              <button class="chart-btn fullscreen-btn">+</button>
+              <button class="chart-btn zoom-out-btn">-</button>
+              <button class="chart-btn reset-zoom-btn">Reset</button>
+              <button class="chart-btn mobile-btn">📱</button>
+              <button class="chart-btn download-btn">💾</button>
             </div>
-            <div class="chart-container"><canvas id="repartitionChart"></canvas></div>
           </div>
         </div>
       </section>
       <section class="table-section">
         <h2>Données Détaillées</h2>
-        <div class="table-header"><input type="text" id="searchTable" class="form-control" placeholder="Rechercher..."></div>
-        <div class="table-container card">
-          <table id="communeTable">
-            <thead><tr><th data-column="commune" class="sortable" data-tooltip="Nom de la commune">Commune</th><th data-column="parcelles_brutes" class="sortable" data-tooltip="Nombre total de parcelles brutes">Parcelles Brutes</th><th data-column="parcelles_sans_doublons" class="sortable" data-tooltip="Parcelles après dédoublonnage">Sans Doublons</th><th data-column="parcelles_post_traitees" class="sortable" data-tooltip="Parcelles après traitement">Post-traitées</th><th data-column="parcelles_ok_post_traitement" class="sortable" data-tooltip="Parcelles validées après traitement">OK Post-traitement</th><th data-column="parcelles_restantes" class="sortable" data-tooltip="Parcelles non traitées ou en attente">Restantes</th><th data-column="parcelles_jointure_ok" class="sortable" data-tooltip="Parcelles avec jointure réussie">Jointure OK</th><th data-column="parcelles_jointure_pas_ok" class="sortable" data-tooltip="Parcelles avec jointure échouée">Jointure PAS OK</th><th data-column="parcelles_quarantaines" class="sortable" data-tooltip="Parcelles en quarantaine">Quarantaines</th><th data-column="taux_jointure_ok" class="sortable" data-tooltip="Pourcentage de jointures réussies">Taux Jointure</th></tr></thead>
-            <tbody id="tableBody"></tbody>
-          </table>
-        </div>
+        <table id="dataTable" class="data-table">
+          <thead>
+            <tr>
+              <th class="sortable">Commune</th>
+              <th class="sortable">Parcelles Brutes</th>
+              <th class="sortable">Sans Doublons</th>
+              <th class="sortable">Post-traitées</th>
+              <th class="sortable">OK Post-traitement</th>
+              <th class="sortable">Restantes</th>
+              <th class="sortable">Jointure OK</th>
+              <th class="sortable">Jointure PAS OK</th>
+              <th class="sortable">Quarantaines</th>
+              <th class="sortable">Taux Jointure</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Rows will be populated dynamically -->
+          </tbody>
+        </table>
         <div class="table-pagination">
-          <span id="paginationInfo">Affichage de 0 à 0 sur 0 entrées</span>
-          <div class="pagination-controls"><button id="prevPage" class="btn page-btn">Précédent</button><div id="pageNumbers"></div><button id="nextPage" class="btn page-btn">Suivant</button></div>
+          <span id="tableInfo"></span>
+          <div>
+            <button id="prevPage" class="page-btn">Précédent</button>
+            <button id="nextPage" class="page-btn">Suivant</button>
+          </div>
         </div>
       </section>
-      <section class="legend-section card">
+      <section class="legend-section">
         <h2>Légende</h2>
         <div class="legend-grid">
-          <div class="legend-item"><strong>Parcelles Quarantaines:</strong> Parcelles inventoriées dans la forêt de Gouloumbou à Netteboulou</div>
-          <div class="legend-item"><strong>Parcelles OK Post-traitement:</strong> Parcelles validées pour la jointure</div>
-          <div class="legend-item"><strong>Parcelles Restantes:</strong> Parcelles envoyées et non post-traitées ou transmises à l'URM</div>
-          <div class="legend-item"><strong>Parcelles Jointure OK:</strong> Parcelles dont la jointure a réussi</div>
-          <div class="legend-item"><strong>Parcelles Jointure PAS OK:</strong> Parcelles dont la jointure a échoué (enquêtes non soumises ou supprimées par erreur - nécessitent une nouvelle enquête socio-foncière)</div>
+          <div class="legend-item">Levées brutes: Parcelles inventoriées initialement sans aucun traitement (données brutes collectées sur le terrain).</div>
+          <div class="legend-item">Sans doublons géométriques: Parcelles après élimination des doublons basés sur la géométrie (suppression des parcelles superposées ou identiques spatialement).</div>
+          <div class="legend-item">Sans doublons attributaires: Parcelles après élimination des doublons basés sur les attributs (suppression des parcelles avec des caractéristiques descriptives identiques).</div>
+          <div class="legend-item">Post-traitées: Parcelles après traitements supplémentaires pour nettoyage, validation et préparation à l'utilisation finale.</div>
+          <div class="legend-item">Parcelles Quarantaines: Parcelles inventoriées dans la forêt de Gouloumbou à Netteboulou et mises en quarantaine (exclues du traitement principal).</div>
+          <div class="legend-item">Parcelles OK Post-traitement: Parcelles post-traitées (assumées OK).</div>
+          <div class="legend-item">Parcelles Restantes: Parcelles sans doublons non post-traitées ou transmises à l'URM.</div>
+          <div class="legend-item">Parcelles Jointure OK: Parcelles validées par URM (NICAD).</div>
+          <div class="legend-item">Parcelles Jointure PAS OK: Parcelles post-traitées non validées (enquêtes non soumises ou supprimées par erreur - nécessitent une nouvelle enquête socio-foncière).</div>
         </div>
       </section>
       <footer class="dashboard-footer">
-        <p>© 2025 - Dashboard Interactif Inventaire Foncier Boundou - Données au 01 Juillet 2025</p>
+        © 2025 - Dashboard Interactif Inventaire Foncier Boundou - Données au 09 Août 2025
       </footer>
     </main>
-    <div id="fullscreenModal" class="modal hidden">
-      <div class="modal-overlay"></div>
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 id="modalTitle">Graphique en Plein Écran</h3>
-          <button id="closeModal" class="btn btn--sm">×</button>
-        </div>
-        <div class="modal-body"><canvas id="fullscreenChart"></canvas></div>
+  </div>
+  <div id="fullscreenModal" class="modal hidden">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle">Graphique en Plein Écran</h2>
+        <button id="closeModal">×</button>
+      </div>
+      <div class="modal-body">
+        <canvas id="fullscreenChart" style="height: 100%; width: 100%;"></canvas>
       </div>
     </div>
-    <div id="notifications" class="notifications"></div>
-    <div id="tooltip" class="tooltip hidden"></div>
   </div>
+  <div id="notifications" class="notifications"></div>
   <script src="app.js"></script>
 </body>
 </html>
