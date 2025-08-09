@@ -1,0 +1,114 @@
+[
+  {
+    "commune": "Bala",
+    "donnees_brutes": 912,
+    "sans_doublons_attributaire_et_geometriqu": 907,
+    "post_traitees": 842,
+    "valideespar_urm_nicad": 0
+  },
+  {
+    "commune": "Ballou",
+    "donnees_brutes": 1551,
+    "sans_doublons_attributaire_et_geometriqu": 659,
+    "post_traitees": 1964,
+    "valideespar_urm_nicad": 1294
+  },
+  {
+    "commune": "Bandafassi",
+    "donnees_brutes": 11731,
+    "sans_doublons_attributaire_et_geometriqu": 3832,
+    "post_traitees": 4121,
+    "valideespar_urm_nicad": 2883
+  },
+  {
+    "commune": "Bembou",
+    "donnees_brutes": 5885,
+    "sans_doublons_attributaire_et_geometriqu": 2083,
+    "post_traitees": 2024,
+    "valideespar_urm_nicad": 1805
+  },
+  {
+    "commune": "Dimboli",
+    "donnees_brutes": 6474,
+    "sans_doublons_attributaire_et_geometriqu": 3075,
+    "post_traitees": 3014,
+    "valideespar_urm_nicad": 2852
+  },
+  {
+    "commune": "Dindefello",
+    "donnees_brutes": 5725,
+    "sans_doublons_attributaire_et_geometriqu": 1845,
+    "post_traitees": 2124,
+    "valideespar_urm_nicad": 492
+  },
+  {
+    "commune": "Fongolembi",
+    "donnees_brutes": 5001,
+    "sans_doublons_attributaire_et_geometriqu": 1542,
+    "post_traitees": 1579,
+    "valideespar_urm_nicad": 1374
+  },
+  {
+    "commune": "Gabou",
+    "donnees_brutes": 1999,
+    "sans_doublons_attributaire_et_geometriqu": 947,
+    "post_traitees": 1633,
+    "valideespar_urm_nicad": 1609
+  },
+  {
+    "commune": "Koar",
+    "donnees_brutes": 101,
+    "sans_doublons_attributaire_et_geometriqu": 93,
+    "post_traitees": 92,
+    "valideespar_urm_nicad": 0
+  },
+  {
+    "commune": "Missirah",
+    "donnees_brutes": 7371,
+    "sans_doublons_attributaire_et_geometriqu": 5383,
+    "post_traitees": 5905,
+    "valideespar_urm_nicad": 3261
+  },
+  {
+    "commune": "Moudery",
+    "donnees_brutes": 1009,
+    "sans_doublons_attributaire_et_geometriqu": 4973,
+    "post_traitees": 1006,
+    "valideespar_urm_nicad": 983
+  },
+  {
+    "commune": "Ndoga Babacar",
+    "donnees_brutes": 4759,
+    "sans_doublons_attributaire_et_geometriqu": 2451,
+    "post_traitees": 4035,
+    "valideespar_urm_nicad": 2604
+  },
+  {
+    "commune": "Netteboulou",
+    "donnees_brutes": 3919,
+    "sans_doublons_attributaire_et_geometriqu": 1775,
+    "post_traitees": 2564,
+    "valideespar_urm_nicad": 2026
+  },
+  {
+    "commune": "Sinthiou Maleme",
+    "donnees_brutes": 2449,
+    "sans_doublons_attributaire_et_geometriqu": 1391,
+    "post_traitees": 0,
+    "valideespar_urm_nicad": 0
+  },
+  {
+    "commune": "Tomboronkoto",
+    "donnees_brutes": 56834,
+    "sans_doublons_attributaire_et_geometriqu": 10674,
+    "post_traitees": 9236,
+    "valideespar_urm_nicad": 2330
+  },
+  {
+    "commune": "Total",
+    "donnees_brutes": 115720,
+    "sans_doublons_attributaire_et_geometriqu": 41630,
+    "post_traitees": 40139,
+    "valideespar_urm_nicad": 23513
+  }
+]
