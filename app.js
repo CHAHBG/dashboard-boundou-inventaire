@@ -721,7 +721,6 @@ class PROCASEFDashboard {
     }
 
     // Efficiency trends radar chart
-
     createEfficiencyChart() {
         const ctx = document.getElementById('efficiencyChart');
         if (!ctx) return;
@@ -753,7 +752,7 @@ class PROCASEFDashboard {
                         pointBorderColor: '#fff',
                         pointBorderWidth: 2,
                         pointRadius: 6,
-                        order: 1 // Ensure this is drawn first
+                        order: 1
                     },
                     {
                         label: 'Score Qualité (%)',
@@ -765,7 +764,7 @@ class PROCASEFDashboard {
                         pointBorderColor: '#fff',
                         pointBorderWidth: 2,
                         pointRadius: 6,
-                        order: 2 // Ensure this is drawn on top
+                        order: 2
                     }
                 ]
             },
@@ -774,7 +773,7 @@ class PROCASEFDashboard {
                 maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        position: 'right', // Kept from previous fix
+                        position: 'right',
                         labels: {
                             padding: 20,
                             usePointStyle: true,
@@ -788,7 +787,7 @@ class PROCASEFDashboard {
                 scales: {
                     r: {
                         beginAtZero: true,
-                        max: 100, // Explicitly enforce max
+                        max: 100,
                         min: 0,
                         ticks: {
                             stepSize: 20,
@@ -817,8 +816,8 @@ class PROCASEFDashboard {
                 },
                 elements: {
                     line: {
-                        tension: 0.4, // Smooth the line to reduce overlap perception
-                        borderWidth: 2 // Slightly reduce line thickness if overlap is visual
+                        tension: 0.4,
+                        borderWidth: 2
                     },
                     point: {
                         hitRadius: 5,
@@ -1007,7 +1006,42 @@ class PROCASEFDashboard {
         }
     }
 
-// Open chart in modal
+    // Sanitize scale configuration to prevent TypeError
+    sanitizeScale(scale) {
+        if (!scale) return {};
+        return Object.fromEntries(
+            Object.entries(scale).map(([key, value]) => [
+                key,
+                typeof value === 'string' ? value : (typeof value === 'object' ? value : '')
+            ])
+        );
+    }
+
+    // Sanitize legend configuration
+    sanitizeLegend(legend) {
+        if (!legend) return {};
+        return {
+            ...legend,
+            labels: legend.labels ? {
+                ...legend.labels,
+                generateLabels: legend.labels.generateLabels || undefined
+            } : {}
+        };
+    }
+
+    // Sanitize tooltip configuration
+    sanitizeTooltip(tooltip) {
+        if (!tooltip) return {};
+        return {
+            ...tooltip,
+            callbacks: tooltip.callbacks ? {
+                ...tooltip.callbacks,
+                label: tooltip.callbacks.label || ((context) => context.label || '')
+            } : {}
+        };
+    }
+
+    // Open chart in modal
     openChartModal(chart, chartType) {
         const modal = document.getElementById('modalOverlay');
         const modalTitle = document.getElementById('modalTitle');
@@ -1060,7 +1094,7 @@ class PROCASEFDashboard {
 
                 this.modalChartInstance = new Chart(ctx, {
                     type: chart.config.type,
-                    data: { ...chart.data }, // Shallow copy to avoid reference issues
+                    data: { ...chart.data },
                     options: safeOptions
                 });
             } catch (error) {
@@ -1068,41 +1102,6 @@ class PROCASEFDashboard {
                 this.showNotification(`Erreur: ${error.message}`, 'error');
             }
         };
-
-        // Sanitize scale configuration to prevent TypeError
-    sanitizeScale(scale) {
-        if (!scale) return {};
-        return Object.fromEntries(
-            Object.entries(scale).map(([key, value]) => [
-                key,
-                typeof value === 'string' ? value : (typeof value === 'object' ? value : '')
-            ])
-        );
-    }
-
-    // Sanitize legend configuration
-    sanitizeLegend(legend) {
-        if (!legend) return {};
-        return {
-            ...legend,
-            labels: legend.labels ? {
-                ...legend.labels,
-                generateLabels: legend.labels.generateLabels || undefined
-            } : {}
-        };
-    }
-
-    // Sanitize tooltip configuration
-    sanitizeTooltip(tooltip) {
-        if (!tooltip) return {};
-        return {
-            ...tooltip,
-            callbacks: tooltip.callbacks ? {
-                ...tooltip.callbacks,
-                label: tooltip.callbacks.label || ((context) => context.label || '')
-            } : {}
-        };
-    }
 
         // Use requestAnimationFrame for better timing
         requestAnimationFrame(() => {
@@ -1545,17 +1544,17 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Global error handling
     window.addEventListener('error', (e) => {
-            console.error('Erreur globale:', {
-                message: e.message || 'Erreur inconnue',
-                filename: e.filename,
-                lineno: e.lineno,
-                colno: e.colno,
-                error: e.error
-            });
-            if (dashboard) {
-                dashboard.showNotification('Une erreur inattendue s\'est produite: ' + (e.message || 'Détails manquants'), 'error');
-            }
+        console.error('Erreur globale:', {
+            message: e.message || 'Erreur inconnue',
+            filename: e.filename,
+            lineno: e.lineno,
+            colno: e.colno,
+            error: e.error
         });
+        if (dashboard) {
+            dashboard.showNotification('Une erreur inattendue s\'est produite: ' + (e.message || 'Détails manquants'), 'error');
+        }
+    });
 
     window.addEventListener('unhandledrejection', (e) => {
         console.error('Promise rejetée:', e.reason);
