@@ -1,4 +1,3 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -161,10 +160,16 @@
 
             <!-- KPI Section -->
             <section class="kpi-section">
-                <h2 class="section-title">
-                    <i class="fas fa-tachometer-alt"></i> 
-                    Indicateurs de Performance
-                </h2>
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-tachometer-alt"></i> 
+                        Indicateurs de Performance
+                    </h2>
+                    <button class="btn btn-info btn-sm" id="showKPILegend">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Guide des KPI</span>
+                    </button>
+                </div>
                 <div class="kpi-grid">
                     <div class="kpi-card" data-kpi="pipeline">
                         <div class="kpi-header">
@@ -367,7 +372,7 @@
                                     <span>Données Brutes</span>
                                     <i class="fas fa-sort"></i>
                                 </th>
-                                <th data-sort="sans_doublons">
+                                <th data-sort="sans_doublons_attributaire_et_geometriqu">
                                     <span>Sans Doublons</span>
                                     <i class="fas fa-sort"></i>
                                 </th>
@@ -375,15 +380,15 @@
                                     <span>Post-traitées</span>
                                     <i class="fas fa-sort"></i>
                                 </th>
-                                <th data-sort="validees">
+                                <th data-sort="valideespar_urm_nicad">
                                     <span>Validées</span>
                                     <i class="fas fa-sort"></i>
                                 </th>
-                                <th data-sort="taux_validation">
+                                <th data-sort="validationRate">
                                     <span>Taux Validation</span>
                                     <i class="fas fa-sort"></i>
                                 </th>
-                                <th data-sort="efficacite">
+                                <th data-sort="globalEfficiency">
                                     <span>Efficacité</span>
                                     <i class="fas fa-sort"></i>
                                 </th>
@@ -412,6 +417,187 @@
                 </div>
             </section>
         </main>
+    </div>
+
+    <!-- KPI Legend Modal -->
+    <div class="modal-overlay" id="kpiLegendModal">
+        <div class="modal-container modal-large">
+            <div class="modal-header">
+                <h3><i class="fas fa-book-open"></i> Guide des Indicateurs de Performance</h3>
+                <button class="modal-close" id="closeLegendModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="legend-content">
+                    <div class="legend-section">
+                        <h4><i class="fas fa-chart-line"></i> Indicateurs Principaux</h4>
+                        <div class="legend-grid">
+                            <div class="legend-item">
+                                <div class="legend-icon bg-blue">
+                                    <i class="fas fa-arrow-right"></i>
+                                </div>
+                                <div class="legend-info">
+                                    <h5>Efficacité Pipeline</h5>
+                                    <p><strong>Formule :</strong> (Données Validées ÷ Données Brutes) × 100</p>
+                                    <p><strong>Description :</strong> Mesure le rendement global du processus de traitement des données foncières</p>
+                                    <p><strong>Exemple :</strong> 1000 parcelles collectées → 203 validées = 20.3%</p>
+                                </div>
+                            </div>
+
+                            <div class="legend-item">
+                                <div class="legend-icon bg-green">
+                                    <i class="fas fa-shield-alt"></i>
+                                </div>
+                                <div class="legend-info">
+                                    <h5>Qualité Données</h5>
+                                    <p><strong>Formule :</strong> Score composite pondéré</p>
+                                    <p><strong>Composition :</strong> Dédoublonnage (20%) + Post-traitement (30%) + Validation (50%)</p>
+                                    <p><strong>Description :</strong> Évalue la fiabilité et l'intégrité des données à chaque étape</p>
+                                </div>
+                            </div>
+
+                            <div class="legend-item">
+                                <div class="legend-icon bg-orange">
+                                    <i class="fas fa-certificate"></i>
+                                </div>
+                                <div class="legend-info">
+                                    <h5>Taux Validation</h5>
+                                    <p><strong>Formule :</strong> (Validées URM/NICAD ÷ Post-traitées) × 100</p>
+                                    <p><strong>Description :</strong> Proportion des données acceptées lors de la validation finale</p>
+                                    <p><strong>Organismes :</strong> URM (Unité de Restructuration et de Modernisation) et NICAD</p>
+                                </div>
+                            </div>
+
+                            <div class="legend-item">
+                                <div class="legend-icon bg-purple">
+                                    <i class="fas fa-globe"></i>
+                                </div>
+                                <div class="legend-info">
+                                    <h5>Couverture</h5>
+                                    <p><strong>Formule :</strong> (Communes avec données ÷ Total communes) × 100</p>
+                                    <p><strong>Description :</strong> Mesure l'exhaustivité géographique du projet EDL</p>
+                                    <p><strong>Objectif :</strong> Atteindre 100% de couverture dans la région du Boundou</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="legend-section">
+                        <h4><i class="fas fa-route"></i> Pipeline de Traitement</h4>
+                        <div class="pipeline-legend">
+                            <div class="pipeline-step">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <h5>Données Brutes</h5>
+                                    <p>Collecte initiale des informations foncières sur le terrain</p>
+                                </div>
+                            </div>
+                            <div class="pipeline-arrow">→</div>
+                            
+                            <div class="pipeline-step">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <h5>Sans Doublons</h5>
+                                    <p>Suppression des doublons attributaires et géométriques</p>
+                                </div>
+                            </div>
+                            <div class="pipeline-arrow">→</div>
+                            
+                            <div class="pipeline-step">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <h5>Post-traitées</h5>
+                                    <p>Nettoyage, standardisation et harmonisation des données</p>
+                                </div>
+                            </div>
+                            <div class="pipeline-arrow">→</div>
+                            
+                            <div class="pipeline-step">
+                                <div class="step-number">4</div>
+                                <div class="step-content">
+                                    <h5>Validées URM/NICAD</h5>
+                                    <p>Validation finale par les organismes compétents</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="legend-section">
+                        <h4><i class="fas fa-trending-up"></i> Interprétation des Tendances</h4>
+                        <div class="trends-legend">
+                            <div class="trend-item positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span class="trend-value">+2.3%</span>
+                                <div class="trend-description">
+                                    <strong>Tendance Positive :</strong> Amélioration par rapport à la période précédente
+                                </div>
+                            </div>
+                            <div class="trend-item negative">
+                                <i class="fas fa-arrow-down"></i>
+                                <span class="trend-value">-0.5%</span>
+                                <div class="trend-description">
+                                    <strong>Tendance Négative :</strong> Détérioration nécessitant une attention particulière
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="legend-section">
+                        <h4><i class="fas fa-star"></i> Niveaux de Performance</h4>
+                        <div class="performance-legend">
+                            <div class="performance-level excellent">
+                                <span class="level-badge">Excellent</span>
+                                <span class="level-range">≥ 80%</span>
+                                <span class="level-description">Performance optimale</span>
+                            </div>
+                            <div class="performance-level good">
+                                <span class="level-badge">Bon</span>
+                                <span class="level-range">60-80%</span>
+                                <span class="level-description">Bon niveau de qualité</span>
+                            </div>
+                            <div class="performance-level average">
+                                <span class="level-badge">Moyen</span>
+                                <span class="level-range">30-60%</span>
+                                <span class="level-description">Amélioration possible</span>
+                            </div>
+                            <div class="performance-level poor">
+                                <span class="level-badge">Faible</span>
+                                <span class="level-range">< 30%</span>
+                                <span class="level-description">Intervention requise</span>
+                            </div>
+                            <div class="performance-level zero">
+                                <span class="level-badge">Zéro</span>
+                                <span class="level-range">0%</span>
+                                <span class="level-description">Aucune validation</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="legend-section">
+                        <h4><i class="fas fa-lightbulb"></i> Conseils d'Utilisation</h4>
+                        <div class="tips-grid">
+                            <div class="tip-item">
+                                <i class="fas fa-filter text-blue"></i>
+                                <p>Utilisez les filtres pour analyser des communes spécifiques ou des niveaux de performance</p>
+                            </div>
+                            <div class="tip-item">
+                                <i class="fas fa-search text-green"></i>
+                                <p>La fonction recherche permet de trouver rapidement une commune dans le tableau</p>
+                            </div>
+                            <div class="tip-item">
+                                <i class="fas fa-download text-orange"></i>
+                                <p>Exportez les données et graphiques pour vos rapports et présentations</p>
+                            </div>
+                            <div class="tip-item">
+                                <i class="fas fa-expand text-purple"></i>
+                                <p>Cliquez sur les graphiques pour les voir en plein écran</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Fullscreen Modal -->
