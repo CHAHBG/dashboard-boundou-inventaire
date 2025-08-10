@@ -1,3 +1,4 @@
+// app.js
 // PROCASEF Dashboard - Advanced Analytics Engine
 class PROCASEFDashboard {
     constructor() {
@@ -7,6 +8,7 @@ class PROCASEFDashboard {
         this.filteredData = [];
         this.dataFilePath = './EDL_PostTraitement.json'; // Path to JSON file
         this.charts = {};
+        this.modalChartInstance = null;
         this.filters = {
             communes: [],
             seuil: 0,
@@ -282,12 +284,16 @@ class PROCASEFDashboard {
             this.filters.performance = e.target.value;
         });
 
-        // Search functionality
-        document.getElementById('searchInput')?.addEventListener('input', (e) => {
-            this.searchTerm = e.target.value.toLowerCase();
-            this.currentPage = 1;
-            this.renderTable();
-        });
+        // Search functionality with debounce
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            const debouncedSearch = this.debounce((value) => {
+                this.searchTerm = value.toLowerCase();
+                this.currentPage = 1;
+                this.renderTable();
+            }, 300);
+            searchInput.addEventListener('input', (e) => debouncedSearch(e.target.value));
+        }
 
         // Export buttons
         document.getElementById('exportBtn')?.addEventListener('click', () => {
@@ -486,6 +492,10 @@ class PROCASEFDashboard {
         const ctx = document.getElementById('pipelineChart');
         if (!ctx) return;
 
+        if (this.charts.pipeline) {
+            this.charts.pipeline.destroy();
+        }
+
         const totals = this.filteredData.reduce((acc, commune) => ({
             brutes: acc.brutes + commune.donnees_brutes,
             sansDoublons: acc.sansDoublons + commune.sans_doublons_attributaire_et_geometriqu,
@@ -558,6 +568,10 @@ class PROCASEFDashboard {
         const ctx = document.getElementById('performanceChart');
         if (!ctx) return;
 
+        if (this.charts.performance) {
+            this.charts.performance.destroy();
+        }
+
         const data = this.filteredData.slice(0, 10); // Top 10 communes
         const communes = data.map(d => d.commune);
         const efficiency = data.map(d => d.globalEfficiency);
@@ -573,16 +587,14 @@ class PROCASEFDashboard {
                         data: efficiency,
                         backgroundColor: this.PROCASEF_COLORS.primary + '80',
                         borderColor: this.PROCASEF_COLORS.primary,
-                        borderWidth: 2,
-                        yAxisID: 'y'
+                        borderWidth: 2
                     },
                     {
                         label: 'Taux Validation (%)',
                         data: validation,
                         backgroundColor: this.PROCASEF_COLORS.success + '80',
                         borderColor: this.PROCASEF_COLORS.success,
-                        borderWidth: 2,
-                        yAxisID: 'y1'
+                        borderWidth: 2
                     }
                 ]
             },
@@ -611,24 +623,8 @@ class PROCASEFDashboard {
                         }
                     },
                     y: {
-                        type: 'linear',
-                        display: true,
-                        position: 'left',
                         beginAtZero: true,
                         max: 100,
-                        ticks: {
-                            callback: (value) => value + '%'
-                        }
-                    },
-                    y1: {
-                        type: 'linear',
-                        display: true,
-                        position: 'right',
-                        beginAtZero: true,
-                        max: 100,
-                        grid: {
-                            drawOnChartArea: false,
-                        },
                         ticks: {
                             callback: (value) => value + '%'
                         }
@@ -643,20 +639,29 @@ class PROCASEFDashboard {
         const ctx = document.getElementById('validationChart');
         if (!ctx) return;
 
+        if (this.charts.validation) {
+            this.charts.validation.destroy();
+        }
+
+        // Store commune names for each performance group
         const performanceGroups = {
-            'Excellent (≥80%)': this.filteredData.filter(d => d.validationRate >= 80).length,
-            'Bon (60-80%)': this.filteredData.filter(d => d.validationRate >= 60 && d.validationRate < 80).length,
-            'Moyen (30-60%)': this.filteredData.filter(d => d.validationRate >= 30 && d.validationRate < 60).length,
-            'Faible (<30%)': this.filteredData.filter(d => d.validationRate > 0 && d.validationRate < 30).length,
-            'Aucune validation': this.filteredData.filter(d => d.validationRate === 0).length
+            'Excellent (≥80%)': this.filteredData.filter(d => d.validationRate >= 80),
+            'Bon (60-80%)': this.filteredData.filter(d => d.validationRate >= 60 && d.validationRate < 80),
+            'Moyen (30-60%)': this.filteredData.filter(d => d.validationRate >= 30 && d.validationRate < 60),
+            'Faible (<30%)': this.filteredData.filter(d => d.validationRate > 0 && d.validationRate < 30),
+            'Aucune validation': this.filteredData.filter(d => d.validationRate === 0)
         };
+
+        // Extract counts and commune names for chart data
+        const counts = Object.values(performanceGroups).map(group => group.length);
+        const communeNames = Object.values(performanceGroups).map(group => group.map(d => d.commune));
 
         this.charts.validation = new Chart(ctx, {
             type: 'doughnut',
             data: {
                 labels: Object.keys(performanceGroups),
                 datasets: [{
-                    data: Object.values(performanceGroups),
+                    data: counts,
                     backgroundColor: [
                         this.PROCASEF_COLORS.success,
                         this.PROCASEF_COLORS.primary,
@@ -685,11 +690,26 @@ class PROCASEFDashboard {
                         bodyColor: '#fff',
                         callbacks: {
                             label: (context) => {
+                                const label = context.label;
+                                const count = context.raw;
                                 const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                const percentage = ((context.raw / total) * 100).toFixed(1);
-                                return `${context.label}: ${context.raw} communes (${percentage}%)`;
+                                const percentage = ((count / total) * 100).toFixed(1);
+                                const communes = communeNames[context.dataIndex].join(', ') || 'Aucune';
+                                return [
+                                    `${label}: ${count} commune(s) (${percentage}%)`,
+                                    `Communes: ${communes}`
+                                ];
                             }
                         }
+                    }
+                },
+                onClick: (event, elements) => {
+                    if (elements.length > 0) {
+                        const index = elements[0].index;
+                        const performanceLevel = Object.keys(performanceGroups)[index].toLowerCase().split(' ')[0];
+                        this.filters.performance = performanceLevel;
+                        this.applyFilters();
+                        this.showNotification(`Filtrage par niveau de performance: ${Object.keys(performanceGroups)[index]}`, 'info');
                     }
                 },
                 animation: {
@@ -704,6 +724,10 @@ class PROCASEFDashboard {
     createEfficiencyChart() {
         const ctx = document.getElementById('efficiencyChart');
         if (!ctx) return;
+
+        if (this.charts.efficiency) {
+            this.charts.efficiency.destroy();
+        }
 
         const topCommunes = this.filteredData
             .sort((a, b) => b.globalEfficiency - a.globalEfficiency)
@@ -927,7 +951,7 @@ class PROCASEFDashboard {
     // Handle chart actions
     handleChartAction(action, chartType) {
         const chart = this.charts[chartType];
-        if (!chart) return;
+        if (!chart && action !== 'details') return;
 
         switch (action) {
             case 'fullscreen':
@@ -935,6 +959,11 @@ class PROCASEFDashboard {
                 break;
             case 'download':
                 this.downloadChart(chart, chartType);
+                break;
+            case 'details':
+                if (chartType === 'validation') {
+                    this.showValidationDetails();
+                }
                 break;
         }
     }
@@ -957,23 +986,30 @@ class PROCASEFDashboard {
         modalTitle.textContent = titles[chartType] || 'Graphique';
         modal.classList.add('active');
 
+        // Destroy existing chart on modal canvas if it exists
+        if (this.modalChartInstance) {
+            this.modalChartInstance.destroy();
+            this.modalChartInstance = null;
+        }
+
         // Create full-screen chart
         setTimeout(() => {
             const ctx = modalChart.getContext('2d');
-            new Chart(ctx, {
+            this.modalChartInstance = new Chart(ctx, {
                 type: chart.config.type,
-                data: JSON.parse(JSON.stringify(chart.data)),
-                options: {
-                    ...chart.options,
-                    responsive: true,
-                    maintainAspectRatio: false
-                }
+                data: chart.data,
+                options: chart.options
             });
         }, 100);
 
         // Close modal events
         const closeModal = () => {
             modal.classList.remove('active');
+            // Destroy modal chart when closing
+            if (this.modalChartInstance) {
+                this.modalChartInstance.destroy();
+                this.modalChartInstance = null;
+            }
         };
 
         document.getElementById('modalClose')?.addEventListener('click', closeModal);
@@ -1086,6 +1122,33 @@ class PROCASEFDashboard {
         `;
 
         this.showCustomModal('Détails de la Commune', modalContent);
+    }
+
+    // Show validation details modal
+    showValidationDetails() {
+        const performanceGroups = {
+            'Excellent (≥80%)': this.filteredData.filter(d => d.validationRate >= 80),
+            'Bon (60-80%)': this.filteredData.filter(d => d.validationRate >= 60 && d.validationRate < 80),
+            'Moyen (30-60%)': this.filteredData.filter(d => d.validationRate >= 30 && d.validationRate < 60),
+            'Faible (<30%)': this.filteredData.filter(d => d.validationRate > 0 && d.validationRate < 30),
+            'Aucune validation': this.filteredData.filter(d => d.validationRate === 0)
+        };
+
+        const modalContent = `
+            <div class="validation-details">
+                <h3>Répartition des Niveaux de Validation</h3>
+                <div class="details-grid">
+                    ${Object.entries(performanceGroups).map(([level, communes]) => `
+                        <div class="detail-item">
+                            <label>${level}:</label>
+                            <span>${communes.length} commune(s) - ${communes.map(c => c.commune).join(', ') || 'Aucune'}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+
+        this.showCustomModal('Détails de Validation', modalContent);
     }
 
     // Show custom modal
@@ -1341,6 +1404,10 @@ class PROCASEFDashboard {
             }
         });
 
+        if (this.modalChartInstance) {
+            this.modalChartInstance.destroy();
+        }
+
         // Clear auto-refresh interval
         if (this.autoRefreshInterval) {
             clearInterval(this.autoRefreshInterval);
@@ -1372,7 +1439,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Global error handling
     window.addEventListener('error', (e) => {
-        console.error('Erreur globale:', e.error);
+        console.error('Erreur globale:', e.message || 'Erreur inconnue', e);
         if (dashboard) {
             dashboard.showNotification('Une erreur inattendue s\'est produite', 'error');
         }
