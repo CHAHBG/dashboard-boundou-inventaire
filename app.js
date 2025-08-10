@@ -1009,12 +1009,44 @@ class PROCASEFDashboard {
     // Sanitize scale configuration to prevent TypeError
     sanitizeScale(scale) {
         if (!scale) return {};
-        return Object.fromEntries(
-            Object.entries(scale).map(([key, value]) => [
-                key,
-                typeof value === 'string' ? value : (typeof value === 'object' ? value : '')
-            ])
-        );
+        
+        const sanitized = {};
+        for (const [key, value] of Object.entries(scale)) {
+            if (value === null || value === undefined) {
+                continue; // Skip null/undefined values
+            }
+            
+            if (typeof value === 'function') {
+                sanitized[key] = value; // Keep functions as-is
+            } else if (typeof value === 'object' && !Array.isArray(value)) {
+                // Recursively sanitize nested objects
+                sanitized[key] = this.sanitizeNestedObject(value);
+            } else {
+                sanitized[key] = value; // Keep primitives and arrays as-is
+            }
+        }
+        return sanitized;
+    }
+
+    // Helper method for sanitizing nested objects
+    sanitizeNestedObject(obj) {
+        if (!obj || typeof obj !== 'object') return obj;
+        
+        const sanitized = {};
+        for (const [key, value] of Object.entries(obj)) {
+            if (value === null || value === undefined) {
+                continue;
+            }
+            
+            if (typeof value === 'function') {
+                sanitized[key] = value;
+            } else if (typeof value === 'object' && !Array.isArray(value)) {
+                sanitized[key] = this.sanitizeNestedObject(value);
+            } else {
+                sanitized[key] = value;
+            }
+        }
+        return sanitized;
     }
 
     // Sanitize legend configuration
@@ -1076,36 +1108,82 @@ class PROCASEFDashboard {
                     throw new Error('Contexte de canvas invalide');
                 }
 
-                // Sanitize options to prevent TypeError
-                const safeOptions = {
-                    ...chart.options,
-                    scales: chart.options.scales ? {
-                        ...chart.options.scales,
-                        x: this.sanitizeScale(chart.options.scales.x),
-                        y: this.sanitizeScale(chart.options.scales.y),
-                        r: this.sanitizeScale(chart.options.scales.r)
-                    } : {},
-                    plugins: chart.options.plugins ? {
-                        ...chart.options.plugins,
-                        legend: this.sanitizeLegend(chart.options.plugins.legend),
-                        tooltip: this.sanitizeTooltip(chart.options.plugins.tooltip)
-                    } : {}
+                // Create a safe copy of the chart configuration
+                const safeConfig = {
+                    type: chart.config.type,
+                    data: JSON.parse(JSON.stringify(chart.data)), // Deep clone data
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        // Copy basic options
+                        plugins: chart.options.plugins ? {
+                            legend: chart.options.plugins.legend || {},
+                            tooltip: chart.options.plugins.tooltip || {}
+                        } : {},
+                        // Copy scales with careful handling
+                        scales: {}
+                    }
                 };
 
-                this.modalChartInstance = new Chart(ctx, {
-                    type: chart.config.type,
-                    data: { ...chart.data },
-                    options: safeOptions
-                });
+                // Handle scales more carefully
+                if (chart.options.scales) {
+                    Object.keys(chart.options.scales).forEach(scaleKey => {
+                        const originalScale = chart.options.scales[scaleKey];
+                        if (originalScale) {
+                            safeConfig.options.scales[scaleKey] = {
+                                beginAtZero: originalScale.beginAtZero,
+                                max: originalScale.max,
+                                min: originalScale.min,
+                                grid: originalScale.grid || {},
+                                ticks: originalScale.ticks ? {
+                                    stepSize: originalScale.ticks.stepSize,
+                                    maxRotation: originalScale.ticks.maxRotation,
+                                    callback: originalScale.ticks.callback
+                                } : {},
+                                angleLines: originalScale.angleLines || {},
+                                pointLabels: originalScale.pointLabels || {}
+                            };
+                        }
+                    });
+                }
+
+                // Handle layout
+                if (chart.options.layout) {
+                    safeConfig.options.layout = { ...chart.options.layout };
+                }
+
+                // Handle elements
+                if (chart.options.elements) {
+                    safeConfig.options.elements = { ...chart.options.elements };
+                }
+
+                // Handle interaction
+                if (chart.options.interaction) {
+                    safeConfig.options.interaction = { ...chart.options.interaction };
+                }
+
+                // Handle animation
+                if (chart.options.animation) {
+                    safeConfig.options.animation = {
+                        duration: chart.options.animation.duration || 1000,
+                        easing: chart.options.animation.easing || 'easeOutQuart'
+                    };
+                }
+
+                this.modalChartInstance = new Chart(ctx, safeConfig);
+
             } catch (error) {
                 console.error('Erreur lors de la création du graphique modal:', error);
-                this.showNotification(`Erreur: ${error.message}`, 'error');
+                this.showNotification(`Erreur lors de l'ouverture du graphique: ${error.message}`, 'error');
+                
+                // Fallback: close modal if chart creation fails
+                modal.classList.remove('active');
             }
         };
 
         // Use requestAnimationFrame for better timing
         requestAnimationFrame(() => {
-            createModalChart();
+            setTimeout(createModalChart, 100); // Small delay to ensure modal is rendered
         });
 
         // Close modal events
@@ -1117,10 +1195,21 @@ class PROCASEFDashboard {
             }
         };
 
-        document.getElementById('modalClose')?.addEventListener('click', closeModal);
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) closeModal();
-        });
+        // Remove existing listeners to prevent duplicates
+        const existingCloseBtn = document.getElementById('modalClose');
+        if (existingCloseBtn) {
+            existingCloseBtn.removeEventListener('click', closeModal);
+            existingCloseBtn.addEventListener('click', closeModal);
+        }
+
+        // Handle modal background click
+        const handleModalClick = (e) => {
+            if (e.target === modal) {
+                closeModal();
+                modal.removeEventListener('click', handleModalClick);
+            }
+        };
+        modal.addEventListener('click', handleModalClick);
     }
 
     // Download chart as image
