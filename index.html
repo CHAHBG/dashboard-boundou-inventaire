@@ -1,300 +1,432 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard EDL Post-Traitement - Boundou</title>
-  <link rel="icon" type="image/x-icon" href="/favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&family=Fira+Code&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PROCASEF - Dashboard EDL Boundou</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="dashboard">
-    <aside class="sidebar">
-      <div class="sidebar-header">
-        <h2>Contrôles</h2>
-        <button id="darkModeToggle" class="btn btn--sm">🌙</button>
-      </div>
-      <section class="filters-panel card">
-        <h3>Filtres</h3>
-        <div class="filters-row">
-          <div class="filter-group">
-            <label class="form-label">Communes</label>
-            <div class="commune-filters" id="communeFilters"></div>
-          </div>
-          <div class="filter-group">
-            <label class="form-label" for="seuilFilter">Seuil Min. Données Brutes</label>
-            <input type="range" id="seuilFilter" class="form-control" min="0" max="60000" value="0" step="100">
-            <span id="seuilValue">0</span>
-          </div>
-          <div class="filter-group">
-            <label class="form-label" for="performanceFilter">Taux de Validation</label>
-            <select id="performanceFilter" class="form-control">
-              <option value="all">Tous</option>
-              <option value="high">Élevé (>70%)</option>
-              <option value="medium">Moyen (30-70%)</option>
-              <option value="low">Faible (<30%)</option>
-              <option value="zero">Aucune validation</option>
-            </select>
-          </div>
-          <div class="filter-group">
-            <label class="form-label">Problèmes Spéciaux</label>
-            <div class="problem-filters">
-              <label class="checkbox-label"><input type="checkbox" id="quarantineFilter"> Avec Quarantaines</label>
-              <label class="checkbox-label"><input type="checkbox" id="noValidationFilter"> Sans Validation</label>
-            </div>
-          </div>
-          <div class="filter-actions">
-            <button id="applyFilters" class="btn btn--primary">Appliquer</button>
-            <button id="resetFilters" class="btn btn--outline">Réinitialiser</button>
-          </div>
+    <div id="loading" class="loading-overlay">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Chargement des données...</p>
         </div>
-      </section>
-      <div class="sidebar-footer">
-        <button id="exportBtn" class="btn btn--primary">📊 Exporter CSV</button>
-        <button id="refreshBtn" class="btn btn--outline">🔄 Actualiser</button>
-      </div>
-    </aside>
+    </div>
 
-    <main class="main-content">
-      <header class="dashboard-header">
-        <h1>📈 Dashboard EDL Post-Traitement</h1>
-        <h2>Inventaire Foncier - Région de Boundou</h2>
-        <p class="date">Données mises à jour automatiquement - <span id="lastUpdate">Chargement...</span></p>
-      </header>
-
-      <!-- Section KPIs -->
-      <section class="kpi-section">
-        <h2>📊 Indicateurs Clés de Performance</h2>
-        <div class="kpi-grid">
-          <div class="kpi-card card">
-            <span class="kpi-icon">📋</span>
-            <div class="kpi-content">
-              <h3>Total Données Brutes</h3>
-              <p class="kpi-value" id="kpi-brutes">0</p>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiByeD0iOCIgZmlsbD0iIzAwNzJCQyIvPgo8cGF0aCBkPSJNMTIgMTJIMjhWMjhIMTJWMTJaIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiLz4KPHBhdGggZD0iTTE2IDE2SDI0VjI0SDE2VjE2WiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+" alt="PROCASEF" class="logo">
+                <div class="brand-text">
+                    <h1>PROCASEF</h1>
+                    <span>Dashboard EDL</span>
+                </div>
             </div>
-          </div>
-          <div class="kpi-card card">
-            <span class="kpi-icon">🏘️</span>
-            <div class="kpi-content">
-              <h3>Communes Analysées</h3>
-              <p class="kpi-value" id="kpi-communes">0</p>
+            <div class="nav-actions">
+                <button class="nav-btn" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="nav-btn" id="exportBtn">
+                    <i class="fas fa-download"></i>
+                    <span>Exporter</span>
+                </button>
+                <button class="nav-btn" id="refreshBtn">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
             </div>
-          </div>
-          <div class="kpi-card card">
-            <span class="kpi-icon">🔄</span>
-            <div class="kpi-content">
-              <h3>Taux Dédoublonnage</h3>
-              <p class="kpi-value" id="kpi-dedoublonnage">0%</p>
-            </div>
-          </div>
-          <div class="kpi-card card">
-            <span class="kpi-icon">⚙️</span>
-            <div class="kpi-content">
-              <h3>Taux Post-traitement</h3>
-              <p class="kpi-value" id="kpi-post-traitement">0%</p>
-            </div>
-          </div>
-          <div class="kpi-card card">
-            <span class="kpi-icon">✅</span>
-            <div class="kpi-content">
-              <h3>Taux Validation URM/NICAD</h3>
-              <p class="kpi-value" id="kpi-validation">0%</p>
-            </div>
-          </div>
-          <div class="kpi-card card">
-            <span class="kpi-icon">⚠️</span>
-            <div class="kpi-content">
-              <h3>Parcelles Quarantaine</h3>
-              <p class="kpi-value" id="kpi-quarantaine">337</p>
-              <small>Netteboulou - Forêt Gouloumbou</small>
-            </div>
-          </div>
         </div>
-      </section>
+    </nav>
 
-      <!-- Section Graphiques -->
-      <section class="charts-section">
-        <h2>📈 Analyses Graphiques Interactives</h2>
-        <div class="charts-grid">
-          <!-- Pipeline de traitement -->
-          <div class="chart-card card">
-            <div class="chart-header">
-              <h3>🔄 Pipeline de Traitement des Données</h3>
-              <div class="chart-controls">
-                <button class="btn btn--sm chart-btn" data-action="zoom-in" data-chart="pipeline">🔍+</button>
-                <button class="btn btn--sm chart-btn" data-action="zoom-out" data-chart="pipeline">🔍-</button>
-                <button class="btn btn--sm chart-btn" data-action="reset-zoom" data-chart="pipeline">🔄</button>
-                <button class="btn btn--sm chart-btn" data-action="fullscreen" data-chart="pipeline">📱</button>
-                <button class="btn btn--sm chart-btn" data-action="save-image" data-chart="pipeline">💾</button>
-              </div>
+    <!-- Main Layout -->
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h3><i class="fas fa-filter"></i> Filtres & Analyses</h3>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
             </div>
-            <div class="chart-container">
-              <canvas id="pipelineChart"></canvas>
-            </div>
-          </div>
 
-          <!-- Comparaison par commune -->
-          <div class="chart-card card">
-            <div class="chart-header">
-              <h3>🏘️ Performance par Commune</h3>
-              <div class="chart-controls">
-                <button class="btn btn--sm chart-btn" data-action="zoom-in" data-chart="communes">🔍+</button>
-                <button class="btn btn--sm chart-btn" data-action="zoom-out" data-chart="communes">🔍-</button>
-                <button class="btn btn--sm chart-btn" data-action="reset-zoom" data-chart="communes">🔄</button>
-                <button class="btn btn--sm chart-btn" data-action="fullscreen" data-chart="communes">📱</button>
-                <button class="btn btn--sm chart-btn" data-action="save-image" data-chart="communes">💾</button>
-              </div>
-            </div>
-            <div class="chart-container">
-              <canvas id="communesChart"></canvas>
-            </div>
-          </div>
+            <div class="filter-section">
+                <div class="filter-group">
+                    <label class="filter-label">Communes sélectionnées</label>
+                    <div class="communes-filter" id="communesFilter">
+                        <!-- Dynamically populated -->
+                    </div>
+                </div>
 
-          <!-- Taux de validation -->
-          <div class="chart-card card">
-            <div class="chart-header">
-              <h3>🎯 Taux de Validation URM/NICAD</h3>
-              <div class="chart-controls">
-                <button class="btn btn--sm chart-btn" data-action="zoom-in" data-chart="validation">🔍+</button>
-                <button class="btn btn--sm chart-btn" data-action="zoom-out" data-chart="validation">🔍-</button>
-                <button class="btn btn--sm chart-btn" data-action="reset-zoom" data-chart="validation">🔄</button>
-                <button class="btn btn--sm chart-btn" data-action="fullscreen" data-chart="validation">📱</button>
-                <button class="btn btn--sm chart-btn" data-action="save-image" data-chart="validation">💾</button>
-              </div>
-            </div>
-            <div class="chart-container">
-              <canvas id="validationChart"></canvas>
-            </div>
-          </div>
+                <div class="filter-group">
+                    <label class="filter-label">Seuil minimum (données brutes)</label>
+                    <div class="range-input">
+                        <input type="range" id="seuilRange" min="0" max="60000" value="0" step="500">
+                        <div class="range-value">
+                            <span id="seuilValue">0</span>
+                        </div>
+                    </div>
+                </div>
 
-          <!-- Efficacité du traitement -->
-          <div class="chart-card card">
-            <div class="chart-header">
-              <h3>⚡ Efficacité du Traitement</h3>
-              <div class="chart-controls">
-                <button class="btn btn--sm chart-btn" data-action="zoom-in" data-chart="efficacite">🔍+</button>
-                <button class="btn btn--sm chart-btn" data-action="zoom-out" data-chart="efficacite">🔍-</button>
-                <button class="btn btn--sm chart-btn" data-action="reset-zoom" data-chart="efficacite">🔄</button>
-                <button class="btn btn--sm chart-btn" data-action="fullscreen" data-chart="efficacite">📱</button>
-                <button class="btn btn--sm chart-btn" data-action="save-image" data-chart="efficacite">💾</button>
-              </div>
+                <div class="filter-group">
+                    <label class="filter-label">Niveau de performance</label>
+                    <select class="filter-select" id="performanceFilter">
+                        <option value="all">Tous niveaux</option>
+                        <option value="excellent">Excellent (≥80%)</option>
+                        <option value="good">Bon (60-80%)</option>
+                        <option value="average">Moyen (30-60%)</option>
+                        <option value="poor">Faible (<30%)</option>
+                        <option value="zero">Aucune validation</option>
+                    </select>
+                </div>
+
+                <div class="filter-actions">
+                    <button class="btn btn-primary" id="applyFilters">
+                        <i class="fas fa-search"></i> Appliquer
+                    </button>
+                    <button class="btn btn-outline" id="resetFilters">
+                        <i class="fas fa-undo"></i> Réinitialiser
+                    </button>
+                </div>
             </div>
-            <div class="chart-container">
-              <canvas id="efficaciteChart"></canvas>
+
+            <div class="analysis-section">
+                <h4><i class="fas fa-chart-line"></i> Analyses rapides</h4>
+                <div class="quick-stats">
+                    <div class="quick-stat">
+                        <span class="stat-label">Efficacité moyenne</span>
+                        <span class="stat-value" id="avgEfficiency">0%</span>
+                    </div>
+                    <div class="quick-stat">
+                        <span class="stat-label">Meilleure commune</span>
+                        <span class="stat-value" id="topCommune">-</span>
+                    </div>
+                    <div class="quick-stat">
+                        <span class="stat-label">Total parcelles</span>
+                        <span class="stat-value" id="totalParcels">0</span>
+                    </div>
+                </div>
             </div>
-          </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header Section -->
+            <section class="dashboard-header">
+                <div class="header-content">
+                    <div class="title-section">
+                        <h1>Inventaire Foncier - Région du Boundou</h1>
+                        <p class="subtitle">Suivi en temps réel du post-traitement EDL</p>
+                        <div class="update-info">
+                            <i class="fas fa-clock"></i>
+                            <span>Dernière mise à jour: <span id="lastUpdate">-</span></span>
+                        </div>
+                    </div>
+                    <div class="header-stats">
+                        <div class="stat-card">
+                            <div class="stat-icon bg-blue">
+                                <i class="fas fa-database"></i>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-number" id="totalData">0</span>
+                                <span class="stat-label">Données collectées</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon bg-green">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-number" id="validatedData">0</span>
+                                <span class="stat-label">Validées URM/NICAD</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon bg-orange">
+                                <i class="fas fa-map-marked-alt"></i>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-number" id="totalCommunes">0</span>
+                                <span class="stat-label">Communes traitées</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- KPI Section -->
+            <section class="kpi-section">
+                <h2 class="section-title">
+                    <i class="fas fa-tachometer-alt"></i> 
+                    Indicateurs de Performance
+                </h2>
+                <div class="kpi-grid">
+                    <div class="kpi-card" data-kpi="pipeline">
+                        <div class="kpi-header">
+                            <h3>Efficacité Pipeline</h3>
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                        <div class="kpi-content">
+                            <div class="kpi-main">
+                                <span class="kpi-value" id="pipelineEfficiency">0%</span>
+                                <div class="kpi-trend positive">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span>+2.3%</span>
+                                </div>
+                            </div>
+                            <div class="kpi-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="pipelineProgress"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card" data-kpi="quality">
+                        <div class="kpi-header">
+                            <h3>Qualité Données</h3>
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="kpi-content">
+                            <div class="kpi-main">
+                                <span class="kpi-value" id="qualityScore">0%</span>
+                                <div class="kpi-trend positive">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span>+1.8%</span>
+                                </div>
+                            </div>
+                            <div class="kpi-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="qualityProgress"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card" data-kpi="validation">
+                        <div class="kpi-header">
+                            <h3>Taux Validation</h3>
+                            <i class="fas fa-certificate"></i>
+                        </div>
+                        <div class="kpi-content">
+                            <div class="kpi-main">
+                                <span class="kpi-value" id="validationRate">0%</span>
+                                <div class="kpi-trend negative">
+                                    <i class="fas fa-arrow-down"></i>
+                                    <span>-0.5%</span>
+                                </div>
+                            </div>
+                            <div class="kpi-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="validationProgress"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card" data-kpi="coverage">
+                        <div class="kpi-header">
+                            <h3>Couverture</h3>
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <div class="kpi-content">
+                            <div class="kpi-main">
+                                <span class="kpi-value" id="coverageRate">0%</span>
+                                <div class="kpi-trend positive">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span>+5.2%</span>
+                                </div>
+                            </div>
+                            <div class="kpi-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="coverageProgress"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Charts Section -->
+            <section class="charts-section">
+                <div class="charts-grid">
+                    <!-- Pipeline Chart -->
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3><i class="fas fa-funnel-dollar"></i> Pipeline de Traitement</h3>
+                            <div class="chart-actions">
+                                <button class="chart-btn" data-action="fullscreen" data-chart="pipeline">
+                                    <i class="fas fa-expand"></i>
+                                </button>
+                                <button class="chart-btn" data-action="download" data-chart="pipeline">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="chart-body">
+                            <canvas id="pipelineChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Performance by Commune -->
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3><i class="fas fa-chart-bar"></i> Performance par Commune</h3>
+                            <div class="chart-actions">
+                                <button class="chart-btn" data-action="fullscreen" data-chart="performance">
+                                    <i class="fas fa-expand"></i>
+                                </button>
+                                <button class="chart-btn" data-action="download" data-chart="performance">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="chart-body">
+                            <canvas id="performanceChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Validation Rates -->
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3><i class="fas fa-pie-chart"></i> Répartition Validation</h3>
+                            <div class="chart-actions">
+                                <button class="chart-btn" data-action="fullscreen" data-chart="validation">
+                                    <i class="fas fa-expand"></i>
+                                </button>
+                                <button class="chart-btn" data-action="download" data-chart="validation">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="chart-body">
+                            <canvas id="validationChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Efficiency Trends -->
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3><i class="fas fa-chart-line"></i> Tendances d'Efficacité</h3>
+                            <div class="chart-actions">
+                                <button class="chart-btn" data-action="fullscreen" data-chart="efficiency">
+                                    <i class="fas fa-expand"></i>
+                                </button>
+                                <button class="chart-btn" data-action="download" data-chart="efficiency">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="chart-body">
+                            <canvas id="efficiencyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Data Table Section -->
+            <section class="table-section">
+                <div class="table-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-table"></i> 
+                        Données Détaillées
+                    </h2>
+                    <div class="table-controls">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Rechercher une commune..." id="searchInput">
+                        </div>
+                        <div class="table-actions">
+                            <button class="btn btn-outline" id="columnToggle">
+                                <i class="fas fa-columns"></i>
+                            </button>
+                            <button class="btn btn-outline" id="tableExport">
+                                <i class="fas fa-file-excel"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table" id="dataTable">
+                        <thead>
+                            <tr>
+                                <th data-sort="commune">
+                                    <span>Commune</span>
+                                    <i class="fas fa-sort"></i>
+                                </th>
+                                <th data-sort="donnees_brutes">
+                                    <span>Données Brutes</span>
+                                    <i class="fas fa-sort"></i>
+                                </th>
+                                <th data-sort="sans_doublons">
+                                    <span>Sans Doublons</span>
+                                    <i class="fas fa-sort"></i>
+                                </th>
+                                <th data-sort="post_traitees">
+                                    <span>Post-traitées</span>
+                                    <i class="fas fa-sort"></i>
+                                </th>
+                                <th data-sort="validees">
+                                    <span>Validées</span>
+                                    <i class="fas fa-sort"></i>
+                                </th>
+                                <th data-sort="taux_validation">
+                                    <span>Taux Validation</span>
+                                    <i class="fas fa-sort"></i>
+                                </th>
+                                <th data-sort="efficacite">
+                                    <span>Efficacité</span>
+                                    <i class="fas fa-sort"></i>
+                                </th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <!-- Dynamically populated -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="table-pagination">
+                    <div class="pagination-info">
+                        <span id="paginationInfo">Affichage de 0 à 0 sur 0 entrées</span>
+                    </div>
+                    <div class="pagination-controls">
+                        <button class="btn btn-sm" id="prevPage">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <div class="page-numbers" id="pageNumbers"></div>
+                        <button class="btn btn-sm" id="nextPage">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Fullscreen Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 id="modalTitle">Graphique</h3>
+                <button class="modal-close" id="modalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <canvas id="modalChart"></canvas>
+            </div>
         </div>
-      </section>
-
-      <!-- Section Tableau -->
-      <section class="table-section">
-        <h2>📋 Données Détaillées par Commune</h2>
-        <div class="table-header">
-          <input type="text" id="searchTable" class="form-control" placeholder="🔍 Rechercher par commune...">
-          <div class="table-stats">
-            <span id="tableStats">Affichage de toutes les communes</span>
-          </div>
-        </div>
-        <div class="table-container card">
-          <table id="communeTable">
-            <thead>
-              <tr>
-                <th data-column="commune" class="sortable" data-tooltip="Nom de la commune">🏘️ Commune</th>
-                <th data-column="donnees_brutes" class="sortable" data-tooltip="Données initiales collectées">📋 Données Brutes</th>
-                <th data-column="sans_doublons_attributaire_et_geometriqu" class="sortable" data-tooltip="Après suppression des doublons géométriques et attributaires">🔄 Sans Doublons</th>
-                <th data-column="post_traitees" class="sortable" data-tooltip="Données après traitement technique">⚙️ Post-traitées</th>
-                <th data-column="valideespar_urm_nicad" class="sortable" data-tooltip="Validées par URM et NICAD">✅ Validées URM/NICAD</th>
-                <th data-column="taux_dedoublonnage" class="sortable" data-tooltip="Pourcentage de conservation après dédoublonnage">📊 Taux Dédoublonnage</th>
-                <th data-column="taux_validation" class="sortable" data-tooltip="Pourcentage de validation finale">🎯 Taux Validation</th>
-                <th data-column="quarantaines" class="sortable" data-tooltip="Parcelles en quarantaine spéciale">⚠️ Quarantaines</th>
-              </tr>
-            </thead>
-            <tbody id="tableBody">
-            </tbody>
-          </table>
-        </div>
-        <div class="table-pagination">
-          <span id="paginationInfo">Chargement...</span>
-          <div class="pagination-controls">
-            <button id="prevPage" class="btn page-btn">◀ Précédent</button>
-            <div id="pageNumbers"></div>
-            <button id="nextPage" class="btn page-btn">Suivant ▶</button>
-          </div>
-        </div>
-      </section>
-
-      <!-- Section Légende -->
-      <section class="legend-section card">
-        <h2>📚 Guide des Termes et Définitions</h2>
-        <div class="legend-grid">
-          <div class="legend-item">
-            <h4>📋 Données Brutes (Levées Brutes)</h4>
-            <p>Données topographiques et cadastrales collectées directement sur le terrain lors des opérations d'arpentage. Incluent toutes les parcelles identifiées sans aucun filtrage.</p>
-          </div>
-          <div class="legend-item">
-            <h4>🔄 Sans Doublons Géométriques et Attributaires</h4>
-            <p>Données après suppression des duplicatas basés sur les coordonnées géométriques et les attributs identiques (même propriétaire, même localisation, etc.).</p>
-          </div>
-          <div class="legend-item">
-            <h4>⚙️ Post-traitées</h4>
-            <p>Données ayant subi les traitements techniques : correction des erreurs géométriques, normalisation des attributs, vérification de cohérence spatiale.</p>
-          </div>
-          <div class="legend-item">
-            <h4>✅ Validées par URM/NICAD</h4>
-            <p>Parcelles approuvées par l'Unité de Réforme du Millénaire (URM) et le Nouveau Cadastre (NICAD) après vérification administrative et juridique.</p>
-          </div>
-          <div class="legend-item">
-            <h4>⚠️ Parcelles en Quarantaine (Netteboulou)</h4>
-            <p><strong>337 parcelles</strong> identifiées dans la forêt de Gouloumbou à Netteboulou, mises en quarantaine pour résolution de conflits fonciers ou environnementaux.</p>
-          </div>
-          <div class="legend-item">
-            <h4>🎯 Taux de Validation</h4>
-            <p>Pourcentage de parcelles post-traitées qui ont été validées par les organismes officiels (URM/NICAD). Indicateur clé de qualité.</p>
-          </div>
-          <div class="legend-item">
-            <h4>📊 Processus de Qualité</h4>
-            <p>Le pipeline suit : <em>Levées → Dédoublonnage → Post-traitement → Validation</em>. Chaque étape améliore la qualité et la fiabilité des données foncières.</p>
-          </div>
-          <div class="legend-item">
-            <h4>🔍 Méthodes de Vérification</h4>
-            <p>Contrôles géométriques automatisés, vérifications attributaires, validation croisée avec les registres fonciers existants.</p>
-          </div>
-        </div>
-      </section>
-
-      <footer class="dashboard-footer">
-        <p>© 2025 - Dashboard EDL Post-Traitement - Inventaire Foncier Boundou</p>
-        <p>Données mises à jour automatiquement depuis EDL_PostTraitement.json</p>
-      </footer>
-    </main>
-
-    <!-- Modal plein écran -->
-    <div id="fullscreenModal" class="modal hidden">
-      <div class="modal-overlay"></div>
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 id="modalTitle">Graphique en Plein Écran</h3>
-          <button id="closeModal" class="btn btn--sm">✖</button>
-        </div>
-        <div class="modal-body">
-          <canvas id="fullscreenChart"></canvas>
-        </div>
-      </div>
     </div>
 
     <!-- Notifications -->
-    <div id="notifications" class="notifications"></div>
-    
-    <!-- Tooltip -->
-    <div id="tooltip" class="tooltip hidden"></div>
+    <div class="notifications-container" id="notifications"></div>
 
-    <!-- Menu hamburger pour mobile -->
-    <button id="hamburger" class="hamburger btn btn--sm">☰</button>
-  </div>
-
-  <script src="app.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
