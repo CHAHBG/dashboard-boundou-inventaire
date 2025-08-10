@@ -721,6 +721,7 @@ class PROCASEFDashboard {
     }
 
     // Efficiency trends radar chart
+
     createEfficiencyChart() {
         const ctx = document.getElementById('efficiencyChart');
         if (!ctx) return;
@@ -733,6 +734,10 @@ class PROCASEFDashboard {
             .sort((a, b) => b.globalEfficiency - a.globalEfficiency)
             .slice(0, 8);
 
+        // Extract and clamp data to ensure it stays within 0-100 range
+        const globalEfficiencyData = topCommunes.map(d => Math.min(100, Math.max(0, d.globalEfficiency)));
+        const qualityScoreData = topCommunes.map(d => Math.min(100, Math.max(0, d.qualityScore)));
+
         this.charts.efficiency = new Chart(ctx, {
             type: 'radar',
             data: {
@@ -740,25 +745,27 @@ class PROCASEFDashboard {
                 datasets: [
                     {
                         label: 'Efficacité Globale (%)',
-                        data: topCommunes.map(d => d.globalEfficiency),
+                        data: globalEfficiencyData,
                         backgroundColor: this.PROCASEF_COLORS.primary + '20',
                         borderColor: this.PROCASEF_COLORS.primary,
                         borderWidth: 3,
                         pointBackgroundColor: this.PROCASEF_COLORS.primary,
                         pointBorderColor: '#fff',
                         pointBorderWidth: 2,
-                        pointRadius: 6
+                        pointRadius: 6,
+                        order: 1 // Ensure this is drawn first
                     },
                     {
                         label: 'Score Qualité (%)',
-                        data: topCommunes.map(d => d.qualityScore),
+                        data: qualityScoreData,
                         backgroundColor: this.PROCASEF_COLORS.success + '20',
                         borderColor: this.PROCASEF_COLORS.success,
                         borderWidth: 3,
                         pointBackgroundColor: this.PROCASEF_COLORS.success,
                         pointBorderColor: '#fff',
                         pointBorderWidth: 2,
-                        pointRadius: 6
+                        pointRadius: 6,
+                        order: 2 // Ensure this is drawn on top
                     }
                 ]
             },
@@ -767,13 +774,22 @@ class PROCASEFDashboard {
                 maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        position: 'top'
+                        position: 'right', // Kept from previous fix
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true,
+                            boxWidth: 10,
+                            font: {
+                                size: 12
+                            }
+                        }
                     }
                 },
                 scales: {
                     r: {
                         beginAtZero: true,
-                        max: 100,
+                        max: 100, // Explicitly enforce max
+                        min: 0,
                         ticks: {
                             stepSize: 20,
                             callback: (value) => value + '%'
@@ -783,7 +799,30 @@ class PROCASEFDashboard {
                         },
                         angleLines: {
                             color: 'rgba(0, 0, 0, 0.1)'
+                        },
+                        pointLabels: {
+                            font: {
+                                size: 10
+                            }
                         }
+                    }
+                },
+                layout: {
+                    padding: {
+                        right: 100,
+                        left: 20,
+                        top: 20,
+                        bottom: 20
+                    }
+                },
+                elements: {
+                    line: {
+                        tension: 0.4, // Smooth the line to reduce overlap perception
+                        borderWidth: 2 // Slightly reduce line thickness if overlap is visual
+                    },
+                    point: {
+                        hitRadius: 5,
+                        hoverRadius: 8
                     }
                 },
                 animation: {
@@ -968,13 +1007,16 @@ class PROCASEFDashboard {
         }
     }
 
-    // Open chart in modal
+// Open chart in modal
     openChartModal(chart, chartType) {
         const modal = document.getElementById('modalOverlay');
         const modalTitle = document.getElementById('modalTitle');
         const modalChart = document.getElementById('modalChart');
         
-        if (!modal || !modalChart) return;
+        if (!modal || !modalChart) {
+            this.showNotification('Impossible d\'ouvrir le modal - Élément manquant', 'error');
+            return;
+        }
 
         const titles = {
             pipeline: 'Pipeline de Traitement des Données',
@@ -992,20 +1034,84 @@ class PROCASEFDashboard {
             this.modalChartInstance = null;
         }
 
-        // Create full-screen chart
-        setTimeout(() => {
-            const ctx = modalChart.getContext('2d');
-            this.modalChartInstance = new Chart(ctx, {
-                type: chart.config.type,
-                data: chart.data,
-                options: chart.options
-            });
-        }, 100);
+        // Ensure modal is fully rendered before creating chart
+        const createModalChart = () => {
+            try {
+                const ctx = modalChart.getContext('2d');
+                if (!ctx) {
+                    throw new Error('Contexte de canvas invalide');
+                }
+
+                // Sanitize options to prevent TypeError
+                const safeOptions = {
+                    ...chart.options,
+                    scales: chart.options.scales ? {
+                        ...chart.options.scales,
+                        x: this.sanitizeScale(chart.options.scales.x),
+                        y: this.sanitizeScale(chart.options.scales.y),
+                        r: this.sanitizeScale(chart.options.scales.r)
+                    } : {},
+                    plugins: chart.options.plugins ? {
+                        ...chart.options.plugins,
+                        legend: this.sanitizeLegend(chart.options.plugins.legend),
+                        tooltip: this.sanitizeTooltip(chart.options.plugins.tooltip)
+                    } : {}
+                };
+
+                this.modalChartInstance = new Chart(ctx, {
+                    type: chart.config.type,
+                    data: { ...chart.data }, // Shallow copy to avoid reference issues
+                    options: safeOptions
+                });
+            } catch (error) {
+                console.error('Erreur lors de la création du graphique modal:', error);
+                this.showNotification(`Erreur: ${error.message}`, 'error');
+            }
+        };
+
+        // Sanitize scale configuration to prevent TypeError
+    sanitizeScale(scale) {
+        if (!scale) return {};
+        return Object.fromEntries(
+            Object.entries(scale).map(([key, value]) => [
+                key,
+                typeof value === 'string' ? value : (typeof value === 'object' ? value : '')
+            ])
+        );
+    }
+
+    // Sanitize legend configuration
+    sanitizeLegend(legend) {
+        if (!legend) return {};
+        return {
+            ...legend,
+            labels: legend.labels ? {
+                ...legend.labels,
+                generateLabels: legend.labels.generateLabels || undefined
+            } : {}
+        };
+    }
+
+    // Sanitize tooltip configuration
+    sanitizeTooltip(tooltip) {
+        if (!tooltip) return {};
+        return {
+            ...tooltip,
+            callbacks: tooltip.callbacks ? {
+                ...tooltip.callbacks,
+                label: tooltip.callbacks.label || ((context) => context.label || '')
+            } : {}
+        };
+    }
+
+        // Use requestAnimationFrame for better timing
+        requestAnimationFrame(() => {
+            createModalChart();
+        });
 
         // Close modal events
         const closeModal = () => {
             modal.classList.remove('active');
-            // Destroy modal chart when closing
             if (this.modalChartInstance) {
                 this.modalChartInstance.destroy();
                 this.modalChartInstance = null;
@@ -1439,11 +1545,17 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Global error handling
     window.addEventListener('error', (e) => {
-        console.error('Erreur globale:', e.message || 'Erreur inconnue', e);
-        if (dashboard) {
-            dashboard.showNotification('Une erreur inattendue s\'est produite', 'error');
-        }
-    });
+            console.error('Erreur globale:', {
+                message: e.message || 'Erreur inconnue',
+                filename: e.filename,
+                lineno: e.lineno,
+                colno: e.colno,
+                error: e.error
+            });
+            if (dashboard) {
+                dashboard.showNotification('Une erreur inattendue s\'est produite: ' + (e.message || 'Détails manquants'), 'error');
+            }
+        });
 
     window.addEventListener('unhandledrejection', (e) => {
         console.error('Promise rejetée:', e.reason);
