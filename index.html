@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
     <div class="loading-overlay">
@@ -19,7 +20,6 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-brand">
-                <img src="logo.png" alt="Logo" class="logo">
                 <div class="brand-text">
                     <h1>PROCASEF</h1>
                     <span>Dashboard EDL</span>
@@ -105,21 +105,21 @@
                     <div class="stat-card">
                         <i class="fas fa-database"></i>
                         <div>
-                            <h3 id="collectedData">0</h3>
+                            <h3 id="collectedData">115,720</h3>
                             <p>Données collectées</p>
                         </div>
                     </div>
                     <div class="stat-card">
                         <i class="fas fa-check-circle"></i>
                         <div>
-                            <h3 id="validatedData">0</h3>
+                            <h3 id="validatedData">40,139</h3>
                             <p>Validées URM/NICAD</p>
                         </div>
                     </div>
                     <div class="stat-card">
                         <i class="fas fa-map-marker-alt"></i>
                         <div>
-                            <h3 id="processedCommunes">0</h3>
+                            <h3 id="processedCommunes">15</h3>
                             <p>Communes traitées</p>
                         </div>
                     </div>
@@ -132,32 +132,50 @@
                 <div class="kpi-grid">
                     <div class="kpi-card">
                         <h4>Efficacité Pipeline</h4>
-                        <div class="kpi-value" id="efficiencyKPI">0%</div>
-                        <div class="kpi-trend" id="efficiencyTrend"></div>
+                        <div class="kpi-value" id="efficiencyKPI">34.7%</div>
+                        <div class="kpi-progress">
+                            <div class="progress-bar" id="efficiencyProgress" style="width: 34.7%; background: var(--primary-blue);"></div>
+                        </div>
+                        <div class="kpi-trend positive" id="efficiencyTrend"><i class="fas fa-arrow-up"></i> +2.3%</div>
                     </div>
                     <div class="kpi-card">
                         <h4>Qualité Données</h4>
-                        <div class="kpi-value" id="qualityKPI">0%</div>
-                        <div class="kpi-trend" id="qualityTrend"></div>
+                        <div class="kpi-value" id="qualityKPI">88.7%</div>
+                        <div class="kpi-progress">
+                            <div class="progress-bar" id="qualityProgress" style="width: 88.7%; background: var(--success);"></div>
+                        </div>
+                        <div class="kpi-trend positive" id="qualityTrend"><i class="fas fa-arrow-up"></i> +1.8%</div>
                     </div>
                     <div class="kpi-card">
                         <h4>Taux Validation</h4>
-                        <div class="kpi-value" id="validationKPI">0%</div>
-                        <div class="kpi-trend" id="validationTrend"></div>
+                        <div class="kpi-value" id="validationKPI">100%</div>
+                        <div class="kpi-progress">
+                            <div class="progress-bar" id="validationProgress" style="width: 100%; background: var(--success);"></div>
+                        </div>
+                        <div class="kpi-trend negative" id="validationTrend"><i class="fas fa-arrow-down"></i> -0.5%</div>
                     </div>
                     <div class="kpi-card">
                         <h4>Couverture</h4>
-                        <div class="kpi-value" id="coverageKPI">0%</div>
-                        <div class="kpi-trend" id="coverageTrend"></div>
+                        <div class="kpi-value" id="coverageKPI">100%</div>
+                        <div class="kpi-progress">
+                            <div class="progress-bar" id="coverageProgress" style="width: 100%; background: var(--primary-blue);"></div>
+                        </div>
+                        <div class="kpi-trend positive" id="coverageTrend"><i class="fas fa-arrow-up"></i> +5.2%</div>
                     </div>
                     <div class="kpi-card">
                         <h4>Taux Quarantaine</h4>
-                        <div class="kpi-value" id="quarantaineKPI">0%</div>
+                        <div class="kpi-value" id="quarantaineKPI">0.8%</div>
+                        <div class="kpi-progress">
+                            <div class="progress-bar" id="quarantaineProgress" style="width: 0.8%; background: var(--warning);"></div>
+                        </div>
                         <div class="kpi-trend" id="quarantaineTrend"></div>
                     </div>
                     <div class="kpi-card">
                         <h4>Taux Conflits</h4>
-                        <div class="kpi-value" id="conflitsKPI">0%</div>
+                        <div class="kpi-value" id="conflitsKPI">0.2%</div>
+                        <div class="kpi-progress">
+                            <div class="progress-bar" id="conflitsProgress" style="width: 0.2%; background: var(--error);"></div>
+                        </div>
                         <div class="kpi-trend" id="conflitsTrend"></div>
                     </div>
                 </div>
