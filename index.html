@@ -3,40 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Enquête Foncière - Analyse des Données</title>
+    <title>Dashboard Enquête Foncière</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="dashboard-container">
-        <!-- Loading will be inserted here -->
-        
-        <!-- Header -->
         <header class="header">
             <div class="header-content">
                 <div class="logo">
-                    <i class="fas fa-map-marked-alt"></i>
+                    <i class="fas fa-map-marker-alt"></i>
                     <h1>Dashboard Enquête Foncière</h1>
-                    <span class="data-status valid" id="dataStatus" style="display: none;">
-                        <i class="fas fa-check-circle"></i>
-                        Données chargées
-                    </span>
                 </div>
                 <div class="header-info">
                     <div class="update-info">
-                        <i class="fas fa-clock"></i>
-                        <span>Dernière mise à jour: <span id="lastUpdate">Chargement...</span></span>
+                        <span>Dernière mise à jour: </span>
+                        <span id="lastUpdate">Chargement...</span>
                     </div>
-                    <button class="help-btn" id="helpBtn">
-                        <i class="fas fa-question-circle"></i>
-                        Guide d'emploi
-                    </button>
+                    <button class="help-btn" onclick="openModal()">Guide d'emploi</button>
                 </div>
             </div>
         </header>
 
-        <!-- Navigation -->
         <nav class="nav-tabs">
             <button class="tab-btn active" data-tab="overview">Vue d'ensemble</button>
             <button class="tab-btn" data-tab="communes">Analyse par Commune</button>
@@ -44,11 +32,10 @@
             <button class="tab-btn" data-tab="duplicates">Doublons</button>
         </nav>
 
-        <!-- Filters -->
         <div class="filters-section">
             <div class="filter-group">
                 <label for="communeFilter">Filtrer par commune:</label>
-                <select id="communeFilter" multiple>
+                <select id="communeFilter">
                     <option value="">Toutes les communes</option>
                 </select>
             </div>
@@ -56,8 +43,8 @@
                 <label for="statusFilter">Statut de jointure:</label>
                 <select id="statusFilter">
                     <option value="">Tous les statuts</option>
-                    <option value="SUCCÈS">Succès</option>
-                    <option value="ERREUR">Erreur</option>
+                    <option value="success">Succès</option>
+                    <option value="error">Erreur</option>
                 </select>
             </div>
             <div class="filter-actions">
@@ -66,498 +53,190 @@
             </div>
         </div>
 
-        <!-- Tab Contents -->
         <div class="tab-content active" id="overview">
             <div class="kpi-grid">
                 <div class="kpi-card">
-                    <div class="kpi-icon">
-                        <i class="fas fa-file-alt"></i>
-                    </div>
+                    <div class="kpi-icon"><i class="fas fa-file-alt"></i></div>
                     <div class="kpi-content">
                         <h3>Fichiers Traités</h3>
-                        <div class="kpi-value" id="totalFiles">--</div>
-                        <div class="kpi-trend success">
-                            <span id="successRate">--%</span> de succès
-                        </div>
+                        <div class="kpi-value" id="kpiFilesProcessed">--</div>
+                        <div class="kpi-trend" id="kpiFilesSuccess">--% de succès</div>
                     </div>
                 </div>
-
                 <div class="kpi-card">
-                    <div class="kpi-icon">
-                        <i class="fas fa-layer-group"></i>
-                    </div>
+                    <div class="kpi-icon"><i class="fas fa-map"></i></div>
                     <div class="kpi-content">
                         <h3>Total Parcelles</h3>
-                        <div class="kpi-value" id="totalParcels">--</div>
-                        <div class="kpi-trend">
-                            Après nettoyage
-                        </div>
+                        <div class="kpi-value" id="kpiTotalParcels">--</div>
+                        <div class="kpi-trend" id="kpiAfterCleaning">Après nettoyage</div>
                     </div>
                 </div>
-
                 <div class="kpi-card">
-                    <div class="kpi-icon">
-                        <i class="fas fa-exclamation-triangle"></i>
-                    </div>
+                    <div class="kpi-icon"><i class="fas fa-exclamation-triangle"></i></div>
                     <div class="kpi-content">
                         <h3>Conflits Détectés</h3>
-                        <div class="kpi-value warning" id="totalConflicts">--</div>
-                        <div class="kpi-trend warning">
-                            <span id="conflictRate">--%</span> du total
-                        </div>
+                        <div class="kpi-value" id="kpiConflicts">--</div>
+                        <div class="kpi-trend" id="kpiConflictPercentage">--% du total</div>
                     </div>
                 </div>
-
                 <div class="kpi-card">
-                    <div class="kpi-icon">
-                        <i class="fas fa-chart-pie"></i>
-                    </div>
+                    <div class="kpi-icon"><i class="fas fa-broom"></i></div>
                     <div class="kpi-content">
                         <h3>Taux de Nettoyage</h3>
-                        <div class="kpi-value" id="cleaningRate">--%</div>
-                        <div class="kpi-trend">
-                            Doublons supprimés
-                        </div>
+                        <div class="kpi-value" id="kpiCleaningRate">--%</div>
+                        <div class="kpi-trend" id="kpiDuplicatesRemoved">Doublons supprimés</div>
                     </div>
                 </div>
             </div>
-
             <div class="charts-grid">
                 <div class="chart-card">
                     <div class="chart-header">
                         <h3>Répartition des Types de Parcelles</h3>
                         <div class="chart-controls">
-                            <button class="chart-toggle active" data-type="doughnut">
-                                <i class="fas fa-chart-pie"></i>
-                            </button>
-                            <button class="chart-toggle" data-type="bar">
-                                <i class="fas fa-chart-bar"></i>
-                            </button>
+                            <button class="chart-toggle active" data-type="doughnut">Doughnut</button>
+                            <button class="chart-toggle" data-type="bar">Bar</button>
                         </div>
                     </div>
                     <canvas id="parcelTypeChart"></canvas>
-                    <div class="chart-legend">
-                        <div class="legend-item">
-                            <span class="legend-color" style="background: #3498db"></span>
-                            <span>Individuelles</span>
-                        </div>
-                        <div class="legend-item">
-                            <span class="legend-color" style="background: #2ecc71"></span>
-                            <span>Collectives</span>
-                        </div>
-                        <div class="legend-item">
-                            <span class="legend-color" style="background: #e74c3c"></span>
-                            <span>Conflits</span>
-                        </div>
-                        <div class="legend-item">
-                            <span class="legend-color" style="background: #f39c12"></span>
-                            <span>Sans jointure</span>
-                        </div>
-                    </div>
                 </div>
-
-                <div class="chart-card">
+                <div class="chart-card full-width">
                     <div class="chart-header">
                         <h3>Évolution du Traitement par Commune</h3>
+                        <select id="metricSelector">
+                            <option value="parcelles_individuelles">Parcelles Individuelles</option>
+                            <option value="parcelles_collectives">Parcelles Collectives</option>
+                            <option value="parcelles_en_conflits">Conflits</option>
+                            <option value="pas_de_jointure">Sans Jointure</option>
+                        </select>
                     </div>
-                    <canvas id="processingChart"></canvas>
+                    <canvas id="communeTrendChart"></canvas>
                 </div>
             </div>
-
             <div class="summary-section">
-                <div class="summary-card">
-                    <h3>Résumé Exécutif</h3>
-                    <div class="summary-content">
-                        <p><strong>Performance Globale:</strong> Le traitement a été réalisé avec un taux de succès élevé.</p>
-                        <p><strong>Qualité des Données:</strong> Les données ont été nettoyées et validées avec soin.</p>
-                        <p><strong>Optimisation:</strong> Le processus de nettoyage a permis d'améliorer la qualité des données.</p>
-                        <p><em>Les détails précis seront mis à jour une fois les données JSON chargées.</em></p>
-                    </div>
-                </div>
+                <h2>Résumé Exécutif</h2>
+                <p id="executiveSummary">
+                    Performance Globale: Le traitement a été réalisé avec un taux de succès élevé.<br>
+                    Qualité des Données: Les données ont été nettoyées et validées avec soin.<br>
+                    Optimisation: Le processus de nettoyage a permis d'améliorer la qualité des données.<br>
+                    Les détails précis seront mis à jour une fois les données JSON chargées.
+                </p>
             </div>
         </div>
 
         <div class="tab-content" id="communes">
-            <div class="commune-analysis">
-                <div class="chart-card full-width">
+            <div class="charts-grid">
+                <div class="chart-card">
                     <div class="chart-header">
                         <h3>Analyse Comparative par Commune</h3>
-                        <div class="chart-controls">
-                            <select id="metricSelector">
-                                <option value="parcelles_individuelles">Parcelles Individuelles</option>
-                                <option value="parcelles_collectives">Parcelles Collectives</option>
-                                <option value="parcelles_en_conflits">Conflits</option>
-                                <option value="pas_de_jointure">Sans Jointure</option>
-                            </select>
-                        </div>
+                        <select id="metricSelectorComparative">
+                            <option value="parcelles_individuelles">Parcelles Individuelles</option>
+                            <option value="parcelles_collectives">Parcelles Collectives</option>
+                            <option value="parcelles_en_conflits">Conflits</option>
+                            <option value="pas_de_jointure">Sans Jointure</option>
+                        </select>
                     </div>
                     <canvas id="communeComparisonChart"></canvas>
                 </div>
-
-                <div class="commune-table-container">
-                    <h3>Détails par Commune</h3>
-                    <div class="table-controls">
-                        <input type="text" id="communeSearch" placeholder="Rechercher une commune...">
-                        <select id="sortBy">
-                            <option value="commune">Nom</option>
-                            <option value="brutes">Parcelles Brutes</option>
-                            <option value="parcelles_individuelles">Individuelles</option>
-                            <option value="parcelles_collectives">Collectives</option>
-                        </select>
-                    </div>
-                    <div class="table-wrapper">
-                        <table id="communeTable">
-                            <thead>
-                                <tr>
-                                    <th>Commune</th>
-                                    <th>Brutes</th>
-                                    <th>Individuelles</th>
-                                    <th>Collectives</th>
-                                    <th>Conflits</th>
-                                    <th>Sans Jointure</th>
-                                    <th>Statut</th>
-                                </tr>
-                            </thead>
-                            <tbody id="communeTableBody">
-                                <tr>
-                                    <td colspan="7" style="text-align: center; padding: 2rem; color: #7f8c8d;">
-                                        <i class="fas fa-spinner fa-spin"></i> Chargement des données...
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+            </div>
+            <div class="table-wrapper">
+                <div class="table-controls">
+                    <input type="text" id="communeSearch" placeholder="Rechercher une commune...">
                 </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th onclick="sortCommuneTable('commune')">Nom</th>
+                            <th onclick="sortCommuneTable('brutes')">Parcelles Brutes</th>
+                            <th onclick="sortCommuneTable('parcelles_individuelles')">Individuelles</th>
+                            <th onclick="sortCommuneTable('parcelles_collectives')">Collectives</th>
+                            <th>Conflits</th>
+                            <th>Sans Jointure</th>
+                            <th>Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody id="communeTableBody">
+                        <tr><td colspan="7">Chargement des données...</td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
         <div class="tab-content" id="quality">
-            <div class="quality-metrics">
+            <div class="charts-grid">
                 <div class="chart-card">
                     <div class="chart-header">
                         <h3>Taux de Suppression des Doublons par Commune</h3>
                     </div>
-                    <canvas id="qualityChart"></canvas>
+                    <canvas id="duplicateRemovalChart"></canvas>
                 </div>
-
                 <div class="chart-card">
                     <div class="chart-header">
                         <h3>Statut des Jointures</h3>
                     </div>
-                    <canvas id="joinStatusChart"></canvas>
+                    <canvas id="jointureStatusChart"></canvas>
                 </div>
             </div>
-
-            <div class="quality-details">
-                <div class="quality-card">
-                    <h3>Métriques de Qualité</h3>
-                    <div class="quality-stats">
-                        <div class="stat-item">
-                            <span class="stat-label">Données en cours de chargement...</span>
-                            <span class="stat-value"><i class="fas fa-spinner fa-spin"></i></span>
-                        </div>
-                    </div>
+            <div class="quality-metrics">
+                <h2>Métriques de Qualité</h2>
+                <div class="metric-card" id="qualityMetrics">
+                    <p>Données en cours de chargement...</p>
                 </div>
             </div>
         </div>
 
         <div class="tab-content" id="duplicates">
-            <div class="duplicates-analysis">
+            <div class="charts-grid">
                 <div class="chart-card">
                     <div class="chart-header">
                         <h3>Distribution des Doublons par Fréquence</h3>
                     </div>
                     <canvas id="duplicateFrequencyChart"></canvas>
                 </div>
-
-                <div class="duplicates-table-container">
-                    <h3>Détails des Doublons les Plus Fréquents</h3>
-                    <div class="table-wrapper">
-                        <table id="duplicatesTable">
-                            <thead>
-                                <tr>
-                                    <th>Valeur</th>
-                                    <th>Fréquence</th>
-                                    <th>Commune</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="duplicatesTableBody">
-                                <tr>
-                                    <td colspan="4" style="text-align: center; padding: 2rem; color: #7f8c8d;">
-                                        <i class="fas fa-spinner fa-spin"></i> Chargement des données...
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Valeur</th>
+                            <th>Fréquence</th>
+                            <th>Commune</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="duplicateTableBody">
+                        <tr><td colspan="4">Chargement des données...</td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 
-    <!-- Help Modal -->
     <div id="helpModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2><i class="fas fa-question-circle"></i> Guide d'emploi du Dashboard</h2>
-                <span class="close">&times;</span>
+                <h2>Guide d'emploi du Dashboard</h2>
+                <span class="close-btn" onclick="closeModal()">&times;</span>
             </div>
             <div class="modal-body">
-                <div class="help-section">
-                    <h3><i class="fas fa-database"></i> Chargement des Données</h3>
-                    <p>Le dashboard charge automatiquement les données depuis le fichier <code>Rapport Post traitement.json</code>.</p>
-                    <ul>
-                        <li><strong>Chargement automatique:</strong> Les données sont récupérées au démarrage</li>
-                        <li><strong>Actualisation:</strong> Utilisez le bouton "Actualiser" pour recharger les données</li>
-                        <li><strong>Validation:</strong> Les données sont vérifiées avant affichage</li>
-                    </ul>
-                </div>
-
-                <div class="help-section">
-                    <h3><i class="fas fa-eye"></i> Vue d'ensemble</h3>
-                    <p>Tableau de bord principal affichant les KPI essentiels et la répartition des parcelles.</p>
-                    <ul>
-                        <li><strong>KPI Cards:</strong> Métriques clés avec tendances</li>
-                        <li><strong>Graphiques interactifs:</strong> Cliquez sur les légendes pour masquer/afficher des données</li>
-                    </ul>
-                </div>
-
-                <div class="help-section">
-                    <h3><i class="fas fa-map-marker-alt"></i> Analyse par Commune</h3>
-                    <p>Comparaison détaillée des performances par commune.</p>
-                    <ul>
-                        <li><strong>Graphique comparatif:</strong> Changez la métrique via le sélecteur</li>
-                        <li><strong>Tableau détaillé:</strong> Recherche et tri disponibles</li>
-                    </ul>
-                </div>
-
-                <div class="help-section">
-                    <h3><i class="fas fa-check-circle"></i> Qualité des Données</h3>
-                    <p>Métriques sur la qualité et le nettoyage des données.</p>
-                    <ul>
-                        <li><strong>Taux de suppression:</strong> Pourcentage de doublons éliminés</li>
-                        <li><strong>Statut des jointures:</strong> Succès/échecs par commune</li>
-                    </ul>
-                </div>
-
-                <div class="help-section">
-                    <h3><i class="fas fa-copy"></i> Doublons</h3>
-                    <p>Analyse détaillée des doublons détectés et traités.</p>
-                    <ul>
-                        <li><strong>Distribution:</strong> Fréquence des doublons</li>
-                        <li><strong>Détails:</strong> Valeurs spécifiques avec actions possibles</li>
-                    </ul>
-                </div>
-
-                <div class="help-section">
-                    <h3><i class="fas fa-filter"></i> Filtres</h3>
-                    <p>Utilisez les filtres pour personnaliser l'affichage des données.</p>
-                    <ul>
-                        <li><strong>Commune:</strong> Sélection multiple possible</li>
-                        <li><strong>Statut:</strong> Filtrer par succès/erreur</li>
-                        <li><strong>Export:</strong> Générer un rapport PDF</li>
-                    </ul>
-                </div>
-
-                <div class="help-section">
-                    <h3><i class="fas fa-exclamation-triangle"></i> Dépannage</h3>
-                    <p>Solutions aux problèmes courants :</p>
-                    <ul>
-                        <li><strong>Fichier JSON introuvable:</strong> Vérifiez que "Rapport Post traitement.json" est dans le même dossier</li>
-                        <li><strong>Erreur de format:</strong> Vérifiez la validité du JSON</li>
-                        <li><strong>Données manquantes:</strong> Assurez-vous que toutes les sections sont présentes</li>
-                        <li><strong>Problème de serveur:</strong> Utilisez un serveur web local (Live Server, XAMPP, etc.)</li>
-                    </ul>
-                </div>
+                <h3>Chargement des Données</h3>
+                <p>Le dashboard charge automatiquement les données depuis le fichier Rapport Post traitement.json.<ul><li>Chargement automatique: Les données sont récupérées au démarrage</li><li>Actualisation: Utilisez le bouton "Actualiser" pour recharger les données</li><li>Validation: Les données sont vérifiées avant affichage</li></ul></p>
+                <h3>Vue d'ensemble</h3>
+                <p>Tableau de bord principal affichant les KPI essentiels et la répartition des parcelles.<ul><li>KPI Cards: Métriques clés avec tendances</li><li>Graphiques interactifs: Cliquez sur les légendes pour masquer/afficher des données</li></ul></p>
+                <h3>Analyse par Commune</h3>
+                <p>Comparaison détaillée des performances par commune.<ul><li>Graphique comparatif: Changez la métrique via le sélecteur</li><li>Tableau détaillé: Recherche et tri disponibles</li></ul></p>
+                <h3>Qualité des Données</h3>
+                <p>Métriques sur la qualité et le nettoyage des données.<ul><li>Taux de suppression: Pourcentage de doublons éliminés</li><li>Statut des jointures: Succès/échecs par commune</li></ul></p>
+                <h3>Doublons</h3>
+                <p>Analyse détaillée des doublons détectés et traités.<ul><li>Distribution: Fréquence des doublons</li><li>Détails: Valeurs spécifiques avec actions possibles</li></ul></p>
+                <h3>Filtres</h3>
+                <p>Utilisez les filtres pour personnaliser l'affichage des données.<ul><li>Commune: Sélectionnez une commune dans la liste déroulante</li><li>Statut: Filtrer par succès/erreur</li><li>Export: Générer un rapport PDF</li></ul></p>
+                <h3>Dépannage</h3>
+                <p>Solutions aux problèmes courants :<ul><li>Fichier JSON introuvable: Vérifiez que "Rapport Post traitement.json" est dans le même dossier</li><li>Erreur de format: Vérifiez la validité du JSON</li><li>Données manquantes: Assurez-vous que toutes les sections sont présentes</li><li>Problème de serveur: Utilisez un serveur web local (Live Server, XAMPP, etc.)</li></ul></p>
             </div>
         </div>
     </div>
 
-    <script src="script.js"></script>
-</body>
-</html> (14 sur 15 fichiers traités avec succès).</p>
-                        <p><strong>Qualité des Données:</strong> Sur 36,471 parcelles traitées, seulement <span class="highlight warning">0.4%</span> présentent des conflits nécessitant une attention particulière.</p>
-                        <p><strong>Optimisation:</strong> Le processus de nettoyage a permis d'éliminer <span class="highlight">9.93%</span> de doublons, améliorant la qualité des données.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="tab-content" id="communes">
-            <div class="commune-analysis">
-                <div class="chart-card full-width">
-                    <div class="chart-header">
-                        <h3>Analyse Comparative par Commune</h3>
-                        <div class="chart-controls">
-                            <select id="metricSelector">
-                                <option value="parcelles_individuelles">Parcelles Individuelles</option>
-                                <option value="parcelles_collectives">Parcelles Collectives</option>
-                                <option value="parcelles_en_conflits">Conflits</option>
-                                <option value="pas_de_jointure">Sans Jointure</option>
-                            </select>
-                        </div>
-                    </div>
-                    <canvas id="communeComparisonChart"></canvas>
-                </div>
-
-                <div class="commune-table-container">
-                    <h3>Détails par Commune</h3>
-                    <div class="table-controls">
-                        <input type="text" id="communeSearch" placeholder="Rechercher une commune...">
-                        <select id="sortBy">
-                            <option value="commune">Nom</option>
-                            <option value="brutes">Parcelles Brutes</option>
-                            <option value="parcelles_individuelles">Individuelles</option>
-                            <option value="parcelles_collectives">Collectives</option>
-                        </select>
-                    </div>
-                    <div class="table-wrapper">
-                        <table id="communeTable">
-                            <thead>
-                                <tr>
-                                    <th>Commune</th>
-                                    <th>Brutes</th>
-                                    <th>Individuelles</th>
-                                    <th>Collectives</th>
-                                    <th>Conflits</th>
-                                    <th>Sans Jointure</th>
-                                    <th>Statut</th>
-                                </tr>
-                            </thead>
-                            <tbody id="communeTableBody">
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="tab-content" id="quality">
-            <div class="quality-metrics">
-                <div class="chart-card">
-                    <div class="chart-header">
-                        <h3>Taux de Suppression des Doublons par Commune</h3>
-                    </div>
-                    <canvas id="qualityChart"></canvas>
-                </div>
-
-                <div class="chart-card">
-                    <div class="chart-header">
-                        <h3>Statut des Jointures</h3>
-                    </div>
-                    <canvas id="joinStatusChart"></canvas>
-                </div>
-            </div>
-
-            <div class="quality-details">
-                <div class="quality-card">
-                    <h3>Métriques de Qualité</h3>
-                    <div class="quality-stats">
-                        <div class="stat-item">
-                            <span class="stat-label">Taux de doublons géométriques:</span>
-                            <span class="stat-value" id="geomDuplicateRate">Variable par commune</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Taux de doublons attributaires:</span>
-                            <span class="stat-value">9.93%</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Fichiers avec erreurs de jointure:</span>
-                            <span class="stat-value warning">1 (NDOGA_BABACAR)</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="tab-content" id="duplicates">
-            <div class="duplicates-analysis">
-                <div class="chart-card">
-                    <div class="chart-header">
-                        <h3>Distribution des Doublons par Fréquence</h3>
-                    </div>
-                    <canvas id="duplicateFrequencyChart"></canvas>
-                </div>
-
-                <div class="duplicates-table-container">
-                    <h3>Détails des Doublons les Plus Fréquents</h3>
-                    <div class="table-wrapper">
-                        <table id="duplicatesTable">
-                            <thead>
-                                <tr>
-                                    <th>Valeur</th>
-                                    <th>Fréquence</th>
-                                    <th>Commune</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="duplicatesTableBody">
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Help Modal -->
-    <div id="helpModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2><i class="fas fa-question-circle"></i> Guide d'emploi du Dashboard</h2>
-                <span class="close">&times;</span>
-            </div>
-            <div class="modal-body">
-                <div class="help-section">
-                    <h3><i class="fas fa-eye"></i> Vue d'ensemble</h3>
-                    <p>Tableau de bord principal affichant les KPI essentiels et la répartition des parcelles.</p>
-                    <ul>
-                        <li><strong>KPI Cards:</strong> Métriques clés avec tendances</li>
-                        <li><strong>Graphiques interactifs:</strong> Cliquez sur les légendes pour masquer/afficher des données</li>
-                    </ul>
-                </div>
-
-                <div class="help-section">
-                    <h3><i class="fas fa-map-marker-alt"></i> Analyse par Commune</h3>
-                    <p>Comparaison détaillée des performances par commune.</p>
-                    <ul>
-                        <li><strong>Graphique comparatif:</strong> Changez la métrique via le sélecteur</li>
-                        <li><strong>Tableau détaillé:</strong> Recherche et tri disponibles</li>
-                    </ul>
-                </div>
-
-                <div class="help-section">
-                    <h3><i class="fas fa-check-circle"></i> Qualité des Données</h3>
-                    <p>Métriques sur la qualité et le nettoyage des données.</p>
-                    <ul>
-                        <li><strong>Taux de suppression:</strong> Pourcentage de doublons éliminés</li>
-                        <li><strong>Statut des jointures:</strong> Succès/échecs par commune</li>
-                    </ul>
-                </div>
-
-                <div class="help-section">
-                    <h3><i class="fas fa-copy"></i> Doublons</h3>
-                    <p>Analyse détaillée des doublons détectés et traités.</p>
-                    <ul>
-                        <li><strong>Distribution:</strong> Fréquence des doublons</li>
-                        <li><strong>Détails:</strong> Valeurs spécifiques avec actions possibles</li>
-                    </ul>
-                </div>
-
-                <div class="help-section">
-                    <h3><i class="fas fa-filter"></i> Filtres</h3>
-                    <p>Utilisez les filtres pour personnaliser l'affichage des données.</p>
-                    <ul>
-                        <li><strong>Commune:</strong> Sélection multiple possible</li>
-                        <li><strong>Statut:</strong> Filtrer par succès/erreur</li>
-                        <li><strong>Export:</strong> Générer un rapport PDF</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <script src="app.js"></script>
 </body>
 </html>
