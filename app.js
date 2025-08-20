@@ -293,7 +293,12 @@ function createParcelTypeChart() {
     charts.parcelTypeChart = new Chart(ctx, {
         type: 'doughnut',
         data: data,
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } } }
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false,
+            aspectRatio: 1,
+            plugins: { legend: { position: 'top' } }
+        }
     });
 }
 
@@ -316,7 +321,13 @@ function createCommuneTrendChart() {
     charts.communeTrendChart = new Chart(ctx, {
         type: 'bar',
         data: data,
-        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false,
+            aspectRatio: 2,
+            scales: { y: { beginAtZero: true } },
+            plugins: { legend: { display: false } }
+        }
     });
 }
 
@@ -338,7 +349,12 @@ function createCommuneComparisonChart() {
     charts.communeComparisonChart = new Chart(ctx, {
         type: 'bar',
         data: data,
-        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false,
+            aspectRatio: 2,
+            scales: { y: { beginAtZero: true } }
+        }
     });
 }
 
@@ -363,7 +379,12 @@ function createDuplicateRemovalChart() {
     charts.duplicateRemovalChart = new Chart(ctx, {
         type: 'bar',
         data: data,
-        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, title: { display: true, text: '%' } } } }
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false,
+            aspectRatio: 2,
+            scales: { y: { beginAtZero: true, title: { display: true, text: '%' } } }
+        }
     });
 }
 
@@ -385,7 +406,12 @@ function createJointureStatusChart() {
     charts.jointureStatusChart = new Chart(ctx, {
         type: 'pie',
         data: data,
-        options: { responsive: true, maintainAspectRatio: false }
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false,
+            aspectRatio: 1,
+            plugins: { legend: { position: 'top' } }
+        }
     });
 }
 
@@ -407,7 +433,12 @@ function createDuplicateFrequencyChart() {
     charts.duplicateFrequencyChart = new Chart(ctx, {
         type: 'bar',
         data: data,
-        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false,
+            aspectRatio: 2,
+            scales: { y: { beginAtZero: true } }
+        }
     });
 }
 
@@ -479,14 +510,14 @@ function setupEventListeners() {
 function applyFilters() {
     const communeFilter = document.getElementById('communeFilter');
     const statusFilter = document.getElementById('statusFilter');
-    currentFilters.communes = Array.from(communeFilter.selectedOptions).map(option => option.value);
+    currentFilters.communes = [communeFilter.value]; // Single value for dropdown
     currentFilters.status = statusFilter.value;
     loadTabData(document.querySelector('.tab-btn.active').dataset.tab);
 }
 
 // Reset filters
 function resetFilters() {
-    document.getElementById('communeFilter').selectedIndex = -1;
+    document.getElementById('communeFilter').selectedIndex = 0;
     document.getElementById('statusFilter').selectedIndex = 0;
     currentFilters = { communes: [], status: '' };
     loadTabData(document.querySelector('.tab-btn.active').dataset.tab);
@@ -529,7 +560,12 @@ function toggleChartType(chartType) {
             charts.parcelTypeChart = new Chart(ctx, {
                 type: chartType,
                 data: data,
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: chartType === 'bar' } } }
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    aspectRatio: 1,
+                    plugins: { legend: { display: chartType === 'bar' } }
+                }
             });
         }
     }
