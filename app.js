@@ -276,141 +276,164 @@ async function initCharts() {
     anomaly: document.getElementById('communeConflictChart')?.getContext('2d')
   };
 
-  // Check if all canvases exist
-  if (!canvases.parcel || !canvases.commune || !canvases.quality || !canvases.anomaly) {
-    console.error('One or more chart canvases not found:', canvases);
-    return;
-  }
+  // Log canvas availability for debugging
+  console.log('Canvas availability:', canvases);
 
   // Parcel Distribution Chart
-  if (charts.parcelDistribution) charts.parcelDistribution.destroy();
-  charts.parcelDistribution = new Chart(canvases.parcel, {
-    type: document.getElementById('chartTypeSelector')?.value || 'doughnut',
-    data: {
-      labels: ['Individuelles', 'Collectives', 'Conflits', 'Sans Jointure'],
-      datasets: [{
-        data: [summary.indivParcels, summary.collParcels, summary.conflictParcels, summary.noJoinParcels],
-        backgroundColor: [
-          createGradient(canvases.parcel, themeColors.gradients.primary),
-          createGradient(canvases.parcel, themeColors.gradients.secondary),
-          createGradient(canvases.parcel, themeColors.gradients.warning),
-          createGradient(canvases.parcel, themeColors.gradients.success)
-        ],
-        borderWidth: 0,
-        hoverOffset: 10
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { position: 'bottom', labels: { padding: 20, usePointStyle: true, font: { size: 12 } } },
-        tooltip: {
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
-          titleColor: '#fff',
-          bodyColor: '#fff',
-          callbacks: {
-            label: (context) => `${context.label}: ${formatNumber(context.raw)} (${(context.raw / summary.totalParcels * 100).toFixed(1)}%)`
-          }
-        }
+  if (canvases.parcel) {
+    if (charts.parcelDistribution) charts.parcelDistribution.destroy();
+    charts.parcelDistribution = new Chart(canvases.parcel, {
+      type: document.getElementById('chartTypeSelector')?.value || 'doughnut',
+      data: {
+        labels: ['Individuelles', 'Collectives', 'Conflits', 'Sans Jointure'],
+        datasets: [{
+          data: [summary.indivParcels, summary.collParcels, summary.conflictParcels, summary.noJoinParcels],
+          backgroundColor: [
+            createGradient(canvases.parcel, themeColors.gradients.primary),
+            createGradient(canvases.parcel, themeColors.gradients.secondary),
+            createGradient(canvases.parcel, themeColors.gradients.warning),
+            createGradient(canvases.parcel, themeColors.gradients.success)
+          ],
+          borderWidth: 0,
+          hoverOffset: 10
+        }]
       },
-      cutout: '60%',
-      animation: { animateRotate: true, duration: 1000 }
-    }
-  });
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom', labels: { padding: 20, usePointStyle: true, font: { size: 12 } } },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            titleColor: '#fff',
+            bodyColor: '#fff',
+            callbacks: {
+              label: (context) => `${context.label}: ${formatNumber(context.raw)} (${(context.raw / summary.totalParcels * 100).toFixed(1)}%)`
+            }
+          }
+        },
+        cutout: '60%',
+        animation: { animateRotate: true, duration: 1000 }
+      }
+    });
+  } else {
+    console.warn('Parcel distribution canvas not found');
+  }
 
   // Commune Performance Chart
-  if (charts.communePerformance) charts.communePerformance.destroy();
-  const communes = data.communes.map(c => c.nom);
-  const metric = document.getElementById('metricSelector')?.value || 'individuelles';
-  charts.communePerformance = new Chart(canvases.commune, {
-    type: 'bar',
-    data: {
-      labels: communes,
-      datasets: [{
-        label: getMetricLabel(metric),
-        data: data.communes.map(c => c[metric]),
-        backgroundColor: communes.map(() => createGradient(canvases.commune, themeColors.gradients.primary)),
-        borderRadius: 8,
-        borderSkipped: false
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { grid: { display: false }, border: { display: false } },
-        y: { beginAtZero: true, grid: { color: 'rgba(0, 0, 0, 0.1)', drawBorder: false }, border: { display: false } }
+  if (canvases.commune) {
+    if (charts.communePerformance) charts.communePerformance.destroy();
+    const communes = data.communes.map(c => c.nom);
+    const metric = document.getElementById('metricSelector')?.value || 'individuelles';
+    charts.communePerformance = new Chart(canvases.commune, {
+      type: 'bar',
+      data: {
+        labels: communes,
+        datasets: [{
+          label: getMetricLabel(metric),
+          data: data.communes.map(c => c[metric]),
+          backgroundColor: communes.map(() => createGradient(canvases.commune, themeColors.gradients.primary)),
+          borderRadius: 8,
+          borderSkipped: false
+        }]
       },
-      animation: { duration: 1000, delay: (context) => context.dataIndex * 100 }
-    }
-  });
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false }, border: { display: false } },
+          y: { beginAtZero: true, grid: { color: 'rgba(0, 0, 0, 0.1)', drawBorder: false }, border: { display: false } }
+        },
+        animation: { duration: 1000, delay: (context) => context.dataIndex * 100 }
+      }
+    });
+  } else {
+    console.warn('Commune performance canvas not found');
+  }
 
   // Quality Metrics Chart
-  if (charts.qualityMetrics) charts.qualityMetrics.destroy();
-  charts.qualityMetrics = new Chart(canvases.quality, {
-    type: 'radar',
-    data: {
-      labels: ['Validation', 'Cohérence', 'Complétude', 'Précision', 'Intégrité'],
-      datasets: [{
-        label: 'Score de qualité',
-        data: [data.quality.validationRate, data.quality.consistency, data.quality.completude, data.quality.precision, data.quality.integrite],
-        backgroundColor: `${themeColors.procasf.vert}40`,
-        borderColor: themeColors.procasf.vert,
-        borderWidth: 2,
-        pointBackgroundColor: themeColors.procasf.vert
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: { r: { beginAtZero: true, max: 100, grid: { color: 'rgba(0, 0, 0, 0.1)' } } }
-    }
-  });
+  if (canvases.quality) {
+    if (charts.qualityMetrics) charts.qualityMetrics.destroy();
+    charts.qualityMetrics = new Chart(canvases.quality, {
+      type: 'radar',
+      data: {
+        labels: ['Validation', 'Cohérence', 'Complétude', 'Précision', 'Intégrité'],
+        datasets: [{
+          label: 'Score de qualité',
+          data: [data.quality.validationRate, data.quality.consistency, data.quality.completude, data.quality.precision, data.quality.integrite],
+          backgroundColor: `${themeColors.procasf.vert}40`,
+          borderColor: themeColors.procasf.vert,
+          borderWidth: 2,
+          pointBackgroundColor: themeColors.procasf.vert
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { r: { beginAtZero: true, max: 100, grid: { color: 'rgba(0, 0, 0, 0.1)' } } }
+      }
+    });
+  } else {
+    console.warn('Quality metrics canvas not found');
+  }
 
   // IA Anomaly Chart
-  if (charts.anomalyChart) charts.anomalyChart.destroy();
-  charts.anomalyChart = new Chart(canvases.anomaly, {
-    type: 'bar',
-    data: {
-      labels: ['Conflits', 'Échecs', 'Corrélation Collectives-Conflits'],
-      datasets: [{
-        label: 'Occurrences',
-        data: [
-          summary.conflictParcels,
-          summary.failures,
-          data.iaAnalysis.correlation.coll_conflits * 100
-        ],
-        backgroundColor: [
-          createGradient(canvases.anomaly, themeColors.gradients.warning),
-          createGradient(canvases.anomaly, themeColors.gradients.success),
-          createGradient(canvases.anomaly, themeColors.gradients.primary)
-        ],
-        borderRadius: 8
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: { y: { beginAtZero: true } }
-    }
-  });
+  if (canvases.anomaly) {
+    if (charts.anomalyChart) charts.anomalyChart.destroy();
+    charts.anomalyChart = new Chart(canvases.anomaly, {
+      type: 'bar',
+      data: {
+        labels: ['Conflits', 'Échecs', 'Corrélation Collectives-Conflits'],
+        datasets: [{
+          label: 'Occurrences',
+          data: [
+            summary.conflictParcels,
+            summary.failures,
+            data.iaAnalysis.correlation.coll_conflits * 100
+          ],
+          backgroundColor: [
+            createGradient(canvases.anomaly, themeColors.gradients.warning),
+            createGradient(canvases.anomaly, themeColors.gradients.success),
+            createGradient(canvases.anomaly, themeColors.gradients.primary)
+          ],
+          borderRadius: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+  } else {
+    console.warn('Anomaly chart canvas not found');
+  }
 
   // Event listeners for chart updates
-  document.getElementById('chartTypeSelector')?.addEventListener('change', () => {
-    charts.parcelDistribution.config.type = document.getElementById('chartTypeSelector').value;
-    charts.parcelDistribution.options.cutout = document.getElementById('chartTypeSelector').value === 'doughnut' ? '60%' : 0;
-    charts.parcelDistribution.update();
-  });
+  const chartTypeSelector = document.getElementById('chartTypeSelector');
+  if (chartTypeSelector) {
+    chartTypeSelector.addEventListener('change', () => {
+      if (charts.parcelDistribution) {
+        charts.parcelDistribution.config.type = chartTypeSelector.value;
+        charts.parcelDistribution.options.cutout = chartTypeSelector.value === 'doughnut' ? '60%' : 0;
+        charts.parcelDistribution.update();
+      }
+    });
+  }
 
-  document.getElementById('metricSelector')?.addEventListener('change', () => {
-    const metric = document.getElementById('metricSelector').value;
-    charts.communePerformance.data.datasets[0].label = getMetricLabel(metric);
-    charts.communePerformance.data.datasets[0].data = data.communes.map(c => c[metric]);
-    charts.communePerformance.update();
-  });
+  const metricSelector = document.getElementById('metricSelector');
+  if (metricSelector) {
+    metricSelector.addEventListener('change', () => {
+      if (charts.communePerformance) {
+        const metric = metricSelector.value;
+        charts.communePerformance.data.datasets[0].label = getMetricLabel(metric);
+        charts.communePerformance.data.datasets[0].data = data.communes.map(c => c[metric]);
+        charts.communePerformance.update();
+      }
+    });
+  }
 }
 
 // Enhanced IA Analysis
@@ -494,6 +517,8 @@ async function runAdvancedAnalysis() {
             }
           }
         });
+      } else {
+        console.warn(`Gauge canvas ${g.id} not found`);
       }
     });
 
@@ -852,6 +877,7 @@ function loadTabData(tabId) {
       break;
     case 'analysis':
       runAdvancedAnalysis();
+      initCharts(); // Ensure anomaly chart is initialized
       break;
     case 'communes':
       populateCommuneTable();
@@ -878,25 +904,30 @@ function toggleTheme() {
 
 function refreshData() {
   const refreshBtn = document.querySelector('.refresh-btn i');
-  refreshBtn.style.animation = 'spin 1s linear infinite';
-  setTimeout(() => {
-    initializeDashboard();
-    refreshBtn.style.animation = '';
-  }, 1000);
+  if (refreshBtn) {
+    refreshBtn.style.animation = 'spin 1s linear infinite';
+    setTimeout(() => {
+      initializeDashboard();
+      refreshBtn.style.animation = '';
+    }, 1000);
+  }
 }
 
 function resetFilters() {
-  document.getElementById('communeFilter').selectedIndex = 0;
-  document.getElementById('statusFilter').selectedIndex = 0;
-  document.getElementById('dateFilter').value = '';
+  const communeFilter = document.getElementById('communeFilter');
+  const statusFilter = document.getElementById('statusFilter');
+  const dateFilter = document.getElementById('dateFilter');
+  if (communeFilter) communeFilter.selectedIndex = 0;
+  if (statusFilter) statusFilter.selectedIndex = 0;
+  if (dateFilter) dateFilter.value = '';
   currentFilters = { commune: '', status: '', date: '' };
   populateCommuneTable();
 }
 
 function applyFilters() {
-  currentFilters.commune = document.getElementById('communeFilter').value;
-  currentFilters.status = document.getElementById('statusFilter').value;
-  currentFilters.date = document.getElementById('dateFilter').value;
+  currentFilters.commune = document.getElementById('communeFilter')?.value || '';
+  currentFilters.status = document.getElementById('statusFilter')?.value || '';
+  currentFilters.date = document.getElementById('dateFilter')?.value || '';
   filterTable();
 }
 
