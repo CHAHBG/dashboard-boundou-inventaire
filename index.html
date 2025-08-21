@@ -47,6 +47,7 @@
         <button class="tab-btn active" data-tab="dashboard">Tableau de Bord</button>
         <button class="tab-btn" data-tab="communes">Communes</button>
         <button class="tab-btn" data-tab="quality">Qualité</button>
+        <button class="tab-btn" data-tab="analysis">Analyse</button>
         <button class="tab-btn" data-tab="reports">Rapports</button>
       </div>
     </nav>
@@ -170,6 +171,46 @@
             <li><strong>Intégrité</strong>: Intégrité structurelle des données. Une intégrité élevée prévient les corruptions.</li>
             <li><strong>Erreurs critiques</strong>: Nombre d'erreurs critiques détectées. Un faible nombre est souhaitable.</li>
           </ul>
+        </div>
+      </div>
+
+      <!-- Analysis Tab -->
+      <div id="analysis" class="tab-content">
+        <div class="ia-kpi-gauges">
+          <div class="ia-gauge-card">
+            <canvas id="gaugeValidation"></canvas>
+            <div class="ia-gauge-label">Validation</div>
+          </div>
+          <div class="ia-gauge-card">
+            <canvas id="gaugeConsistency"></canvas>
+            <div class="ia-gauge-label">Cohérence</div>
+          </div>
+          <div class="ia-gauge-card">
+            <canvas id="gaugeCritical"></canvas>
+            <div class="ia-gauge-label">Erreurs Critiques</div>
+          </div>
+          <div class="ia-gauge-card">
+            <canvas id="gaugeForecast"></canvas>
+            <div class="ia-gauge-label">Prévision Conflits</div>
+          </div>
+        </div>
+        <div class="charts-section">
+          <div class="chart-card full-width">
+            <div class="chart-header">
+              <h3 class="chart-title">Analyse des Conflits</h3>
+            </div>
+            <div class="chart-container">
+              <canvas id="communeConflictChart"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="ia-insights" id="iaInsights">
+          <h3>Insights IA</h3>
+          <p>Analyse IA en cours...</p>
+        </div>
+        <div class="ia-anomaly-list" id="iaAnomalyList">
+          <h3>Anomalies Détectées</h3>
+          <ul></ul>
         </div>
       </div>
 
