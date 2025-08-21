@@ -68,7 +68,10 @@ const realData = {
   quality: {
     validationRate: 93.3,
     criticalErrors: 9,
-    consistency: 92.87
+    consistency: 92.87,
+    completude: 92.1,
+    precision: 87.5,
+    integrite: 91.3
   },
   reportsHistory: [
     { date: '2025-08-21 14:30', type: 'Résumé exécutif', format: 'PDF', statut: 'Terminé', size: '2.3 MB' },
@@ -88,7 +91,7 @@ const realData = {
     },
     forecast: 9.18,
     quality: {
-      validation: 26.36,
+      validation: 93.3,
       consistency: 92.87,
       critical: 9
     }
@@ -363,7 +366,7 @@ async function initCharts() {
       labels: ['Validation', 'Cohérence', 'Complétude', 'Précision', 'Intégrité'],
       datasets: [{
         label: 'Score de qualité',
-        data: [data.quality.validationRate, data.quality.consistency, 92.1, 87.5, 91.3],
+        data: [data.quality.validationRate, data.quality.consistency, data.quality.completude, data.quality.precision, data.quality.integrite],
         backgroundColor: `${themeColors.procasf.vert}40`,
         borderColor: themeColors.procasf.vert,
         borderWidth: 2,
@@ -444,6 +447,7 @@ async function runAdvancedAnalysis() {
     if (summary.failures > 1) anomalies.push(`Échecs élevés: ${summary.failures} fichiers en erreur.`);
     if (summary.conflictParcels > 100) anomalies.push(`Conflits élevés: ${summary.conflictParcels} parcelles en conflit.`);
     if (analysis.correlation.coll_conflits > 0.5) anomalies.push(`Forte corrélation entre parcelles collectives et conflits: ${analysis.correlation.coll_conflits.toFixed(3)}.`);
+    if (summary.memeIDUP > 5) anomalies.push(`Nombre élevé de fichiers avec même IDUP: ${summary.memeIDUP}.`);
 
     anomalies.forEach(anomaly => {
       const li = document.createElement('li');
@@ -454,15 +458,15 @@ async function runAdvancedAnalysis() {
     // Insights
     insightsDiv.innerHTML = `
       <h3>Insights IA</h3>
-      <p>Corrélation brutes-conflits: ${analysis.correlation.brutes_conflits.toFixed(3)}</p>
-      <p>Corrélation individuelles-conflits: ${analysis.correlation.indiv_conflits.toFixed(3)}</p>
-      <p>Corrélation collectives-conflits: ${analysis.correlation.coll_conflits.toFixed(3)}</p>
-      <p>Régression pour conflits vs brutes: Slope = ${analysis.regression.slope.toFixed(6)}, R-value = ${analysis.regression.r_value.toFixed(3)}</p>
-      <p>Prévision conflits pour 10,000 parcelles: ${analysis.forecast.toFixed(2)}</p>
-      <p>Qualité: Validation = ${summary.successRate}%, Cohérence = ${analysis.quality.consistency.toFixed(2)}%</p>
+      <p><strong>Corrélation brutes-conflits</strong>: ${analysis.correlation.brutes_conflits.toFixed(3)} (faible impact des parcelles brutes sur les conflits).</p>
+      <p><strong>Corrélation individuelles-conflits</strong>: ${analysis.correlation.indiv_conflits.toFixed(3)} (corrélation modérée).</p>
+      <p><strong>Corrélation collectives-conflits</strong>: ${analysis.correlation.coll_conflits.toFixed(3)} (forte relation entre parcelles collectives et conflits).</p>
+      <p><strong>Régression pour conflits vs brutes</strong>: Slope = ${analysis.regression.slope.toFixed(6)}, R-value = ${analysis.regression.r_value.toFixed(3)} (faible prédiction linéaire).</p>
+      <p><strong>Prévision conflits</strong>: ${analysis.forecast.toFixed(2)} conflits estimés pour 10,000 parcelles.</p>
+      <p><strong>Qualité</strong>: Validation = ${summary.successRate}%, Cohérence = ${analysis.quality.consistency.toFixed(2)}%, Erreurs critiques = ${analysis.quality.critical}.</p>
     `;
 
-    // IA Gauges (using doughnut charts instead of gauge)
+    // IA Gauges (using doughnut charts)
     const gauges = [
       { id: 'gaugeValidation', value: summary.successRate, label: 'Validation', max: 100 },
       { id: 'gaugeConsistency', value: analysis.quality.consistency, label: 'Cohérence', max: 100 },
@@ -547,7 +551,7 @@ function renderGuide() {
     {
       title: 'Export & Rapports',
       icon: 'fas fa-file-export',
-      content: 'Générez des rapports CSV/JSON dans l’onglet Rapports. Consultez l’historique pour retélécharger.'
+      content: 'Générez des rapports CSV/JSON/PDF dans l’onglet Rapports. Consultez l’historique pour retélécharger.'
     },
     {
       title: 'Mode Sombre',
@@ -709,6 +713,8 @@ async function generateReport() {
 
   const data = await fetchDashboardData();
   let reportData;
+
+  // Prepare data based on report type
   switch (reportType) {
     case 'executive':
       reportData = {
@@ -736,8 +742,14 @@ async function generateReport() {
       reportData = {
         'Taux de validation': data.summary.successRate,
         'Cohérence': data.quality.consistency,
+        'Complétude': data.quality.completude,
+        'Précision': data.quality.precision,
+        'Intégrité': data.quality.integrite,
         'Erreurs critiques': data.quality.criticalErrors
       };
+      break;
+    case 'full':
+      reportData = data; // Include all dashboard data for PDF
       break;
   }
 
@@ -746,19 +758,22 @@ async function generateReport() {
     downloadFile(csvContent, `report_${reportType}.csv`, 'text/csv');
   } else if (reportFormat === 'json') {
     downloadFile(JSON.stringify(reportData, null, 2), `report_${reportType}.json`, 'application/json');
+  } else if (reportFormat === 'pdf') {
+    generatePDFReport(data);
+    return; // PDF generation is handled separately
   } else {
     alert(`Format ${reportFormat} non supporté pour le moment.`);
     return;
   }
 
-  // Update report history
+  // Update report history for non-PDF formats
   const reportHistoryBody = document.getElementById('reportHistoryBody');
   if (reportHistoryBody) {
     const row = document.createElement('tr');
     row.innerHTML = `
       <td>${new Date().toLocaleString()}</td>
       <td>${reportType}</td>
-      <td>${reportFormat}</td>
+      <td>${reportFormat.toUpperCase()}</td>
       <td><span class="status-badge completed">Terminé</span></td>
       <td>${(JSON.stringify(reportData).length / 1024).toFixed(2)} KB</td>
       <td>
@@ -768,6 +783,147 @@ async function generateReport() {
     `;
     reportHistoryBody.appendChild(row);
   }
+}
+
+// Generate PDF Report
+async function generatePDFReport(data) {
+  const latexContent = generateLatexContent(data);
+  const blob = new Blob([latexContent], { type: 'text/latex' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'dashboard_full_report.tex';
+  a.click();
+  URL.revokeObjectURL(url);
+
+  // Update report history
+  const reportHistoryBody = document.getElementById('reportHistoryBody');
+  if (reportHistoryBody) {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${new Date().toLocaleString()}</td>
+      <td>Complet</td>
+      <td>PDF</td>
+      <td><span class="status-badge completed">Terminé</span></td>
+      <td>~</td>
+      <td>
+        <button class="btn-icon" title="Télécharger"><i class="fas fa-download"></i></button>
+        <button class="btn-icon" title="Partager"><i class="fas fa-share"></i></button>
+      </td>
+    `;
+    reportHistoryBody.appendChild(row);
+  }
+}
+
+// Generate LaTeX content for PDF
+function generateLatexContent(data) {
+  const summary = data.summary;
+  const communes = data.communes;
+  const quality = data.quality;
+  const iaAnalysis = data.iaAnalysis;
+  const reportsHistory = data.reportsHistory;
+
+  return `
+\\documentclass[a4paper,12pt]{article}
+\\usepackage[utf8]{inputenc}
+\\usepackage[T1]{fontenc}
+\\usepackage[french]{babel}
+\\usepackage{geometry}
+\\geometry{margin=1in}
+\\usepackage{booktabs}
+\\usepackage{longtable}
+\\usepackage{amsmath}
+\\usepackage{natbib}
+\\usepackage{parskip}
+\\usepackage{enumitem}
+\\usepackage{xcolor}
+\\definecolor{procasfrouge}{HTML}{A4161A}
+\\definecolor{procasfvert}{HTML}{2E7D32}
+\\definecolor{procasfbleu}{HTML}{003087}
+\\usepackage{DejaVuSans}
+\\renewcommand{\\familydefault}{\\sfdefault}
+
+\\begin{document}
+
+\\title{Rapport Complet du Tableau de Bord - Enquête Foncière}
+\\author{PROCASF \& BET-PLUS SA}
+\\date{${new Date().toLocaleString('fr-FR')}}
+\\maketitle
+
+\\section*{Résumé Exécutif}
+Ce rapport présente une analyse complète des données de l'enquête foncière, incluant les KPIs, les graphiques, les analyses par commune, les métriques de qualité et les insights IA.
+
+\\subsection*{Indicateurs Clés de Performance (KPIs)}
+\\begin{itemize}
+  \\item \\textbf{Fichiers Traités}: ${formatNumber(summary.totalFiles)}
+  \\item \\textbf{Succès/Échecs}: ${summary.success} succès / ${summary.failures} échecs
+  \\item \\textbf{Total Parcelles}: ${formatNumber(summary.totalParcels)}
+  \\item \\textbf{Conflits Globaux}: ${formatNumber(summary.globalConflicts)}
+  \\item \\textbf{Parcelles Individuelles}: ${formatNumber(summary.indivParcels)} (${summary.indivRate}\\%)
+  \\item \\textbf{Parcelles Collectives}: ${formatNumber(summary.collParcels)} (${summary.collRate}\\%)
+  \\item \\textbf{Parcelles en Conflit}: ${formatNumber(summary.conflictParcels)} (${summary.conflictRate}\\%)
+  \\item \\textbf{Parcelles Sans Jointure}: ${formatNumber(summary.noJoinParcels)} (${summary.noJoinRate}\\%)
+  \\item \\textbf{Jointures Individuelles}: ${formatNumber(summary.jointuresIndividuelles)}
+  \\item \\textbf{Jointures Collectives}: ${formatNumber(summary.jointuresCollectives)}
+  \\item \\textbf{Même IDUP Indiv/Coll}: ${formatNumber(summary.memeIDUP)}
+\\end{itemize}
+
+\\section*{Analyse par Commune}
+\\begin{longtable}{lrrrrrr}
+  \\toprule
+  \\textbf{Commune} & \\textbf{Brutes} & \\textbf{Individuelles} & \\textbf{Collectives} & \\textbf{Conflits} & \\textbf{Qualité} & \\textbf{Statut} \\\\
+  \\midrule
+  \\endhead
+  ${communes.map(c => `${c.nom} & ${formatNumber(c.brutes)} & ${formatNumber(c.individuelles)} & ${formatNumber(c.collectives)} & ${formatNumber(c.conflits)} & ${c.qualite}\\% & ${c.statut} \\\\`).join('\n')}
+  \\bottomrule
+\\end{longtable}
+
+\\section*{Métriques de Qualité}
+Les métriques de qualité évaluent la fiabilité des données:
+\\begin{itemize}
+  \\item \\textbf{Validation} (${quality.validationRate}\\%): Taux de fichiers traités avec succès par rapport au total. Une valeur élevée indique un traitement robuste.
+  \\item \\textbf{Cohérence} (${quality.consistency}\\%): Mesure de la cohérence des données entre les différentes sources. Une cohérence élevée réduit les risques d'erreurs.
+  \\item \\textbf{Complétude} (${quality.completude}\\%): Proportion des données complètes sans valeurs manquantes. Une complétude élevée garantit une analyse fiable.
+  \\item \\textbf{Précision} (${quality.precision}\\%): Exactitude des données par rapport aux références. Une précision élevée est cruciale pour la prise de décision.
+  \\item \\textbf{Intégrité} (${quality.integrite}\\%): Intégrité structurelle des données. Une intégrité élevée prévient les corruptions.
+  \\item \\textbf{Erreurs Critiques} (${quality.criticalErrors}): Nombre d'erreurs critiques détectées. Un faible nombre est souhaitable.
+\\end{itemize}
+
+\\section*{Analyse IA}
+\\subsection*{Corrélations}
+\\begin{itemize}
+  \\item \\textbf{Brutes-Conflits}: ${iaAnalysis.correlation.brutes_conflits.toFixed(3)} (faible impact).
+  \\item \\textbf{Individuelles-Conflits}: ${iaAnalysis.correlation.indiv_conflits.toFixed(3)} (corrélation modérée).
+  \\item \\textbf{Collectives-Conflits}: ${iaAnalysis.correlation.coll_conflits.toFixed(3)} (forte relation).
+\\end{itemize}
+\\subsection*{Régression}
+\\begin{itemize}
+  \\item \\textbf{Slope}: ${iaAnalysis.regression.slope.toFixed(6)}
+  \\item \\textbf{R-value}: ${iaAnalysis.regression.r_value.toFixed(3)}
+  \\item \\textbf{P-value}: ${iaAnalysis.regression.p_value.toFixed(3)}
+\\end{itemize}
+\\subsection*{Prévision}
+Prévision de conflits pour 10,000 parcelles: ${iaAnalysis.forecast.toFixed(2)}.
+
+\\subsection*{Qualité IA}
+\\begin{itemize}
+  \\item \\textbf{Validation}: ${iaAnalysis.quality.validation.toFixed(2)}\\%
+  \\item \\textbf{Cohérence}: ${iaAnalysis.quality.consistency.toFixed(2)}\\%
+  \\item \\textbf{Erreurs Critiques}: ${iaAnalysis.quality.critical}
+\\end{itemize}
+
+\\section*{Historique des Rapports}
+\\begin{longtable}{llccl}
+  \\toprule
+  \\textbf{Date} & \\textbf{Type} & \\textbf{Format} & \\textbf{Statut} & \\textbf{Taille} \\\\
+  \\midrule
+  \\endhead
+  ${reportsHistory.map(r => `${r.date} & ${r.type} & ${r.format} & ${r.statut} & ${r.size} \\\\`).join('\n')}
+  \\bottomrule
+\\end{longtable}
+
+\\end{document}
+`;
 }
 
 function convertToCSV(obj) {
@@ -839,6 +995,7 @@ function loadTabData(tabId) {
       break;
     case 'quality':
       initCharts();
+      document.getElementById('qualityAnalysis')?.classList.add('active');
       break;
     case 'reports':
       populateReportHistory();
