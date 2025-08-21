@@ -207,9 +207,6 @@ async function updateKPIs() {
       </div>
       <div class="kpi-title">${kpi.label}</div>
       <div class="kpi-value" id="${kpi.id}">${typeof kpi.value === 'string' ? kpi.value : formatNumber(kpi.value)}${kpi.suffix || ''}</div>
-      <div class="kpi-trend ${kpi.value > 0 ? 'trend-positive' : 'trend-neutral'}">
-        <i class="fas fa-arrow-up"></i> Tendance
-      </div>
     `;
     kpiGrid.appendChild(card);
     if (typeof kpi.value === 'number') {
@@ -239,13 +236,12 @@ async function initCharts() {
   const summary = data.summary;
   const canvases = {
     parcel: document.getElementById('parcelDistributionChart')?.getContext('2d'),
-    monthly: document.getElementById('monthlyTrendChart')?.getContext('2d'),
     commune: document.getElementById('communePerformanceChart')?.getContext('2d'),
     quality: document.getElementById('qualityMetricsChart')?.getContext('2d'),
     anomaly: document.getElementById('communeConflictChart')?.getContext('2d')
   };
 
-  if (!canvases.parcel || !canvases.monthly || !canvases.commune || !canvases.quality || !canvases.anomaly) {
+  if (!canvases.parcel || !canvases.commune || !canvases.quality || !canvases.anomaly) {
     console.error('One or more chart canvases not found:', canvases);
     return;
   }
@@ -283,50 +279,7 @@ async function initCharts() {
         }
       },
       cutout: '60%',
-      animation: { animateRotate: true, duration: 1000 },
-      onClick: (e, elements) => {
-        if (elements.length) {
-          const label = charts.parcelDistribution.data.labels[elements[0].index];
-          alert(`Filtrer par: ${label}`);
-          currentFilters.commune = label.toLowerCase();
-          filterTable();
-        }
-      }
-    }
-  });
-
-  // Monthly Trend Chart
-  if (charts.monthlyTrend) charts.monthlyTrend.destroy();
-  const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun'];
-  const monthlyData = months.map(() => Math.floor(Math.random() * 1000) + 500); // Mock data
-  charts.monthlyTrend = new Chart(canvases.monthly, {
-    type: 'line',
-    data: {
-      labels: months,
-      datasets: [{
-        label: 'Parcelles traitées',
-        data: monthlyData,
-        borderColor: themeColors.betplus.bleu,
-        backgroundColor: `${themeColors.betplus.bleu}20`,
-        borderWidth: 3,
-        fill: true,
-        tension: 0.4,
-        pointBackgroundColor: themeColors.betplus.bleu,
-        pointBorderColor: '#fff',
-        pointBorderWidth: 2,
-        pointRadius: 6,
-        pointHoverRadius: 8
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { grid: { display: false }, border: { display: false } },
-        y: { beginAtZero: true, grid: { color: 'rgba(0, 0, 0, 0.1)', drawBorder: false }, border: { display: false } }
-      },
-      animation: { duration: 1000, easing: 'easeInOutQuart' }
+      animation: { animateRotate: true, duration: 1000 }
     }
   });
 
@@ -466,7 +419,7 @@ async function runAdvancedAnalysis() {
       <p><strong>Qualité</strong>: Validation = ${summary.successRate}%, Cohérence = ${analysis.quality.consistency.toFixed(2)}%, Erreurs critiques = ${analysis.quality.critical}.</p>
     `;
 
-    // IA Gauges (using doughnut charts)
+    // IA Gauges
     const gauges = [
       { id: 'gaugeValidation', value: summary.successRate, label: 'Validation', max: 100 },
       { id: 'gaugeConsistency', value: analysis.quality.consistency, label: 'Cohérence', max: 100 },
@@ -517,128 +470,6 @@ async function runAdvancedAnalysis() {
       ease: 'power2.out'
     });
   }, 1500);
-}
-
-// Dynamic User Guide
-function renderGuide() {
-  const guide = document.querySelector('.dashboard-guide');
-  if (!guide) {
-    console.error('Guide element not found');
-    return;
-  }
-
-  const guideData = [
-    {
-      title: 'Navigation',
-      icon: 'fas fa-compass',
-      content: 'Utilisez les onglets en haut pour naviguer entre les vues Tableau de bord, Analyse IA, Communes, Qualité et Rapports.'
-    },
-    {
-      title: 'KPI & Graphiques',
-      icon: 'fas fa-chart-bar',
-      content: 'Visualisez les KPI dans la grille et interagissez avec les graphiques. Changez le type de graphique via le sélecteur.'
-    },
-    {
-      title: 'Filtres Avancés',
-      icon: 'fas fa-filter',
-      content: 'Filtrez par commune, statut ou période dans l’onglet Communes. Utilisez la recherche textuelle pour affiner.'
-    },
-    {
-      title: 'Analyse IA',
-      icon: 'fas fa-robot',
-      content: 'Lancez une analyse IA pour détecter anomalies et obtenir des recommandations. Consultez les jauges pour la qualité.'
-    },
-    {
-      title: 'Export & Rapports',
-      icon: 'fas fa-file-export',
-      content: 'Générez des rapports CSV/JSON/PDF dans l’onglet Rapports. Consultez l’historique pour retélécharger.'
-    },
-    {
-      title: 'Mode Sombre',
-      icon: 'fas fa-moon',
-      content: 'Activez le mode sombre via l’icône dans le header pour un meilleur confort visuel.'
-    }
-  ];
-
-  guide.innerHTML = `
-    <div class="guide-header">
-      <h2><i class="fas fa-info-circle"></i> Guide d'utilisation</h2>
-      <button class="guide-close"><i class="fas fa-times"></i></button>
-    </div>
-    <div class="guide-content"></div>
-  `;
-
-  const guideContent = guide.querySelector('.guide-content');
-  guideData.forEach((section, index) => {
-    const sectionElement = document.createElement('div');
-    sectionElement.className = 'guide-section';
-    sectionElement.innerHTML = `
-      <div class="guide-section-header" data-section="${index}">
-        <i class="${section.icon}"></i>
-        <span>${section.title}</span>
-        <i class="fas fa-chevron-down guide-toggle-icon"></i>
-      </div>
-      <div class="guide-section-content" id="guide-section-${index}">
-        <p>${section.content}</p>
-      </div>
-    `;
-    guideContent.appendChild(sectionElement);
-  });
-
-  document.querySelectorAll('.guide-section-header').forEach(header => {
-    header.addEventListener('click', () => {
-      const sectionId = header.dataset.section;
-      const content = document.getElementById(`guide-section-${sectionId}`);
-      const icon = header.querySelector('.guide-toggle-icon');
-      if (content.style.display === 'block') {
-        gsap.to(content, {
-          height: 0,
-          opacity: 0,
-          duration: 0.3,
-          ease: 'power2.in',
-          onComplete: () => {
-            content.style.display = 'none';
-            icon.className = 'fas fa-chevron-down guide-toggle-icon';
-          }
-        });
-      } else {
-        content.style.display = 'block';
-        gsap.fromTo(content,
-          { height: 0, opacity: 0 },
-          { height: 'auto', opacity: 1, duration: 0.3, ease: 'power2.out' }
-        );
-        icon.className = 'fas fa-chevron-up guide-toggle-icon';
-      }
-    });
-  });
-
-  document.querySelector('.guide-close').addEventListener('click', toggleGuide);
-}
-
-// Toggle User Guide
-function toggleGuide() {
-  const guide = document.querySelector('.dashboard-guide');
-  if (!guide) return;
-
-  if (guide.classList.contains('active')) {
-    gsap.to(guide, {
-      x: '100%',
-      opacity: 0,
-      duration: 0.5,
-      ease: 'power2.in',
-      onComplete: () => {
-        guide.classList.remove('active');
-        guide.style.display = 'none';
-      }
-    });
-  } else {
-    guide.style.display = 'block';
-    guide.classList.add('active');
-    gsap.fromTo(guide,
-      { x: '100%', opacity: 0 },
-      { x: '0%', opacity: 1, duration: 0.5, ease: 'power2.out' }
-    );
-  }
 }
 
 // Populate Commune Table
@@ -714,7 +545,6 @@ async function generateReport() {
   const data = await fetchDashboardData();
   let reportData;
 
-  // Prepare data based on report type
   switch (reportType) {
     case 'executive':
       reportData = {
@@ -760,7 +590,7 @@ async function generateReport() {
     downloadFile(JSON.stringify(reportData, null, 2), `report_${reportType}.json`, 'application/json');
   } else if (reportFormat === 'pdf') {
     generatePDFReport(data);
-    return; // PDF generation is handled separately
+    return;
   } else {
     alert(`Format ${reportFormat} non supporté pour le moment.`);
     return;
@@ -833,7 +663,6 @@ function generateLatexContent(data) {
 \\usepackage{booktabs}
 \\usepackage{longtable}
 \\usepackage{amsmath}
-\\usepackage{natbib}
 \\usepackage{parskip}
 \\usepackage{enumitem}
 \\usepackage{xcolor}
@@ -851,7 +680,7 @@ function generateLatexContent(data) {
 \\maketitle
 
 \\section*{Résumé Exécutif}
-Ce rapport présente une analyse complète des données de l'enquête foncière, incluant les KPIs, les graphiques, les analyses par commune, les métriques de qualité et les insights IA.
+Ce rapport présente une analyse complète des données de l'enquête foncière, incluant les indicateurs clés de performance (KPIs), les données par commune, les métriques de qualité et l'historique des rapports.
 
 \\subsection*{Indicateurs Clés de Performance (KPIs)}
 \\begin{itemize}
@@ -949,7 +778,6 @@ async function initializeDashboard() {
   await updateKPIs();
   await initCharts();
   await runAdvancedAnalysis();
-  renderGuide();
   populateCommuneTable();
   populateReportHistory();
   setupEventListeners();
@@ -967,7 +795,6 @@ function setupEventListeners() {
     });
   });
 
-  document.querySelector('.guide-toggle')?.addEventListener('click', toggleGuide);
   document.querySelector('.refresh-btn')?.addEventListener('click', refreshData);
   document.querySelector('.theme-toggle')?.addEventListener('click', toggleTheme);
   document.getElementById('communeSearch')?.addEventListener('input', debounce(filterTable, 300));
