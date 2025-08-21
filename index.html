@@ -3,57 +3,58 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Moderne - Enquête Foncière</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <title>Tableau de Bord - Enquête Foncière</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-  <script src="app.js" defer></script>
+  <script src="app.js"></script>
 </head>
 <body>
   <div class="dashboard-container">
     <header class="header">
       <div class="header-content">
         <div class="logo-section">
-          <div class="logo-icon"><i class="fas fa-map-marked-alt"></i></div>
+          <div class="logo-icon"><i class="fas fa-map"></i></div>
           <div class="logo-text">
-            <h1>PROCASF & BET-PLUS SA</h1>
-            <p>Dashboard Enquête Foncière</p>
+            <h1>Enquête Foncière</h1>
+            <p>PROCASF & BET-PLUS SA</p>
           </div>
         </div>
         <div class="header-stats">
           <div class="stat-item">
             <span class="stat-value" id="headerTotalFiles">0</span>
-            <span class="stat-label">Fichiers</span>
+            <span class="stat-label">Fichiers traités</span>
           </div>
           <div class="stat-item">
             <span class="stat-value" id="headerTotalParcels">0</span>
-            <span class="stat-label">Parcelles</span>
+            <span class="stat-label">Total Parcelles</span>
           </div>
           <div class="stat-item">
             <span class="stat-value" id="headerSuccessRate">0%</span>
-            <span class="stat-label">Taux de Succès</span>
+            <span class="stat-label">Taux de succès</span>
           </div>
         </div>
         <div class="header-actions">
-          <button class="theme-toggle" title="Changer de thème"><i id="themeIcon" class="fas fa-moon"></i></button>
-          <button class="refresh-btn" title="Actualiser"><i class="fas fa-sync-alt"></i></button>
-          <button class="guide-toggle" title="Guide d'utilisation"><i class="fas fa-info-circle"></i></button>
+          <button class="refresh-btn" title="Rafraîchir"><i class="fas fa-sync-alt"></i></button>
+          <button class="theme-toggle" title="Changer le thème"><i id="themeIcon" class="fas fa-moon"></i></button>
         </div>
       </div>
     </header>
+
     <nav class="nav-container">
       <div class="nav-tabs">
-        <button class="tab-btn active" data-tab="dashboard">Tableau de bord</button>
-        <button class="tab-btn" data-tab="analysis">Analyse IA</button>
+        <button class="tab-btn active" data-tab="dashboard">Tableau de Bord</button>
         <button class="tab-btn" data-tab="communes">Communes</button>
         <button class="tab-btn" data-tab="quality">Qualité</button>
         <button class="tab-btn" data-tab="reports">Rapports</button>
       </div>
     </nav>
+
     <main class="main-content">
+      <!-- Dashboard Tab -->
       <div id="dashboard" class="tab-content active">
-        <div class="kpi-grid" id="kpiGrid"></div>
+        <div id="kpiGrid" class="kpi-grid"></div>
         <div class="charts-section">
           <div class="chart-card">
             <div class="chart-header">
@@ -70,14 +71,6 @@
               <canvas id="parcelDistributionChart"></canvas>
             </div>
           </div>
-          <div class="chart-card">
-            <div class="chart-header">
-              <h3 class="chart-title">Tendance Mensuelle</h3>
-            </div>
-            <div class="chart-container">
-              <canvas id="monthlyTrendChart"></canvas>
-            </div>
-          </div>
           <div class="chart-card full-width">
             <div class="chart-header">
               <h3 class="chart-title">Performance par Commune</h3>
@@ -86,7 +79,7 @@
                   <option value="individuelles">Parcelles Individuelles</option>
                   <option value="collectives">Parcelles Collectives</option>
                   <option value="conflits">Conflits</option>
-                  <option value="qualite">Indice de Qualité</option>
+                  <option value="qualite">Qualité</option>
                 </select>
               </div>
             </div>
@@ -96,69 +89,34 @@
           </div>
         </div>
       </div>
-      <div id="analysis" class="tab-content">
-        <div class="ia-kpi-gauges">
-          <div class="ia-gauge-card">
-            <canvas id="gaugeValidation"></canvas>
-            <div class="ia-gauge-label">Validation</div>
-          </div>
-          <div class="ia-gauge-card">
-            <canvas id="gaugeConsistency"></canvas>
-            <div class="ia-gauge-label">Cohérence</div>
-          </div>
-          <div class="ia-gauge-card">
-            <canvas id="gaugeCritical"></canvas>
-            <div class="ia-gauge-label">Erreurs Critiques</div>
-          </div>
-          <div class="ia-gauge-card">
-            <canvas id="gaugeForecast"></canvas>
-            <div class="ia-gauge-label">Prévision Conflits</div>
-          </div>
-        </div>
-        <div class="ia-insights" id="iaInsights">
-          <div class="loading-state">
-            <div class="spinner"></div>
-            <p>Chargement des insights...</p>
-          </div>
-        </div>
-        <div class="ia-anomaly-list">
-          <h3>Anomalies Détectées</h3>
-          <ul id="iaAnomalyList"></ul>
-        </div>
-        <div class="chart-card">
-          <div class="chart-header">
-            <h3 class="chart-title">Analyse des Anomalies</h3>
-          </div>
-          <div class="chart-container">
-            <canvas id="communeConflictChart"></canvas>
-          </div>
-        </div>
-      </div>
+
+      <!-- Communes Tab -->
       <div id="communes" class="tab-content">
         <div class="filters-panel">
           <div class="filters-grid">
             <div class="filter-group">
-              <label class="filter-label">Rechercher une commune</label>
-              <input type="text" id="communeSearch" class="filter-input" placeholder="Nom de la commune">
+              <label class="filter-label" for="communeSearch">Rechercher</label>
+              <input type="text" id="communeSearch" class="filter-input" placeholder="Rechercher une commune...">
             </div>
             <div class="filter-group">
-              <label class="filter-label">Filtrer par commune</label>
-              <select id="communeFilter" class="filter-input"></select>
-            </div>
-            <div class="filter-group">
-              <label class="filter-label">Statut</label>
-              <select id="statusFilter" class="filter-input">
-                <option value="">Tous les statuts</option>
-                <option value="Succès">Succès</option>
-                <option value="Erreur">Erreur</option>
+              <label class="filter-label" for="communeFilter">Commune</label>
+              <select id="communeFilter" class="filter-input">
+                <option value="">Toutes les communes</option>
               </select>
             </div>
             <div class="filter-group">
-              <label class="filter-label">Période</label>
+              <label class="filter-label" for="statusFilter">Statut</label>
+              <select id="statusFilter" class="filter-input">
+                <option value="">Tous les statuts</option>
+                <option value="SUCCÈS">Succès</option>
+                <option value="ERREUR">Erreur</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label class="filter-label" for="dateFilter">Date</label>
               <input type="date" id="dateFilter" class="filter-input">
             </div>
             <div class="filter-actions">
-              <button class="btn btn-primary" onclick="applyFilters()">Appliquer</button>
               <button class="btn btn-secondary" onclick="resetFilters()">Réinitialiser</button>
             </div>
           </div>
@@ -166,8 +124,8 @@
         <div class="table-container">
           <div class="table-header">
             <h3 class="table-title">Données par Commune</h3>
-            <button class="btn btn-primary" id="exportCommuneTableBtn">
-              <i class="fas fa-file-export"></i> Exporter
+            <button id="exportCommuneTableBtn" class="btn btn-primary">
+              <i class="fas fa-download"></i> Exporter CSV
             </button>
           </div>
           <div class="table-wrapper">
@@ -176,8 +134,8 @@
                 <tr>
                   <th>Commune</th>
                   <th>Parcelles Brutes</th>
-                  <th>Parcelles Individuelles</th>
-                  <th>Parcelles Collectives</th>
+                  <th>Individuelles</th>
+                  <th>Collectives</th>
                   <th>Conflits</th>
                   <th>Qualité</th>
                   <th>Statut</th>
@@ -189,38 +147,57 @@
           </div>
         </div>
       </div>
+
+      <!-- Quality Tab -->
       <div id="quality" class="tab-content">
-        <div class="chart-card full-width">
-          <div class="chart-header">
-            <h3 class="chart-title">Métriques de Qualité</h3>
-          </div>
-          <div class="chart-container">
-            <canvas id="qualityMetricsChart"></canvas>
+        <div class="charts-section">
+          <div class="chart-card full-width">
+            <div class="chart-header">
+              <h3 class="chart-title">Métriques de Qualité</h3>
+            </div>
+            <div class="chart-container">
+              <canvas id="qualityMetricsChart"></canvas>
+            </div>
           </div>
         </div>
+        <div class="quality-analysis">
+          <h3>Analyse de la Qualité</h3>
+          <ul>
+            <li><strong>Validation</strong>: Taux de fichiers traités avec succès par rapport au total. Une valeur élevée indique un traitement robuste.</li>
+            <li><strong>Cohérence</strong>: Mesure de la cohérence des données entre différentes sources. Une cohérence élevée réduit les risques d'erreurs.</li>
+            <li><strong>Complétude</strong>: Proportion des données complètes sans valeurs manquantes. Une complétude élevée garantit une analyse fiable.</li>
+            <li><strong>Précision</strong>: Exactitude des données par rapport aux références. Une précision élevée est cruciale pour la prise de décision.</li>
+            <li><strong>Intégrité</strong>: Intégrité structurelle des données. Une intégrité élevée prévient les corruptions.</li>
+            <li><strong>Erreurs critiques</strong>: Nombre d'erreurs critiques détectées. Un faible nombre est souhaitable.</li>
+          </ul>
+        </div>
       </div>
+
+      <!-- Reports Tab -->
       <div id="reports" class="tab-content">
         <div class="filters-panel">
           <div class="filters-grid">
             <div class="filter-group">
-              <label class="filter-label">Type de Rapport</label>
+              <label class="filter-label" for="reportType">Type de Rapport</label>
               <select id="reportType" class="filter-input">
                 <option value="executive">Résumé Exécutif</option>
                 <option value="detailed">Rapport Détaillé</option>
                 <option value="technical">Rapport Technique</option>
-                <option value="quality">Rapport de Qualité</option>
+                <option value="quality">Rapport Qualité</option>
+                <option value="full">Rapport Complet (Tout le Tableau)</option>
               </select>
             </div>
             <div class="filter-group">
-              <label class="filter-label">Format</label>
+              <label class="filter-label" for="reportFormat">Format</label>
               <select id="reportFormat" class="filter-input">
+                <option value="pdf">PDF</option>
                 <option value="csv">CSV</option>
                 <option value="json">JSON</option>
               </select>
             </div>
             <div class="filter-actions">
-              <button class="btn btn-primary" id="generateReportBtn">
-                <i class="fas fa-file-export"></i> Générer
+              <button id="generateReportBtn" class="btn btn-primary">
+                <i class="fas fa-file-export"></i> Générer Rapport
               </button>
             </div>
           </div>
@@ -247,9 +224,6 @@
         </div>
       </div>
     </main>
-    <div class="dashboard-guide">
-      <!-- Guide content will be dynamically populated -->
-    </div>
   </div>
 </body>
 </html>
