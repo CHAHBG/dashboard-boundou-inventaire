@@ -1,4 +1,3 @@
-// script.js
 // Variables globales
 let dashboardData = null;
 let charts = {};
@@ -90,7 +89,7 @@ const realData = {
         },
         forecast: 9.18,
         quality: {
-            validation: 26.36, // Adjusted calculation, but use real success
+            validation: 26.36,
             consistency: 92.87,
             critical: 9
         }
@@ -102,6 +101,11 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeDashboard();
     setupEventListeners();
     loadData();
+
+    const exportBtn = document.getElementById('exportCommuneTableBtn');
+    if (exportBtn) {
+        exportBtn.onclick = () => exportTableToCSV('communeTableBody', 'communes.csv');
+    }
 });
 
 function initializeDashboard() {
@@ -158,6 +162,14 @@ function setupEventListeners() {
     if (chartTypeSelector) {
         chartTypeSelector.addEventListener('change', updateParcelChart);
     }
+
+    // Écouteur pour les boutons de détail
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.fa-eye')) {
+            const row = e.target.closest('tr');
+            alert('Détail Commune: ' + row.cells[0].innerText + '\n(À personnaliser)');
+        }
+    });
 }
 
 function loadData() {
@@ -389,6 +401,31 @@ function createCommunePerformanceChart() {
     });
 }
 
+function createCommuneConflictChart(topData) {
+    const ctx = document.getElementById('communeConflictChart').getContext('2d');
+    if (window.charts && window.charts.communeConflict) window.charts.communeConflict.destroy();
+    window.charts = window.charts || {};
+    window.charts.communeConflict = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: topData.map(c => c.name),
+            datasets: [{
+                label: 'Taux de conflits (%)',
+                data: topData.map(c => c.taux.toFixed(2)),
+                backgroundColor: '#A4161A',
+                borderRadius: 7
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, max: Math.max(...topData.map(c=>c.taux))+1 }
+            }
+        }
+    });
+}
+
 function createQualityCharts() {
     const ctx = document.getElementById('qualityMetricsChart').getContext('2d');
     if (!ctx || !dashboardData.quality) return;
@@ -427,6 +464,10 @@ function createQualityCharts() {
     });
 }
 
+function createIAGauges() {
+    // Placeholder pour les jauges IA (non implémenté dans cette version)
+}
+
 function populateCommuneTable() {
     const tbody = document.getElementById('communeTableBody');
     if (!tbody || !dashboardData) return;
@@ -461,7 +502,7 @@ function populateCommuneTable() {
 }
 
 function populateReportHistory() {
-    const tbody = document.getElementById('reportHistoryBody');
+    const tbody = document.getElementById('reposrtHistoryBody');
     if (!tbody) return;
 
     tbody.innerHTML = '';
@@ -487,7 +528,6 @@ function populateReportHistory() {
     });
 }
 
-// Fonctions utilitaires
 function loadTabData(tabId) {
     switch(tabId) {
         case 'dashboard':
@@ -511,18 +551,91 @@ function loadTabData(tabId) {
 function loadAnalysisTab() {
     const insightsDiv = document.getElementById('iaInsights');
     if (!insightsDiv) return;
-
     const analysis = dashboardData.iaAnalysis;
+    const communes = dashboardData.communes;
+
+    const conflictRates = communes.map(c => ({
+        name: c.nom,
+        taux: c.conflits && c.brutes ? (c.conflits / c.brutes * 100) : 0,
+        brutes: c.brutes,
+        conflits: c.conflits,
+        pas_de_jointure: c.pas_de_jointure || 0,
+        individuelles: c.individuelles,
+        collectives: c.collectives
+    }));
+    conflictRates.sort((a, b) => b.taux - a.taux);
+    const topConflict = conflictRates.slice(0, 5);
+
+    const anomalies = [];
+    communes.forEach(c => {
+        if (c.conflits > 10 || (c.conflits/c.brutes)*100 > 1)
+            anomalies.push(`Commune <b>${c.nom}</b> : taux de conflits élevé (${c.conflits} conflits, ${((c.conflits/c.brutes)*100).toFixed(2)}%)`);
+        if ((c.individuelles + c.collectives) < 0.7 * c.brutes)
+            anomalies.push(`Commune <b>${c.nom}</b> : complétude faible (${c.individuelles + c.collectives}/${c.brutes})`);
+        if (c.pas_de_jointure && c.pas_de_jointure > 0.2 * c.brutes)
+            anomalies.push(`Commune <b>${c.nom}</b> : beaucoup de parcelles sans jointure (${c.pas_de_jointure}/${c.brutes})`);
+    });
+
+    const topIndiv = [...communes].sort((a, b) => b.individuelles - a.individuelles).slice(0, 3);
+    const topColl = [...communes].sort((a, b) => b.collectives - a.collectives).slice(0, 3);
+
+    const regression = analysis.regression;
+    const forecast10000 = regression.intercept + regression.slope * 10000;
 
     insightsDiv.innerHTML = `
-        <h3>Insights IA</h3>
-        <p>Correlation entre brutes et conflits: ${analysis.correlation.brutes_conflits.toFixed(3)}</p>
-        <p>Correlation entre individuelles et conflits: ${analysis.correlation.indiv_conflits.toFixed(3)}</p>
-        <p>Correlation entre collectives et conflits: ${analysis.correlation.coll_conflits.toFixed(3)}</p>
-        <p>Régression linéaire pour conflits vs brutes: Slope = ${analysis.regression.slope.toFixed(6)}, R-value = ${analysis.regression.r_value.toFixed(3)}, P-value = ${analysis.regression.p_value.toFixed(3)}</p>
-        <p>Prévision de conflits pour 10,000 parcelles brutes: ${analysis.forecast.toFixed(2)}</p>
-        <p>Métriques de qualité IA: Validation = ${analysis.quality.validation.toFixed(2)}%, Cohérence = ${analysis.quality.consistency.toFixed(2)}%, Erreurs critiques = ${analysis.quality.critical}</p>
+        <h3><i class="fas fa-lightbulb"></i> Insights IA avancés</h3>
+        <table>
+            <tr><th>Corrélation Brutes / Conflits</th><td>${analysis.correlation.brutes_conflits.toFixed(3)}</td></tr>
+            <tr><th>Corrélation Individuelles / Conflits</th><td>${analysis.correlation.indiv_conflits.toFixed(3)}</td></tr>
+            <tr><th>Corrélation Collectives / Conflits</th><td>${analysis.correlation.coll_conflits.toFixed(3)}</td></tr>
+            <tr><th>Prévision Conflits (10 000 brutes)</th><td>${forecast10000.toFixed(2)}</td></tr>
+            <tr><th>Commune la + "conflictuelle"</th><td>${topConflict[0].name} (${topConflict[0].taux.toFixed(2)}%)</td></tr>
+            <tr><th>Top 3 Individuelles</th><td>
+                ${topIndiv.map(c => `${c.nom} (${c.individuelles})`).join(', ')}
+            </td></tr>
+            <tr><th>Top 3 Collectives</th><td>
+                ${topColl.map(c => `${c.nom} (${c.collectives})`).join(', ')}
+            </td></tr>
+        </table>
+        <div style="margin-top:1.5rem;">
+            <b>Recommandations IA :</b>
+            <ul>
+                <li>Surveillez particulièrement les communes à taux de conflits ou "sans jointure" élevés.</li>
+                <li>Renforcez la complétude là où <b>moins de 70% des brutes</b> sont attribuées.</li>
+                <li>Optimisez la détection des doublons dans les communes à fort volume.</li>
+            </ul>
+        </div>
     `;
+
+    const anomalyList = document.getElementById('iaAnomalyList');
+    anomalyList.innerHTML = anomalies.length
+        ? anomalies.map(a => `<li>${a}</li>`).join('')
+        : `<li style="color:var(--procasf-vert)">Aucune anomalie majeure détectée !</li>`;
+
+    setTimeout(() => createCommuneConflictChart(topConflict), 50);
+    setTimeout(createIAGauges, 10);
+}
+
+function exportTableToCSV(tbodyId, filename) {
+    const tbody = document.getElementById(tbodyId);
+    if (!tbody) return;
+    let csv = [];
+    let headers = Array.from(tbody.parentElement.querySelectorAll('thead th')).map(cell => `"${cell.innerText}"`);
+    csv.push(headers.join(","));
+    for (let row of tbody.rows) {
+        let rowData = [];
+        for (let cell of row.cells) {
+            rowData.push('"' + cell.innerText.replace(/"/g, '""') + '"');
+        }
+        csv.push(rowData.join(","));
+    }
+    const blob = new Blob([csv.join("\n")], { type: 'text/csv' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 
 function runAdvancedAnalysis() {
