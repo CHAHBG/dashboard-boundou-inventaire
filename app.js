@@ -168,7 +168,7 @@ function formatNumber(num) {
   return new Intl.NumberFormat('fr-FR').format(num);
 }
 
-// Initialize KPI cards dynamically
+// Initialize KPI cards with grouped categories
 async function updateKPIs() {
   const data = await fetchDashboardData();
   dashboardData = data;
@@ -179,39 +179,74 @@ async function updateKPIs() {
   }
   kpiGrid.innerHTML = ''; // Clear existing content
   const summary = data.summary;
-  const kpiData = [
-    { id: 'kpiFilesProcessed', value: summary.totalFiles, label: 'Fichiers Traités', icon: 'files' },
-    { id: 'kpiFilesSuccess', value: `${summary.success} succès / ${summary.failures} échecs`, label: 'Succès/Échecs', icon: 'quality' },
-    { id: 'kpiTotalParcels', value: summary.totalParcels, label: 'Total Parcelles', icon: 'parcels' },
-    { id: 'kpiGlobalConflicts', value: summary.globalConflicts, label: 'Conflits Globaux', icon: 'conflicts' },
-    { id: 'kpiIndivParcels', value: summary.indivParcels, label: 'Parcelles Individuelles', icon: 'parcels' },
-    { id: 'kpiCollParcels', value: summary.collParcels, label: 'Parcelles Collectives', icon: 'parcels' },
-    { id: 'kpiConflictParcels', value: summary.conflictParcels, label: 'Parcelles en Conflit', icon: 'conflicts' },
-    { id: 'kpiNoJoinParcels', value: summary.noJoinParcels, label: 'Sans Jointure', icon: 'quality' },
-    { id: 'kpiIndivRate', value: summary.indivRate, label: 'Taux Individuelles', icon: 'parcels', suffix: '%' },
-    { id: 'kpiCollRate', value: summary.collRate, label: 'Taux Collectives', icon: 'parcels', suffix: '%' },
-    { id: 'kpiConflictRate', value: summary.conflictRate, label: 'Taux Conflits', icon: 'conflicts', suffix: '%' },
-    { id: 'kpiNoJoinRate', value: summary.noJoinRate, label: 'Taux Sans Jointure', icon: 'quality', suffix: '%' },
-    { id: 'kpiJointuresIndividuelles', value: summary.jointuresIndividuelles, label: 'Jointures Individuelles', icon: 'files' },
-    { id: 'kpiJointuresCollectives', value: summary.jointuresCollectives, label: 'Jointures Collectives', icon: 'files' },
-    { id: 'kpiMemeIDUP', value: summary.memeIDUP, label: 'Même IDUP Indiv/Coll', icon: 'conflicts' }
+
+  // Grouped KPI data for better organization
+  const kpiGroups = [
+    {
+      category: 'Traitement des Fichiers',
+      kpis: [
+        { id: 'kpiFilesProcessed', value: summary.totalFiles, label: 'Fichiers Traités', icon: 'files' },
+        { id: 'kpiFilesSuccess', value: `${summary.success} succès / ${summary.failures} échecs`, label: 'Succès/Échecs', icon: 'quality' },
+        { id: 'kpiSuccessRate', value: summary.successRate, label: 'Taux de Succès', icon: 'quality', suffix: '%' }
+      ]
+    },
+    {
+      category: 'Parcelles',
+      kpis: [
+        { id: 'kpiTotalParcels', value: summary.totalParcels, label: 'Total Parcelles', icon: 'parcels' },
+        { id: 'kpiIndivParcels', value: summary.indivParcels, label: 'Parcelles Individuelles', icon: 'parcels' },
+        { id: 'kpiCollParcels', value: summary.collParcels, label: 'Parcelles Collectives', icon: 'parcels' },
+        { id: 'kpiNoJoinParcels', value: summary.noJoinParcels, label: 'Sans Jointure', icon: 'quality' }
+      ]
+    },
+    {
+      category: 'Taux',
+      kpis: [
+        { id: 'kpiIndivRate', value: summary.indivRate, label: 'Taux Individuelles', icon: 'parcels', suffix: '%' },
+        { id: 'kpiCollRate', value: summary.collRate, label: 'Taux Collectives', icon: 'parcels', suffix: '%' },
+        { id: 'kpiNoJoinRate', value: summary.noJoinRate, label: 'Taux Sans Jointure', icon: 'quality', suffix: '%' }
+      ]
+    },
+    {
+      category: 'Conflits et Jointures',
+      kpis: [
+        { id: 'kpiGlobalConflicts', value: summary.globalConflicts, label: 'Conflits Globaux', icon: 'conflicts' },
+        { id: 'kpiConflictParcels', value: summary.conflictParcels, label: 'Parcelles en Conflit', icon: 'conflicts' },
+        { id: 'kpiConflictRate', value: summary.conflictRate, label: 'Taux Conflits', icon: 'conflicts', suffix: '%' },
+        { id: 'kpiJointuresIndividuelles', value: summary.jointuresIndividuelles, label: 'Jointures Individuelles', icon: 'files' },
+        { id: 'kpiJointuresCollectives', value: summary.jointuresCollectives, label: 'Jointures Collectives', icon: 'files' },
+        { id: 'kpiMemeIDUP', value: summary.memeIDUP, label: 'Même IDUP Indiv/Coll', icon: 'conflicts' }
+      ]
+    }
   ];
 
-  kpiData.forEach(kpi => {
-    const card = document.createElement('div');
-    card.className = `kpi-card kpi-icon-${kpi.icon}`;
-    card.innerHTML = `
-      <div class="kpi-header">
-        <span class="kpi-icon ${kpi.icon}"><i class="fas fa-${kpi.icon === 'files' ? 'file-alt' : kpi.icon === 'parcels' ? 'map' : kpi.icon === 'conflicts' ? 'exclamation-triangle' : 'check-circle'}"></i></span>
-        <button class="kpi-menu-btn"><i class="fas fa-ellipsis-v"></i></button>
-      </div>
-      <div class="kpi-title">${kpi.label}</div>
-      <div class="kpi-value" id="${kpi.id}">${typeof kpi.value === 'string' ? kpi.value : formatNumber(kpi.value)}${kpi.suffix || ''}</div>
-    `;
-    kpiGrid.appendChild(card);
-    if (typeof kpi.value === 'number') {
-      animateValue(kpi.id, 0, kpi.value, 1000, kpi.suffix || '');
-    }
+  kpiGroups.forEach(group => {
+    const categoryDiv = document.createElement('div');
+    categoryDiv.className = 'kpi-category';
+    const categoryHeader = document.createElement('h3');
+    categoryHeader.className = 'kpi-category-header';
+    categoryHeader.textContent = group.category;
+    categoryDiv.appendChild(categoryHeader);
+    const groupGrid = document.createElement('div');
+    groupGrid.className = 'kpi-group-grid';
+    group.kpis.forEach(kpi => {
+      const card = document.createElement('div');
+      card.className = `kpi-card kpi-icon-${kpi.icon}`;
+      card.innerHTML = `
+        <div class="kpi-header">
+          <span class="kpi-icon ${kpi.icon}"><i class="fas fa-${kpi.icon === 'files' ? 'file-alt' : kpi.icon === 'parcels' ? 'map' : kpi.icon === 'conflicts' ? 'exclamation-triangle' : 'check-circle'}"></i></span>
+          <button class="kpi-menu-btn"><i class="fas fa-ellipsis-v"></i></button>
+        </div>
+        <div class="kpi-title">${kpi.label}</div>
+        <div class="kpi-value" id="${kpi.id}">${typeof kpi.value === 'string' ? kpi.value : formatNumber(kpi.value)}${kpi.suffix || ''}</div>
+      `;
+      groupGrid.appendChild(card);
+      if (typeof kpi.value === 'number') {
+        animateValue(kpi.id, 0, kpi.value, 1000, kpi.suffix || '');
+      }
+    });
+    categoryDiv.appendChild(groupGrid);
+    kpiGrid.appendChild(categoryDiv);
   });
 
   // Animate KPI cards
@@ -241,6 +276,7 @@ async function initCharts() {
     anomaly: document.getElementById('communeConflictChart')?.getContext('2d')
   };
 
+  // Check if all canvases exist
   if (!canvases.parcel || !canvases.commune || !canvases.quality || !canvases.anomaly) {
     console.error('One or more chart canvases not found:', canvases);
     return;
@@ -384,7 +420,7 @@ async function runAdvancedAnalysis() {
   const insightsDiv = document.getElementById('iaInsights');
   const anomalyList = document.getElementById('iaAnomalyList');
   if (!insightsDiv || !anomalyList) {
-    console.error('IA elements not found');
+    console.warn('IA elements not found, skipping IA analysis');
     return;
   }
 
@@ -579,7 +615,7 @@ async function generateReport() {
       };
       break;
     case 'full':
-      reportData = data; // Include all dashboard data for PDF
+      reportData = data;
       break;
   }
 
