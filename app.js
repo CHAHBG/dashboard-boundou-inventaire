@@ -86,9 +86,11 @@ async function updateKPIs() {
   });
 
   // Update header stats
-  animateValue('headerTotalFiles', 0, summary['Fichiers traités'], 1000);
-  animateValue('headerTotalParcels', 0, summary['Total enregistrement (Parcelles apres netoyage)'], 1000);
-  document.getElementById('headerSuccessRate').textContent = `${(summary['Succès'] / summary['Fichiers traités'] * 100).toFixed(1)}%`;
+  if (summary['Fichiers traités'] && summary['Succès'] && summary['Total enregistrement (Parcelles apres netoyage)']) {
+    animateValue('headerTotalFiles', 0, summary['Fichiers traités'], 1000);
+    animateValue('headerTotalParcels', 0, summary['Total enregistrement (Parcelles apres netoyage)'], 1000);
+    document.getElementById('headerSuccessRate').textContent = `${(summary['Succès'] / summary['Fichiers traités'] * 100).toFixed(1)}%`;
+  }
 }
 
 // Initialize Charts
@@ -111,10 +113,10 @@ async function initCharts() {
       labels: ['Individuelles', 'Collectives', 'Conflits', 'Sans Jointure'],
       datasets: [{
         data: [
-          summary['Parcelles individuelles'],
-          summary['Parcelles collectives'],
-          summary['Conflits (Parcelles à la fois individuelle et collecvive)'],
-          summary['Pas de Jointure (Pas d\'idup ou ancien Idup Ndoga)']
+          summary['Parcelles individuelles'] || 0,
+          summary['Parcelles collectives'] || 0,
+          summary['Conflits (Parcelles à la fois individuelle et collecvive)'] || 0,
+          summary['Pas de Jointure (Pas d\'idup ou ancien Idup Ndoga)'] || 0
         ],
         backgroundColor: ['#4CAF50', '#2196F3', '#F44336', '#FF9800']
       }]
@@ -125,7 +127,7 @@ async function initCharts() {
         legend: { position: 'top' },
         tooltip: {
           callbacks: {
-            label: (context) => `${context.label}: ${context.raw} (${(context.raw / summary['Total enregistrement (Parcelles apres netoyage)'] * 100).toFixed(1)}%)`
+            label: (context) => `${context.label}: ${context.raw} (${(context.raw / (summary['Total enregistrement (Parcelles apres netoyage)'] || 1) * 100).toFixed(1)}%)`
           }
         }
       },
@@ -133,6 +135,7 @@ async function initCharts() {
         if (elements.length) {
           const label = parcelChart.data.labels[elements[0].index];
           alert(`Filtrer par: ${label}`);
+          // Add filtering logic here
         }
       }
     }
@@ -145,7 +148,7 @@ async function initCharts() {
       labels: ['2025-08'],
       datasets: [{
         label: 'Conflits Globaux',
-        data: [summary['Conflits globaux']],
+        data: [summary['Conflits globaux'] || 0],
         borderColor: '#F44336',
         fill: false
       }]
@@ -166,12 +169,12 @@ async function initCharts() {
       datasets: [
         {
           label: 'Parcelles Individuelles',
-          data: [summary['Parcelles individuelles']],
+          data: [summary['Parcelles individuelles'] || 0],
           backgroundColor: '#4CAF50'
         },
         {
           label: 'Parcelles Collectives',
-          data: [summary['Parcelles collectives']],
+          data: [summary['Parcelles collectives'] || 0],
           backgroundColor: '#2196F3'
         }
       ]
@@ -195,9 +198,9 @@ async function initCharts() {
       datasets: [{
         label: 'Occurrences',
         data: [
-          summary['Conflits (Parcelles à la fois individuelle et collecvive)'],
-          summary['Échecs'],
-          summary['Fichiers avec m$eme IDUP individuelle et collective']
+          summary['Conflits (Parcelles à la fois individuelle et collecvive)'] || 0,
+          summary['Échecs'] || 0,
+          summary['Fichiers avec m$eme IDUP individuelle et collective'] || 0
         ],
         backgroundColor: ['#F44336', '#FF9800', '#9C27B0']
       }]
@@ -220,7 +223,7 @@ async function initCharts() {
   document.getElementById('metricSelector')?.addEventListener('change', (e) => {
     const metric = e.target.value;
     communeChart.data.datasets[0].label = metric.charAt(0).toUpperCase() + metric.slice(1);
-    communeChart.data.datasets[0].data = [summary[metric]];
+    communeChart.data.datasets[0].data = [summary[metric] || 0];
     communeChart.update();
   });
 }
@@ -258,9 +261,9 @@ async function runAdvancedAnalysis() {
   });
 
   // Predictive Insights
-  const conflictRate = parseFloat(summary['Taux des parcelles conflictuelles'].replace('%', ''));
+  const conflictRate = parseFloat(summary['Taux des parcelles conflictuelles']?.replace('%', '') || 0);
   const insights = [
-    `Taux de conflits actuel: ${conflictRate}%. Si cette tendance se maintient, environ ${Math.round(summary['Total enregistrement (Parcelles apres netoyage)'] * conflictRate / 100)} parcelles supplémentaires pourraient être en conflit dans le prochain lot.`,
+    `Taux de conflits actuel: ${conflictRate}%. Si cette tendance se maintient, environ ${Math.round((summary['Total enregistrement (Parcelles apres netoyage)'] || 0) * conflictRate / 100)} parcelles supplémentaires pourraient être en conflit dans le prochain lot.`,
     summary['Échecs'] > 0 ? `Recommandation: Analysez le fichier ${summary['Fichier des conflits']} pour identifier les causes des ${summary['Échecs']} échecs.` : 'Aucun échec détecté, traitement stable.',
     `Taux de parcelles sans jointure: ${summary['Taux des parcelles sans jointure']}. Envisagez une mise à jour des IDUP pour réduire les ${summary['Pas de Jointure (Pas d\'idup ou ancien Idup Ndoga)']} parcelles non jointes.`
   ];
@@ -275,19 +278,19 @@ async function runAdvancedAnalysis() {
   const gauges = [
     {
       id: 'gaugeValidation',
-      value: (summary['Succès'] / summary['Fichiers traités'] * 100),
+      value: (summary['Succès'] / (summary['Fichiers traités'] || 1) * 100),
       label: 'Validation',
       thresholds: { red: 50, yellow: 80, green: 100 }
     },
     {
       id: 'gaugeConsistency',
-      value: (1 - summary['Conflits (Parcelles à la fois individuelle et collecvive)'] / summary['Total enregistrement (Parcelles apres netoyage)'] * 100),
+      value: (1 - (summary['Conflits (Parcelles à la fois individuelle et collecvive)'] || 0) / (summary['Total enregistrement (Parcelles apres netoyage)'] || 1) * 100),
       label: 'Cohérence',
       thresholds: { red: 90, yellow: 95, green: 100 }
     },
     {
       id: 'gaugeCritical',
-      value: (summary['Échecs'] / summary['Fichiers traités'] * 100),
+      value: (summary['Échecs'] / (summary['Fichiers traités'] || 1) * 100),
       label: 'Erreurs Critiques',
       thresholds: { red: 10, yellow: 5, green: 0 }
     },
