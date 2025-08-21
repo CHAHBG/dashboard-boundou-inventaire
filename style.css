@@ -642,3 +642,21 @@ td {
     opacity: 0.5;
     cursor: not-allowed;
 }
+
+/* IA Insights */
+.ia-insights {
+    margin-top: 2rem;
+    background: var(--background-card);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-light);
+}
+
+.ia-insights h3 {
+    margin-bottom: 1rem;
+    color: var(--betplus-bleu);
+}
+
+.ia-insights table {
+    margin-top: 1rem;
+}
