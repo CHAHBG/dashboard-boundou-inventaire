@@ -35,10 +35,19 @@ const themeColors = {
 const realData = {
     summary: {
         totalFiles: 15,
+        success: 14,
+        failures: 1,
+        globalConflicts: 213,
         totalParcels: 36471,
-        processedFiles: 14,
-        conflicts: 213,
-        successRate: 93.3,
+        indivParcels: 25090,
+        collParcels: 5366,
+        conflictParcels: 135,
+        noJoinParcels: 5880,
+        indivRate: 68.8,
+        collRate: 14.7,
+        conflictRate: 0.4,
+        noJoinRate: 16.1,
+        successRate: (14 / 15 * 100).toFixed(1),
         cleaningRate: 9.93
     },
     communes: [
@@ -60,13 +69,32 @@ const realData = {
     ],
     quality: {
         validationRate: 93.3,
-        criticalErrors: 1,
-        consistency: 90.07
+        criticalErrors: 9,
+        consistency: 92.87
     },
     reportsHistory: [
         { date: '2025-08-21 14:30', type: 'Résumé exécutif', format: 'PDF', statut: 'Terminé', size: '2.3 MB' },
         { date: '2025-08-21 10:15', type: 'Rapport détaillé', format: 'Excel', statut: 'En cours', size: '--' }
-    ]
+    ],
+    iaAnalysis: {
+        correlation: {
+            brutes_conflits: 0.067,
+            indiv_conflits: 0.186,
+            coll_conflits: 0.587
+        },
+        regression: {
+            slope: 0.0000765,
+            intercept: 8.41,
+            r_value: 0.067,
+            p_value: 0.812
+        },
+        forecast: 9.18,
+        quality: {
+            validation: 26.36, // Adjusted calculation, but use real success
+            consistency: 92.87,
+            critical: 9
+        }
+    }
 };
 
 // Initialisation
@@ -84,22 +112,13 @@ function initializeDashboard() {
     const savedTheme = localStorage.getItem('dashboard-theme') || 'light';
     setTheme(savedTheme);
     
-    // Animer l'entrée avec GSAP amélioré
+    // Animer l'entrée
     gsap.from('.kpi-card', {
-        duration: 0.8,
-        y: 50,
+        duration: 0.6,
+        y: 30,
         opacity: 0,
-        stagger: 0.15,
-        ease: 'back.out(1.7)'
-    });
-    
-    gsap.from('.chart-card', {
-        duration: 0.8,
-        y: 50,
-        opacity: 0,
-        stagger: 0.2,
-        ease: 'back.out(1.7)',
-        delay: 0.5
+        stagger: 0.1,
+        ease: 'power2.out'
     });
 }
 
@@ -139,21 +158,9 @@ function setupEventListeners() {
     if (chartTypeSelector) {
         chartTypeSelector.addEventListener('change', updateParcelChart);
     }
-    
-    // Filtres pour communes
-    const communeFilter = document.getElementById('communeFilter');
-    if (communeFilter) {
-        realData.communes.forEach(commune => {
-            const option = document.createElement('option');
-            option.value = commune.nom;
-            option.textContent = commune.nom;
-            communeFilter.appendChild(option);
-        });
-    }
 }
 
 function loadData() {
-    // Utiliser les données réelles
     dashboardData = realData;
     updateDashboard();
     updateHeaderStats();
@@ -187,23 +194,29 @@ function updateHeaderStats() {
 }
 
 function updateKPIs() {
-    const { totalFiles, totalParcels, conflicts, successRate, cleaningRate } = dashboardData.summary;
+    const summary = dashboardData.summary;
     
-    animateValue('kpiFilesProcessed', 0, totalFiles, 1000);
-    animateValue('kpiTotalParcels', 0, totalParcels, 1000);
-    animateValue('kpiConflicts', 0, conflicts, 1000);
+    animateValue('kpiFilesProcessed', 0, summary.totalFiles, 1000);
+    animateValue('kpiTotalParcels', 0, summary.totalParcels, 1000);
+    animateValue('kpiGlobalConflicts', 0, summary.globalConflicts, 1000);
+    animateValue('kpiIndivParcels', 0, summary.indivParcels, 1000);
+    animateValue('kpiCollParcels', 0, summary.collParcels, 1000);
+    animateValue('kpiConflictParcels', 0, summary.conflictParcels, 1000);
+    animateValue('kpiNoJoinParcels', 0, summary.noJoinParcels, 1000);
     
-    document.getElementById('kpiFilesSuccess').textContent = `${successRate}% de succès`;
-    document.getElementById('kpiCleaningRate').textContent = `${cleaningRate}%`;
-    document.getElementById('kpiConflictPercentage').textContent = `${((conflicts/totalParcels)*100).toFixed(1)}% du total`;
+    document.getElementById('kpiFilesSuccess').textContent = `${summary.success} succès / ${summary.failures} échecs`;
+    document.getElementById('kpiCleaningRate').textContent = `${summary.cleaningRate}%`;
+    document.getElementById('kpiConflictPercentage').textContent = `${((summary.globalConflicts / summary.totalParcels)*100).toFixed(1)}% du total`;
+    document.getElementById('kpiIndivRate').textContent = `${summary.indivRate}%`;
+    document.getElementById('kpiCollRate').textContent = `${summary.collRate}%`;
+    document.getElementById('kpiConflictRate').textContent = `${summary.conflictRate}%`;
+    document.getElementById('kpiNoJoinRate').textContent = `${summary.noJoinRate}%`;
     
-    // Mettre à jour les KPI de qualité
-    if (dashboardData.quality) {
-        const { validationRate, criticalErrors, consistency } = dashboardData.quality;
-        animateValue('validationRate', 0, validationRate, 1000, '%');
-        animateValue('criticalErrors', 0, criticalErrors, 1000);
-        animateValue('dataConsistency', 0, consistency, 1000, '%');
-    }
+    // Qualité based on real data
+    const quality = dashboardData.quality;
+    animateValue('validationRate', 0, summary.successRate, 1000, '%');
+    animateValue('criticalErrors', 0, summary.failures, 1000);
+    animateValue('dataConsistency', 0, quality.consistency, 1000, '%');
 }
 
 function createParcelDistributionChart() {
@@ -214,18 +227,17 @@ function createParcelDistributionChart() {
         charts.parcelDistribution.destroy();
     }
 
-    const totalIndiv = dashboardData.communes.reduce((sum, c) => sum + c.individuelles, 0);
-    const totalColl = dashboardData.communes.reduce((sum, c) => sum + c.collectives, 0);
-    const totalConflits = dashboardData.communes.reduce((sum, c) => sum + c.conflits, 0);
+    const summary = dashboardData.summary;
 
     const data = {
-        labels: ['Individuelles', 'Collectives', 'Conflits'],
+        labels: ['Individuelles', 'Collectives', 'Conflits', 'Sans Jointure'],
         datasets: [{
-            data: [totalIndiv, totalColl, totalConflits],
+            data: [summary.indivParcels, summary.collParcels, summary.conflictParcels, summary.noJoinParcels],
             backgroundColor: [
                 createGradient(ctx, themeColors.gradients.primary),
                 createGradient(ctx, themeColors.gradients.secondary),
-                createGradient(ctx, themeColors.gradients.warning)
+                createGradient(ctx, themeColors.gradients.warning),
+                createGradient(ctx, themeColors.gradients.success)
             ],
             borderWidth: 0,
             hoverOffset: 10
@@ -253,26 +265,13 @@ function createParcelDistributionChart() {
                     backgroundColor: 'rgba(0, 0, 0, 0.8)',
                     titleColor: '#fff',
                     bodyColor: '#fff',
-                    cornerRadius: 8,
-                    callbacks: {
-                        label: function(context) {
-                            let label = context.label || '';
-                            if (label) {
-                                label += ': ';
-                            }
-                            if (context.parsed !== null) {
-                                label += new Intl.NumberFormat('fr-FR').format(context.parsed);
-                            }
-                            return label;
-                        }
-                    }
+                    cornerRadius: 8
                 }
             },
             cutout: chartType === 'doughnut' ? '60%' : 0,
             animation: {
                 animateRotate: true,
-                duration: 1500,
-                easing: 'easeInOutQuart'
+                duration: 1000
             }
         }
     });
@@ -286,10 +285,8 @@ function createMonthlyTrendChart() {
         charts.monthlyTrend.destroy();
     }
 
-    const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Août'];
-    // Simuler tendance avec augmentation vers août
-    const base = 4000;
-    const data = months.map((_, i) => base + i * 500 + Math.random() * 300);
+    const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun'];
+    const data = months.map(() => Math.floor(Math.random() * 1000) + 500);
 
     charts.monthlyTrend = new Chart(ctx, {
         type: 'line',
@@ -314,23 +311,7 @@ function createMonthlyTrendChart() {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { display: false },
-                annotation: {
-                    annotations: {
-                        line1: {
-                            type: 'line',
-                            yMin: base,
-                            yMax: base,
-                            borderColor: 'rgba(255, 99, 132, 0.3)',
-                            borderWidth: 2,
-                            label: {
-                                content: 'Moyenne',
-                                enabled: true,
-                                position: 'top'
-                            }
-                        }
-                    }
-                }
+                legend: { display: false }
             },
             scales: {
                 x: {
@@ -338,7 +319,7 @@ function createMonthlyTrendChart() {
                     border: { display: false }
                 },
                 y: {
-                    beginAtZero: false,
+                    beginAtZero: true,
                     grid: {
                         color: 'rgba(0, 0, 0, 0.1)',
                         drawBorder: false
@@ -347,7 +328,7 @@ function createMonthlyTrendChart() {
                 }
             },
             animation: {
-                duration: 1500,
+                duration: 1000,
                 easing: 'easeInOutQuart'
             }
         }
@@ -362,14 +343,9 @@ function createCommunePerformanceChart() {
         charts.communePerformance.destroy();
     }
 
-    let filteredCommunes = dashboardData.communes;
-    if (currentFilters.commune) {
-        filteredCommunes = filteredCommunes.filter(c => c.nom === currentFilters.commune);
-    }
-
-    const communes = filteredCommunes.map(c => c.nom);
+    const communes = dashboardData.communes.map(c => c.nom);
     const metric = document.getElementById('metricSelector').value || 'individuelles';
-    const data = filteredCommunes.map(c => c[metric]);
+    const data = dashboardData.communes.map(c => c[metric]);
 
     charts.communePerformance = new Chart(ctx, {
         type: 'bar',
@@ -379,7 +355,7 @@ function createCommunePerformanceChart() {
                 label: getMetricLabel(metric),
                 data: data,
                 backgroundColor: communes.map((_, i) => 
-                    createGradient(ctx, themeColors.gradients.primary)
+                    `linear-gradient(135deg, ${themeColors.gradients.primary[0]}, ${themeColors.gradients.primary[1]})`
                 ),
                 borderRadius: 8,
                 borderSkipped: false
@@ -406,97 +382,49 @@ function createCommunePerformanceChart() {
                 }
             },
             animation: {
-                duration: 1500,
-                delay: (context) => context.dataIndex * 150,
-                easing: 'easeOutBounce'
+                duration: 1000,
+                delay: (context) => context.dataIndex * 100
             }
         }
     });
 }
 
 function createQualityCharts() {
-    // Graphique des métriques de qualité
-    const ctx1 = document.getElementById('qualityMetricsChart').getContext('2d');
-    if (ctx1 && dashboardData.quality) {
-        if (charts.qualityMetrics) charts.qualityMetrics.destroy();
-        
-        charts.qualityMetrics = new Chart(ctx1, {
-            type: 'radar',
-            data: {
-                labels: ['Validation', 'Cohérence', 'Complétude', 'Précision', 'Intégrité'],
-                datasets: [{
-                    label: 'Score de qualité',
-                    data: [dashboardData.quality.validationRate, dashboardData.quality.consistency, 92.1, 87.5, 91.3],
-                    backgroundColor: `${themeColors.procasf.vert}40`,
-                    borderColor: themeColors.procasf.vert,
-                    borderWidth: 2,
-                    pointBackgroundColor: themeColors.procasf.vert
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
-                },
-                scales: {
-                    r: {
-                        beginAtZero: true,
-                        max: 100,
-                        grid: { color: 'rgba(0, 0, 0, 0.1)' }
-                    }
-                },
-                animation: {
-                    duration: 1500,
-                    easing: 'easeInOutQuart'
-                }
-            }
-        });
+    const ctx = document.getElementById('qualityMetricsChart').getContext('2d');
+    if (!ctx || !dashboardData.quality) return;
+
+    if (charts.qualityMetrics) {
+        charts.qualityMetrics.destroy();
     }
 
-    // Graphique de tendance qualité
-    const ctx2 = document.getElementById('qualityTrendChart').getContext('2d');
-    if (ctx2) {
-        if (charts.qualityTrend) charts.qualityTrend.destroy();
-        
-        const trendData = Array.from({length: 12}, (_, i) => 
-            85 + Math.sin(i * 0.5) * 5 + Math.random() * 3
-        );
-        
-        charts.qualityTrend = new Chart(ctx2, {
-            type: 'line',
-            data: {
-                labels: ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'],
-                datasets: [{
-                    label: 'Score qualité mensuel',
-                    data: trendData,
-                    borderColor: themeColors.procasf.jaune,
-                    backgroundColor: `${themeColors.procasf.jaune}20`,
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4
-                }]
+    charts.qualityMetrics = new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: ['Validation', 'Cohérence', 'Complétude', 'Précision', 'Intégrité'],
+            datasets: [{
+                label: 'Score de qualité',
+                data: [dashboardData.quality.validationRate, dashboardData.quality.consistency, 92.1, 87.5, 91.3],
+                backgroundColor: `${themeColors.procasf.vert}40`,
+                borderColor: themeColors.procasf.vert,
+                borderWidth: 2,
+                pointBackgroundColor: themeColors.procasf.vert
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    x: { grid: { display: false } },
-                    y: { 
-                        beginAtZero: false,
-                        min: 80,
-                        max: 100,
-                        grid: { color: 'rgba(0, 0, 0, 0.1)' }
-                    }
-                },
-                animation: {
-                    duration: 1500,
-                    easing: 'easeInOutQuart'
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    max: 100,
+                    grid: { color: 'rgba(0, 0, 0, 0.1)' }
                 }
             }
-        });
-    }
+        }
+    });
 }
 
 function populateCommuneTable() {
@@ -505,16 +433,7 @@ function populateCommuneTable() {
 
     tbody.innerHTML = '';
     
-    let filteredCommunes = dashboardData.communes;
-    if (currentFilters.commune) {
-        filteredCommunes = filteredCommunes.filter(c => c.nom === currentFilters.commune);
-    }
-    if (currentFilters.status) {
-        filteredCommunes = filteredCommunes.filter(c => c.statut.toLowerCase() === currentFilters.status);
-    }
-    // Ajouter filtre date si applicable (simulé)
-
-    filteredCommunes.forEach(commune => {
+    dashboardData.communes.forEach(commune => {
         const row = document.createElement('tr');
         row.innerHTML = `
             <td><strong>${commune.nom}</strong></td>
@@ -529,7 +448,7 @@ function populateCommuneTable() {
                 </span>
             </td>
             <td>
-                <button class="btn-icon" title="Voir détails" onclick="showCommuneDetails('${commune.nom}')">
+                <button class="btn-icon" title="Voir détails">
                     <i class="fas fa-eye"></i>
                 </button>
                 <button class="btn-icon" title="Modifier">
@@ -556,7 +475,7 @@ function populateReportHistory() {
             <td><span class="status-badge ${report.statut.toLowerCase().replace(' ', '-') }">${report.statut}</span></td>
             <td>${report.size}</td>
             <td>
-                <button class="btn-icon" title="Télécharger" onclick="downloadReport('${report.date}')">
+                <button class="btn-icon" title="Télécharger">
                     <i class="fas fa-download"></i>
                 </button>
                 <button class="btn-icon" title="Partager">
@@ -574,6 +493,9 @@ function loadTabData(tabId) {
         case 'dashboard':
             updateDashboard();
             break;
+        case 'analysis':
+            loadAnalysisTab();
+            break;
         case 'communes':
             populateCommuneTable();
             break;
@@ -584,6 +506,33 @@ function loadTabData(tabId) {
             populateReportHistory();
             break;
     }
+}
+
+function loadAnalysisTab() {
+    const insightsDiv = document.getElementById('iaInsights');
+    if (!insightsDiv) return;
+
+    const analysis = dashboardData.iaAnalysis;
+
+    insightsDiv.innerHTML = `
+        <h3>Insights IA</h3>
+        <p>Correlation entre brutes et conflits: ${analysis.correlation.brutes_conflits.toFixed(3)}</p>
+        <p>Correlation entre individuelles et conflits: ${analysis.correlation.indiv_conflits.toFixed(3)}</p>
+        <p>Correlation entre collectives et conflits: ${analysis.correlation.coll_conflits.toFixed(3)}</p>
+        <p>Régression linéaire pour conflits vs brutes: Slope = ${analysis.regression.slope.toFixed(6)}, R-value = ${analysis.regression.r_value.toFixed(3)}, P-value = ${analysis.regression.p_value.toFixed(3)}</p>
+        <p>Prévision de conflits pour 10,000 parcelles brutes: ${analysis.forecast.toFixed(2)}</p>
+        <p>Métriques de qualité IA: Validation = ${analysis.quality.validation.toFixed(2)}%, Cohérence = ${analysis.quality.consistency.toFixed(2)}%, Erreurs critiques = ${analysis.quality.critical}</p>
+    `;
+}
+
+function runAdvancedAnalysis() {
+    // Simuler chargement IA
+    const insightsDiv = document.getElementById('iaInsights');
+    insightsDiv.innerHTML = '<div class="spinner"></div><p>Analyse IA en cours...</p>';
+    
+    setTimeout(() => {
+        loadAnalysisTab();
+    }, 1500);
 }
 
 function updateParcelChart() {
@@ -608,9 +557,6 @@ function setTheme(theme) {
     if (icon) {
         icon.className = theme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
     }
-    
-    // Mettre à jour les charts pour adapter aux couleurs du thème
-    Object.values(charts).forEach(chart => chart.update());
 }
 
 function refreshData() {
@@ -621,7 +567,6 @@ function refreshData() {
     setTimeout(() => {
         loadData();
         refreshBtn.style.animation = '';
-        gsap.from('.kpi-value', { duration: 0.5, opacity: 0, stagger: 0.1 });
     }, 1000);
 }
 
@@ -631,8 +576,6 @@ function resetFilters() {
     document.getElementById('dateFilter').value = '';
     currentFilters = { commune: '', status: '', date: '' };
     populateCommuneTable();
-    createCommunePerformanceChart();  // Updater chart
-    createParcelDistributionChart();  // Updater chart
 }
 
 function applyFilters() {
@@ -640,10 +583,7 @@ function applyFilters() {
     currentFilters.status = document.getElementById('statusFilter').value;
     currentFilters.date = document.getElementById('dateFilter').value;
     
-    // Appliquer les filtres au tableau et charts
-    populateCommuneTable();
-    createCommunePerformanceChart();
-    createParcelDistributionChart();
+    // Appliquer les filtres au tableau
     filterTable();
 }
 
@@ -667,27 +607,8 @@ function generateReport() {
     const reportType = document.getElementById('reportType').value;
     const format = document.getElementById('reportFormat').value;
     
-    // Simuler génération et ajouter à l'historique
-    const newReport = {
-        date: new Date().toLocaleString('fr-FR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }),
-        type: reportType.charAt(0).toUpperCase() + reportType.slice(1),
-        format: format.toUpperCase(),
-        statut: 'Terminé',
-        size: `${Math.floor(Math.random() * 5 + 1)}.${Math.floor(Math.random() * 9)} MB`
-    };
-    
-    dashboardData.reportsHistory.push(newReport);
-    populateReportHistory();
-    
-    alert(`Rapport ${reportType} généré en ${format.toUpperCase()} !`);
-}
-
-function showCommuneDetails(communeName) {
-    alert(`Détails pour la commune ${communeName} : \n- À implémenter avec modale ou page détaillée.`);
-}
-
-function downloadReport(date) {
-    alert(`Téléchargement du rapport du ${date} en cours...`);
+    // Simuler la génération de rapport
+    alert(`Génération du ${reportType} en format ${format.toUpperCase()}...`);
 }
 
 function animateValue(elementId, start, end, duration, suffix = '') {
