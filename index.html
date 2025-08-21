@@ -76,7 +76,7 @@
         <main class="main-content">
             <!-- Onglet Tableau de bord -->
             <div class="tab-content active" id="dashboard">
-                <!-- KPI Cards -->
+                <!-- KPI Cards augmentées -->
                 <div class="kpi-grid">
                     <div class="kpi-card">
                         <div class="kpi-header">
@@ -117,8 +117,8 @@
                                 <i class="fas fa-exclamation-triangle"></i>
                             </div>
                         </div>
-                        <div class="kpi-title">Conflits Détectés</div>
-                        <div class="kpi-value" id="kpiConflicts">--</div>
+                        <div class="kpi-title">Conflits Globaux</div>
+                        <div class="kpi-value" id="kpiGlobalConflicts">--</div>
                         <div class="kpi-trend trend-negative">
                             <i class="fas fa-arrow-down"></i>
                             <span id="kpiConflictPercentage">--% du total</span>
@@ -136,6 +136,62 @@
                         <div class="kpi-trend trend-positive">
                             <i class="fas fa-arrow-up"></i>
                             <span>Doublons supprimés</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon parcels">
+                                <i class="fas fa-user"></i>
+                            </div>
+                        </div>
+                        <div class="kpi-title">Parcelles Individuelles</div>
+                        <div class="kpi-value" id="kpiIndivParcels">--</div>
+                        <div class="kpi-trend trend-neutral">
+                            <i class="fas fa-percentage"></i>
+                            <span id="kpiIndivRate">--%</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon parcels">
+                                <i class="fas fa-users"></i>
+                            </div>
+                        </div>
+                        <div class="kpi-title">Parcelles Collectives</div>
+                        <div class="kpi-value" id="kpiCollParcels">--</div>
+                        <div class="kpi-trend trend-neutral">
+                            <i class="fas fa-percentage"></i>
+                            <span id="kpiCollRate">--%</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon conflicts">
+                                <i class="fas fa-gavel"></i>
+                            </div>
+                        </div>
+                        <div class="kpi-title">Parcelles Conflictuelles</div>
+                        <div class="kpi-value" id="kpiConflictParcels">--</div>
+                        <div class="kpi-trend trend-negative">
+                            <i class="fas fa-percentage"></i>
+                            <span id="kpiConflictRate">--%</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon quality">
+                                <i class="fas fa-link-slash"></i>
+                            </div>
+                        </div>
+                        <div class="kpi-title">Parcelles Sans Jointure</div>
+                        <div class="kpi-value" id="kpiNoJoinParcels">--</div>
+                        <div class="kpi-trend trend-negative">
+                            <i class="fas fa-percentage"></i>
+                            <span id="kpiNoJoinRate">--%</span>
                         </div>
                     </div>
                 </div>
@@ -189,10 +245,13 @@
 
             <!-- Onglet Analyse avancée -->
             <div class="tab-content" id="analysis">
-                <div class="loading-state">
-                    <div class="spinner"></div>
-                    <h3>Analyses avancées en cours de développement</h3>
-                    <p>Fonctionnalités d'IA et de machine learning à venir</p>
+                <div class="analysis-container">
+                    <h2>Analyse Avancée par IA</h2>
+                    <p>Cette section utilise des algorithmes d'IA pour analyser les correlations, tendances et prévisions basées sur les données du rapport.</p>
+                    <button class="btn btn-primary" onclick="runAdvancedAnalysis()">Lancer l'Analyse IA</button>
+                    <div id="iaInsights" class="ia-insights">
+                        <!-- Contenu généré par IA -->
+                    </div>
                 </div>
             </div>
 
