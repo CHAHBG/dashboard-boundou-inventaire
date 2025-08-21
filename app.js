@@ -43,7 +43,10 @@ const realData = {
     conflictRate: 0.4,
     noJoinRate: 16.1,
     successRate: (14 / 15 * 100).toFixed(1),
-    cleaningRate: 9.93
+    cleaningRate: 9.93,
+    jointuresIndividuelles: 14,
+    jointuresCollectives: 14,
+    memeIDUP: 9
   },
   communes: [
     { nom: 'BALA', brutes: 912, individuelles: 718, collectives: 144, conflits: 0, qualite: 96, statut: 'SUCCÈS' },
@@ -97,25 +100,49 @@ async function fetchDashboardData() {
   try {
     const response = await fetch('data/Rapport_Post_traitement.json');
     if (!response.ok) throw new Error('Failed to fetch JSON');
-    const data = await response.json();
-    const summary = data['Rapport sommaire'].reduce((acc, item) => {
-      acc[item.date] = item['2025_08_19_19_17_47'];
+    const jsonData = await response.json();
+    const summary = jsonData['Rapport sommaire'].reduce((acc, item) => {
+      const key = item.date.toLowerCase().replace(/ /g, '_');
+      let value = item['2025_08_19_19_17_47'];
+      if (typeof value === 'string' && value.includes('%')) {
+        value = parseFloat(value.replace('%', '')) || 0;
+      }
+      acc[key] = value;
       return acc;
     }, {});
-    return { summary, ...realData }; // Merge JSON summary with realData
+    return {
+      summary: {
+        ...realData.summary,
+        totalFiles: summary['fichiers_traités'] || realData.summary.totalFiles,
+        success: summary['succès'] || realData.summary.success,
+        failures: summary['échecs'] || realData.summary.failures,
+        globalConflicts: summary['conflits_globaux'] || realData.summary.globalConflicts,
+        totalParcels: summary['total_enregistrement_(parcelles_apres_netoyage)'] || realData.summary.totalParcels,
+        indivParcels: summary['parcelles_individuelles'] || realData.summary.indivParcels,
+        collParcels: summary['parcelles_collectives'] || realData.summary.collParcels,
+        conflictParcels: summary['conflits_(parcelles_à_la_fois_individuelle_et_collecvive)'] || realData.summary.conflictParcels,
+        noJoinParcels: summary['pas_de_jointure_(pas_d\'idup_ou_ancien_idup_ndoga)'] || realData.summary.noJoinParcels,
+        indivRate: summary['taux_des_parcelles_individuelles'] || realData.summary.indivRate,
+        collRate: summary['taux_des_parcelles_collectives'] || realData.summary.collRate,
+        conflictRate: summary['taux_des_parcelles_conflictuelles'] || realData.summary.conflictRate,
+        noJoinRate: summary['taux_des_parcelles_sans_jointure'] || realData.summary.noJoinRate,
+        jointuresIndividuelles: summary['fichiers_jointures_individuelles'] || realData.summary.jointuresIndividuelles,
+        jointuresCollectives: summary['fichiers_jointures_collectives'] || realData.summary.jointuresCollectives,
+        memeIDUP: summary['fichiers_avec_même_idup_individuelle_et_collective'] || realData.summary.memeIDUP,
+        successRate: summary['succès'] ? (summary['succès'] / summary['fichiers_traités'] * 100).toFixed(1) : realData.summary.successRate
+      },
+      ...realData
+    };
   } catch (error) {
     console.error('Error fetching JSON, using fallback data:', error);
-    return realData; // Fallback to hardcoded data
+    return realData;
   }
 }
 
 // Utility function to animate value changes
 function animateValue(id, start, end, duration, suffix = '') {
   const element = document.getElementById(id);
-  if (!element) {
-    console.warn(`Element with ID ${id} not found for animation.`);
-    return;
-  }
+  if (!element) return;
   const range = end - start;
   const startTime = performance.now();
   function updateValue(currentTime) {
@@ -162,12 +189,14 @@ async function updateKPIs() {
     { id: 'kpiCollRate', value: summary.collRate, label: 'Taux Collectives', icon: 'parcels', suffix: '%' },
     { id: 'kpiConflictRate', value: summary.conflictRate, label: 'Taux Conflits', icon: 'conflicts', suffix: '%' },
     { id: 'kpiNoJoinRate', value: summary.noJoinRate, label: 'Taux Sans Jointure', icon: 'quality', suffix: '%' },
-    { id: 'kpiCleaningRate', value: summary.cleaningRate, label: 'Taux de Nettoyage', icon: 'quality', suffix: '%' }
+    { id: 'kpiJointuresIndividuelles', value: summary.jointuresIndividuelles, label: 'Jointures Individuelles', icon: 'files' },
+    { id: 'kpiJointuresCollectives', value: summary.jointuresCollectives, label: 'Jointures Collectives', icon: 'files' },
+    { id: 'kpiMemeIDUP', value: summary.memeIDUP, label: 'Même IDUP Indiv/Coll', icon: 'conflicts' }
   ];
 
   kpiData.forEach(kpi => {
     const card = document.createElement('div');
-    card.className = `kpi-card shadowed kpi-icon-${kpi.icon}`;
+    card.className = `kpi-card kpi-icon-${kpi.icon}`;
     card.innerHTML = `
       <div class="kpi-header">
         <span class="kpi-icon ${kpi.icon}"><i class="fas fa-${kpi.icon === 'files' ? 'file-alt' : kpi.icon === 'parcels' ? 'map' : kpi.icon === 'conflicts' ? 'exclamation-triangle' : 'check-circle'}"></i></span>
@@ -205,30 +234,32 @@ async function initCharts() {
   const data = await fetchDashboardData();
   dashboardData = data;
   const summary = data.summary;
-  const ctxParcel = document.getElementById('parcelDistributionChart')?.getContext('2d');
-  const ctxMonthly = document.getElementById('monthlyTrendChart')?.getContext('2d');
-  const ctxCommune = document.getElementById('communePerformanceChart')?.getContext('2d');
-  const ctxQuality = document.getElementById('qualityMetricsChart')?.getContext('2d');
-  const ctxAnomaly = document.getElementById('communeConflictChart')?.getContext('2d');
+  const canvases = {
+    parcel: document.getElementById('parcelDistributionChart')?.getContext('2d'),
+    monthly: document.getElementById('monthlyTrendChart')?.getContext('2d'),
+    commune: document.getElementById('communePerformanceChart')?.getContext('2d'),
+    quality: document.getElementById('qualityMetricsChart')?.getContext('2d'),
+    anomaly: document.getElementById('communeConflictChart')?.getContext('2d')
+  };
 
-  if (!ctxParcel || !ctxMonthly || !ctxCommune || !ctxQuality || !ctxAnomaly) {
-    console.error('Chart canvases not found');
+  if (!canvases.parcel || !canvases.monthly || !canvases.commune || !canvases.quality || !canvases.anomaly) {
+    console.error('One or more chart canvases not found:', canvases);
     return;
   }
 
   // Parcel Distribution Chart
   if (charts.parcelDistribution) charts.parcelDistribution.destroy();
-  charts.parcelDistribution = new Chart(ctxParcel, {
+  charts.parcelDistribution = new Chart(canvases.parcel, {
     type: document.getElementById('chartTypeSelector')?.value || 'doughnut',
     data: {
       labels: ['Individuelles', 'Collectives', 'Conflits', 'Sans Jointure'],
       datasets: [{
         data: [summary.indivParcels, summary.collParcels, summary.conflictParcels, summary.noJoinParcels],
         backgroundColor: [
-          createGradient(ctxParcel, themeColors.gradients.primary),
-          createGradient(ctxParcel, themeColors.gradients.secondary),
-          createGradient(ctxParcel, themeColors.gradients.warning),
-          createGradient(ctxParcel, themeColors.gradients.success)
+          createGradient(canvases.parcel, themeColors.gradients.primary),
+          createGradient(canvases.parcel, themeColors.gradients.secondary),
+          createGradient(canvases.parcel, themeColors.gradients.warning),
+          createGradient(canvases.parcel, themeColors.gradients.success)
         ],
         borderWidth: 0,
         hoverOffset: 10
@@ -265,7 +296,7 @@ async function initCharts() {
   if (charts.monthlyTrend) charts.monthlyTrend.destroy();
   const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun'];
   const monthlyData = months.map(() => Math.floor(Math.random() * 1000) + 500); // Mock data
-  charts.monthlyTrend = new Chart(ctxMonthly, {
+  charts.monthlyTrend = new Chart(canvases.monthly, {
     type: 'line',
     data: {
       labels: months,
@@ -300,14 +331,14 @@ async function initCharts() {
   if (charts.communePerformance) charts.communePerformance.destroy();
   const communes = data.communes.map(c => c.nom);
   const metric = document.getElementById('metricSelector')?.value || 'individuelles';
-  charts.communePerformance = new Chart(ctxCommune, {
+  charts.communePerformance = new Chart(canvases.commune, {
     type: 'bar',
     data: {
       labels: communes,
       datasets: [{
         label: getMetricLabel(metric),
         data: data.communes.map(c => c[metric]),
-        backgroundColor: communes.map(() => createGradient(ctxCommune, themeColors.gradients.primary)),
+        backgroundColor: communes.map(() => createGradient(canvases.commune, themeColors.gradients.primary)),
         borderRadius: 8,
         borderSkipped: false
       }]
@@ -326,7 +357,7 @@ async function initCharts() {
 
   // Quality Metrics Chart
   if (charts.qualityMetrics) charts.qualityMetrics.destroy();
-  charts.qualityMetrics = new Chart(ctxQuality, {
+  charts.qualityMetrics = new Chart(canvases.quality, {
     type: 'radar',
     data: {
       labels: ['Validation', 'Cohérence', 'Complétude', 'Précision', 'Intégrité'],
@@ -349,7 +380,7 @@ async function initCharts() {
 
   // IA Anomaly Chart
   if (charts.anomalyChart) charts.anomalyChart.destroy();
-  charts.anomalyChart = new Chart(ctxAnomaly, {
+  charts.anomalyChart = new Chart(canvases.anomaly, {
     type: 'bar',
     data: {
       labels: ['Conflits', 'Échecs', 'Corrélation Collectives-Conflits'],
@@ -361,9 +392,9 @@ async function initCharts() {
           data.iaAnalysis.correlation.coll_conflits * 100
         ],
         backgroundColor: [
-          createGradient(ctxAnomaly, themeColors.gradients.warning),
-          createGradient(ctxAnomaly, themeColors.gradients.success),
-          createGradient(ctxAnomaly, themeColors.gradients.primary)
+          createGradient(canvases.anomaly, themeColors.gradients.warning),
+          createGradient(canvases.anomaly, themeColors.gradients.success),
+          createGradient(canvases.anomaly, themeColors.gradients.primary)
         ],
         borderRadius: 8
       }]
@@ -431,26 +462,43 @@ async function runAdvancedAnalysis() {
       <p>Qualité: Validation = ${summary.successRate}%, Cohérence = ${analysis.quality.consistency.toFixed(2)}%</p>
     `;
 
-    // IA Gauges
+    // IA Gauges (using doughnut charts instead of gauge)
     const gauges = [
-      { id: 'gaugeValidation', value: summary.successRate, label: 'Validation', thresholds: { red: 50, yellow: 80, green: 100 } },
-      { id: 'gaugeConsistency', value: analysis.quality.consistency, label: 'Cohérence', thresholds: { red: 90, yellow: 95, green: 100 } },
-      { id: 'gaugeCritical', value: summary.failures, label: 'Erreurs Critiques', thresholds: { red: 10, yellow: 5, green: 0 } },
-      { id: 'gaugeForecast', value: analysis.forecast, label: 'Prévision Conflits', thresholds: { red: 20, yellow: 10, green: 0 } }
+      { id: 'gaugeValidation', value: summary.successRate, label: 'Validation', max: 100 },
+      { id: 'gaugeConsistency', value: analysis.quality.consistency, label: 'Cohérence', max: 100 },
+      { id: 'gaugeCritical', value: summary.failures, label: 'Erreurs Critiques', max: 20 },
+      { id: 'gaugeForecast', value: analysis.forecast, label: 'Prévision Conflits', max: 50 }
     ];
 
     gauges.forEach(g => {
       const ctx = document.getElementById(g.id)?.getContext('2d');
       if (ctx) {
-        const color = g.value <= g.thresholds.red ? themeColors.procasf.rouge : g.value <= g.thresholds.yellow ? themeColors.procasf.jaune : themeColors.procasf.vert;
-        new Chart(ctx, {
-          type: 'gauge',
+        if (charts[g.id]) charts[g.id].destroy();
+        const color = g.value > g.max * 0.8 ? themeColors.procasf.rouge : g.value > g.max * 0.5 ? themeColors.procasf.jaune : themeColors.procasf.vert;
+        charts[g.id] = new Chart(ctx, {
+          type: 'doughnut',
           data: {
-            datasets: [{ value: g.value, backgroundColor: [color, '#ccc'] }]
+            datasets: [{
+              data: [g.value, g.max - g.value],
+              backgroundColor: [color, '#e0e0e0'],
+              borderWidth: 0
+            }]
           },
           options: {
-            needle: { radiusPercentage: 2, widthPercentage: 3.2 },
-            valueLabel: { display: true, formatter: () => `${Math.round(g.value)}%` }
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '70%',
+            plugins: {
+              legend: { display: false },
+              tooltip: { enabled: false },
+              title: {
+                display: true,
+                text: `${Math.round(g.value)}%`,
+                position: 'bottom',
+                color: color,
+                font: { size: 14, weight: 'bold' }
+              }
+            }
           }
         });
       }
@@ -560,7 +608,7 @@ function renderGuide() {
     });
   });
 
-  guide.querySelector('.guide-close').addEventListener('click', toggleGuide);
+  document.querySelector('.guide-close').addEventListener('click', toggleGuide);
 }
 
 // Toggle User Guide
@@ -668,7 +716,10 @@ async function generateReport() {
         'Succès': data.summary.success,
         'Échecs': data.summary.failures,
         'Parcelles individuelles': data.summary.indivParcels,
-        'Parcelles collectives': data.summary.collParcels
+        'Parcelles collectives': data.summary.collParcels,
+        'Jointures Individuelles': data.summary.jointuresIndividuelles,
+        'Jointures Collectives': data.summary.jointuresCollectives,
+        'Même IDUP': data.summary.memeIDUP
       };
       break;
     case 'detailed':
@@ -771,6 +822,7 @@ function setupEventListeners() {
     const csvContent = convertToCSV(dashboardData.communes);
     downloadFile(csvContent, 'commune_data.csv', 'text/csv');
   });
+  document.getElementById('generateReportBtn')?.addEventListener('click', generateReport);
 }
 
 function loadTabData(tabId) {
@@ -796,7 +848,7 @@ function loadTabData(tabId) {
 
 function toggleTheme() {
   currentTheme = currentTheme === 'light' ? 'dark' : 'light';
-  document.body.dataset.theme = currentTheme;
+  document.documentElement.dataset.theme = currentTheme;
   localStorage.setItem('dashboard-theme', currentTheme);
   const icon = document.getElementById('themeIcon');
   if (icon) {
@@ -873,6 +925,13 @@ function debounce(func, wait) {
 
 // DOM Ready
 document.addEventListener('DOMContentLoaded', () => {
+  const savedTheme = localStorage.getItem('dashboard-theme') || 'light';
+  currentTheme = savedTheme;
+  document.documentElement.dataset.theme = savedTheme;
+  const icon = document.getElementById('themeIcon');
+  if (icon) {
+    icon.className = savedTheme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+  }
   if (document.getElementById('kpiGrid')) {
     initializeDashboard();
   } else {
