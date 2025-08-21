@@ -3,6 +3,7 @@ let dashboardData = null;
 let charts = {};
 let currentTheme = 'light';
 let currentFilters = { commune: '', status: '', date: '' };
+let reportHistory = []; // Liste dynamique pour l'historique des rapports
 
 // Couleurs du thème
 const themeColors = {
@@ -26,7 +27,7 @@ const themeColors = {
   }
 };
 
-// Hardcoded data as fallback
+// Hardcoded data as fallback (sans données fictives pour reportsHistory)
 const realData = {
   summary: {
     totalFiles: 15,
@@ -73,10 +74,7 @@ const realData = {
     precision: 87.5,
     integrite: 91.3
   },
-  reportsHistory: [
-    { date: '2025-08-21 14:30', type: 'Résumé exécutif', format: 'PDF', statut: 'Terminé', size: '2.3 MB' },
-    { date: '2025-08-21 10:15', type: 'Rapport détaillé', format: 'Excel', statut: 'En cours', size: '--' }
-  ],
+  reportsHistory: [], // Données fictives supprimées
   iaAnalysis: {
     correlation: {
       brutes_conflits: 0.067,
@@ -573,10 +571,10 @@ function populateCommuneTable() {
 // Populate Report History
 function populateReportHistory() {
   const tbody = document.getElementById('reportHistoryBody');
-  if (!tbody || !dashboardData) return;
+  if (!tbody) return;
 
   tbody.innerHTML = '';
-  dashboardData.reportsHistory.forEach(report => {
+  reportHistory.forEach(report => {
     const row = document.createElement('tr');
     row.innerHTML = `
       <td>${report.date}</td>
@@ -650,7 +648,7 @@ async function generateReport() {
   } else if (reportFormat === 'json') {
     downloadFile(JSON.stringify(reportData, null, 2), `report_${reportType}.json`, 'application/json');
   } else if (reportFormat === 'pdf') {
-    generatePDFReport(data);
+    generatePDFReport(data, reportType);
     return;
   } else {
     alert(`Format ${reportFormat} non supporté pour le moment.`);
@@ -658,164 +656,175 @@ async function generateReport() {
   }
 
   // Update report history for non-PDF formats
-  const reportHistoryBody = document.getElementById('reportHistoryBody');
-  if (reportHistoryBody) {
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>${new Date().toLocaleString()}</td>
-      <td>${reportType}</td>
-      <td>${reportFormat.toUpperCase()}</td>
-      <td><span class="status-badge completed">Terminé</span></td>
-      <td>${(JSON.stringify(reportData).length / 1024).toFixed(2)} KB</td>
-      <td>
-        <button class="btn-icon" title="Télécharger"><i class="fas fa-download"></i></button>
-        <button class="btn-icon" title="Partager"><i class="fas fa-share"></i></button>
-      </td>
-    `;
-    reportHistoryBody.appendChild(row);
-  }
+  const reportSize = (JSON.stringify(reportData).length / 1024).toFixed(2) + ' KB';
+  reportHistory.push({
+    date: new Date().toLocaleString(),
+    type: reportType.charAt(0).toUpperCase() + reportType.slice(1),
+    format: reportFormat.toUpperCase(),
+    statut: 'Terminé',
+    size: reportSize
+  });
+  populateReportHistory();
 }
 
 // Generate PDF Report
-async function generatePDFReport(data) {
-  const latexContent = generateLatexContent(data);
-  const blob = new Blob([latexContent], { type: 'text/latex' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'dashboard_full_report.tex';
-  a.click();
-  URL.revokeObjectURL(url);
+async function generatePDFReport(data, reportType) {
+  const { jsPDF } = window.jspdf;
+  if (!jsPDF) {
+    console.error('jsPDF library not loaded');
+    alert('Erreur : la bibliothèque jsPDF n\'est pas chargée.');
+    return;
+  }
+
+  const doc = new jsPDF();
+  const margin = 10;
+  let y = 10;
+
+  // Helper function to add text with word wrapping
+  function addText(text, x, y, fontSize = 12, isBold = false, maxWidth = 190) {
+    doc.setFontSize(fontSize);
+    doc.setFont('helvetica', isBold ? 'bold' : 'normal');
+    const splitText = doc.splitTextToSize(text, maxWidth);
+    doc.text(splitText, x, y);
+    return y + splitText.length * (fontSize * 0.4);
+  }
+
+  // Title
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(16);
+  y = addText(`Rapport ${reportType.charAt(0).toUpperCase() + reportType.slice(1)} - Enquête Foncière`, margin, y, 16, true);
+  y = addText(`Date: ${new Date().toLocaleString('fr-FR')}`, margin, y + 5, 12);
+  y = addText('Par PROCASF & BET-PLUS SA', margin, y + 5, 12);
+  y += 10;
+
+  if (reportType === 'full' || reportType === 'executive') {
+    // Executive Summary
+    y = addText('Résumé Exécutif', margin, y, 14, true);
+    const summary = data.summary;
+    const summaryItems = [
+      `Fichiers Traités: ${formatNumber(summary.totalFiles)}`,
+      `Succès/Échecs: ${summary.success} succès / ${summary.failures} échecs`,
+      `Total Parcelles: ${formatNumber(summary.totalParcels)}`,
+      `Conflits Globaux: ${formatNumber(summary.globalConflicts)}`,
+      `Parcelles Individuelles: ${formatNumber(summary.indivParcels)} (${summary.indivRate}%)`,
+      `Parcelles Collectives: ${formatNumber(summary.collParcels)} (${summary.collRate}%)`,
+      `Parcelles en Conflit: ${formatNumber(summary.conflictParcels)} (${summary.conflictRate}%)`,
+      `Parcelles Sans Jointure: ${formatNumber(summary.noJoinParcels)} (${summary.noJoinRate}%)`,
+      `Jointures Individuelles: ${formatNumber(summary.jointuresIndividuelles)}`,
+      `Jointures Collectives: ${formatNumber(summary.jointuresCollectives)}`,
+      `Même IDUP Indiv/Coll: ${formatNumber(summary.memeIDUP)}`
+    ];
+    summaryItems.forEach(item => {
+      y = addText(`• ${item}`, margin + 5, y + 5, 10);
+    });
+    y += 10;
+  }
+
+  if (reportType === 'full' || reportType === 'communes') {
+    // Commune Analysis
+    y = addText('Analyse par Commune', margin, y, 14, true);
+    const communes = data.communes.slice(0, 5); // Limit to 5 for brevity
+    doc.autoTable({
+      startY: y,
+      head: [['Commune', 'Brutes', 'Individuelles', 'Collectives', 'Conflits', 'Qualité', 'Statut']],
+      body: communes.map(c => [
+        c.nom,
+        formatNumber(c.brutes),
+        formatNumber(c.individuelles),
+        formatNumber(c.collectives),
+        formatNumber(c.conflits),
+        `${c.qualite}%`,
+        c.statut
+      ]),
+      theme: 'grid',
+      styles: { fontSize: 8, cellPadding: 2 },
+      headStyles: { fillColor: themeColors.procasf.bleu }
+    });
+    y = doc.lastAutoTable.finalY + 10;
+  }
+
+  if (reportType === 'full' || reportType === 'quality') {
+    // Quality Metrics
+    y = addText('Métriques de Qualité', margin, y, 14, true);
+    const quality = data.quality;
+    const qualityItems = [
+      `Validation (${quality.validationRate}%): Taux de fichiers traités avec succès.`,
+      `Cohérence (${quality.consistency}%): Mesure de la cohérence des données.`,
+      `Complétude (${quality.completude}%): Proportion des données complètes.`,
+      `Précision (${quality.precision}%): Exactitude des données.`,
+      `Intégrité (${quality.integrite}%): Intégrité structurelle des données.`,
+      `Erreurs critiques (${quality.criticalErrors}): Nombre d'erreurs critiques détectées.`
+    ];
+    qualityItems.forEach(item => {
+      y = addText(`• ${item}`, margin + 5, y + 5, 10);
+    });
+    y += 10;
+  }
+
+  if (reportType === 'full' || reportType === 'analysis') {
+    // IA Analysis
+    y = addText('Analyse IA', margin, y, 14, true);
+    const iaAnalysis = data.iaAnalysis;
+    y = addText('Corrélations', margin + 5, y + 5, 12, true);
+    const correlationItems = [
+      `Brutes-Conflits: ${iaAnalysis.correlation.brutes_conflits.toFixed(3)} (faible impact).`,
+      `Individuelles-Conflits: ${iaAnalysis.correlation.indiv_conflits.toFixed(3)} (corrélation modérée).`,
+      `Collectives-Conflits: ${iaAnalysis.correlation.coll_conflits.toFixed(3)} (forte relation).`
+    ];
+    correlationItems.forEach(item => {
+      y = addText(`• ${item}`, margin + 10, y + 5, 10);
+    });
+    y = addText('Régression', margin + 5, y + 5, 12, true);
+    const regressionItems = [
+      `Slope: ${iaAnalysis.regression.slope.toFixed(6)}`,
+      `R-value: ${iaAnalysis.regression.r_value.toFixed(3)}`,
+      `P-value: ${iaAnalysis.regression.p_value.toFixed(3)}`
+    ];
+    regressionItems.forEach(item => {
+      y = addText(`• ${item}`, margin + 10, y + 5, 10);
+    });
+    y = addText(`Prévision: ${iaAnalysis.forecast.toFixed(2)} conflits estimés pour 10,000 parcelles.`, margin + 5, y + 5, 10);
+    y = addText('Qualité IA', margin + 5, y + 5, 12, true);
+    const iaQualityItems = [
+      `Validation: ${iaAnalysis.quality.validation.toFixed(2)}%`,
+      `Cohérence: ${iaAnalysis.quality.consistency.toFixed(2)}%`,
+      `Erreurs Critiques: ${iaAnalysis.quality.critical}`
+    ];
+    iaQualityItems.forEach(item => {
+      y = addText(`• ${item}`, margin + 10, y + 5, 10);
+    });
+    y += 10;
+  }
+
+  if (reportType === 'full' || reportType === 'reports') {
+    // Report History
+    y = addText('Historique des Rapports', margin, y, 14, true);
+    doc.autoTable({
+      startY: y,
+      head: [['Date', 'Type', 'Format', 'Statut', 'Taille']],
+      body: reportHistory.map(r => [r.date, r.type, r.format, r.statut, r.size]),
+      theme: 'grid',
+      styles: { fontSize: 8, cellPadding: 2 },
+      headStyles: { fillColor: themeColors.procasf.bleu }
+    });
+    y = doc.lastAutoTable.finalY + 10;
+  }
+
+  // Save PDF
+  doc.save(`dashboard_${reportType}_report.pdf`);
 
   // Update report history
-  const reportHistoryBody = document.getElementById('reportHistoryBody');
-  if (reportHistoryBody) {
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>${new Date().toLocaleString()}</td>
-      <td>Complet</td>
-      <td>PDF</td>
-      <td><span class="status-badge completed">Terminé</span></td>
-      <td>~</td>
-      <td>
-        <button class="btn-icon" title="Télécharger"><i class="fas fa-download"></i></button>
-        <button class="btn-icon" title="Partager"><i class="fas fa-share"></i></button>
-      </td>
-    `;
-    reportHistoryBody.appendChild(row);
-  }
+  reportHistory.push({
+    date: new Date().toLocaleString(),
+    type: reportType.charAt(0).toUpperCase() + reportType.slice(1),
+    format: 'PDF',
+    statut: 'Terminé',
+    size: '~'
+  });
+  populateReportHistory();
 }
 
-// Generate LaTeX content for PDF
-function generateLatexContent(data) {
-  const summary = data.summary;
-  const communes = data.communes;
-  const quality = data.quality;
-  const iaAnalysis = data.iaAnalysis;
-  const reportsHistory = data.reportsHistory;
-
-  return `
-\\documentclass[a4paper,12pt]{article}
-\\usepackage[utf8]{inputenc}
-\\usepackage[T1]{fontenc}
-\\usepackage[french]{babel}
-\\usepackage{geometry}
-\\geometry{margin=1in}
-\\usepackage{booktabs}
-\\usepackage{longtable}
-\\usepackage{amsmath}
-\\usepackage{parskip}
-\\usepackage{enumitem}
-\\usepackage{xcolor}
-\\definecolor{procasfrouge}{HTML}{A4161A}
-\\definecolor{procasfvert}{HTML}{2E7D32}
-\\definecolor{procasfbleu}{HTML}{003087}
-\\usepackage{DejaVuSans}
-\\renewcommand{\\familydefault}{\\sfdefault}
-
-\\begin{document}
-
-\\title{Rapport Complet du Tableau de Bord - Enquête Foncière}
-\\author{PROCASF \& BET-PLUS SA}
-\\date{${new Date().toLocaleString('fr-FR')}}
-\\maketitle
-
-\\section*{Résumé Exécutif}
-Ce rapport présente une analyse complète des données de l'enquête foncière, incluant les indicateurs clés de performance (KPIs), les données par commune, les métriques de qualité et l'historique des rapports.
-
-\\subsection*{Indicateurs Clés de Performance (KPIs)}
-\\begin{itemize}
-  \\item \\textbf{Fichiers Traités}: ${formatNumber(summary.totalFiles)}
-  \\item \\textbf{Succès/Échecs}: ${summary.success} succès / ${summary.failures} échecs
-  \\item \\textbf{Total Parcelles}: ${formatNumber(summary.totalParcels)}
-  \\item \\textbf{Conflits Globaux}: ${formatNumber(summary.globalConflicts)}
-  \\item \\textbf{Parcelles Individuelles}: ${formatNumber(summary.indivParcels)} (${summary.indivRate}\\%)
-  \\item \\textbf{Parcelles Collectives}: ${formatNumber(summary.collParcels)} (${summary.collRate}\\%)
-  \\item \\textbf{Parcelles en Conflit}: ${formatNumber(summary.conflictParcels)} (${summary.conflictRate}\\%)
-  \\item \\textbf{Parcelles Sans Jointure}: ${formatNumber(summary.noJoinParcels)} (${summary.noJoinRate}\\%)
-  \\item \\textbf{Jointures Individuelles}: ${formatNumber(summary.jointuresIndividuelles)}
-  \\item \\textbf{Jointures Collectives}: ${formatNumber(summary.jointuresCollectives)}
-  \\item \\textbf{Même IDUP Indiv/Coll}: ${formatNumber(summary.memeIDUP)}
-\\end{itemize}
-
-\\section*{Analyse par Commune}
-\\begin{longtable}{lrrrrrr}
-  \\toprule
-  \\textbf{Commune} & \\textbf{Brutes} & \\textbf{Individuelles} & \\textbf{Collectives} & \\textbf{Conflits} & \\textbf{Qualité} & \\textbf{Statut} \\\\
-  \\midrule
-  \\endhead
-  ${communes.map(c => `${c.nom} & ${formatNumber(c.brutes)} & ${formatNumber(c.individuelles)} & ${formatNumber(c.collectives)} & ${formatNumber(c.conflits)} & ${c.qualite}\\% & ${c.statut} \\\\`).join('\n')}
-  \\bottomrule
-\\end{longtable}
-
-\\section*{Métriques de Qualité}
-Les métriques de qualité évaluent la fiabilité des données:
-\\begin{itemize}
-  \\item \\textbf{Validation} (${quality.validationRate}\\%): Taux de fichiers traités avec succès par rapport au total. Une valeur élevée indique un traitement robuste.
-  \\item \\textbf{Cohérence} (${quality.consistency}\\%): Mesure de la cohérence des données entre les différentes sources. Une cohérence élevée réduit les risques d'erreurs.
-  \\item \\textbf{Complétude} (${quality.completude}\\%): Proportion des données complètes sans valeurs manquantes. Une complétude élevée garantit une analyse fiable.
-  \\item \\textbf{Précision} (${quality.precision}\\%): Exactitude des données par rapport aux références. Une précision élevée est cruciale pour la prise de décision.
-  \\item \\textbf{Intégrité} (${quality.integrite}\\%): Intégrité structurelle des données. Une intégrité élevée prévient les corruptions.
-  \\item \\textbf{Erreurs Critiques} (${quality.criticalErrors}): Nombre d'erreurs critiques détectées. Un faible nombre est souhaitable.
-\\end{itemize}
-
-\\section*{Analyse IA}
-\\subsection*{Corrélations}
-\\begin{itemize}
-  \\item \\textbf{Brutes-Conflits}: ${iaAnalysis.correlation.brutes_conflits.toFixed(3)} (faible impact).
-  \\item \\textbf{Individuelles-Conflits}: ${iaAnalysis.correlation.indiv_conflits.toFixed(3)} (corrélation modérée).
-  \\item \\textbf{Collectives-Conflits}: ${iaAnalysis.correlation.coll_conflits.toFixed(3)} (forte relation).
-\\end{itemize}
-\\subsection*{Régression}
-\\begin{itemize}
-  \\item \\textbf{Slope}: ${iaAnalysis.regression.slope.toFixed(6)}
-  \\item \\textbf{R-value}: ${iaAnalysis.regression.r_value.toFixed(3)}
-  \\item \\textbf{P-value}: ${iaAnalysis.regression.p_value.toFixed(3)}
-\\end{itemize}
-\\subsection*{Prévision}
-Prévision de conflits pour 10,000 parcelles: ${iaAnalysis.forecast.toFixed(2)}.
-
-\\subsection*{Qualité IA}
-\\begin{itemize}
-  \\item \\textbf{Validation}: ${iaAnalysis.quality.validation.toFixed(2)}\\%
-  \\item \\textbf{Cohérence}: ${iaAnalysis.quality.consistency.toFixed(2)}\\%
-  \\item \\textbf{Erreurs Critiques}: ${iaAnalysis.quality.critical}
-\\end{itemize}
-
-\\section*{Historique des Rapports}
-\\begin{longtable}{llccl}
-  \\toprule
-  \\textbf{Date} & \\textbf{Type} & \\textbf{Format} & \\textbf{Statut} & \\textbf{Taille} \\\\
-  \\midrule
-  \\endhead
-  ${reportsHistory.map(r => `${r.date} & ${r.type} & ${r.format} & ${r.statut} & ${r.size} \\\\`).join('\n')}
-  \\bottomrule
-\\end{longtable}
-
-\\end{document}
-`;
-}
-
+// Convert to CSV
 function convertToCSV(obj) {
   if (Array.isArray(obj)) {
     const headers = Object.keys(obj[0]);
@@ -824,6 +833,7 @@ function convertToCSV(obj) {
   return 'Metric,Value\n' + Object.entries(obj).map(([k, v]) => `"${k.replace(/"/g, '""')}",${v}`).join('\n');
 }
 
+// Download File
 function downloadFile(content, fileName, mimeType) {
   const blob = new Blob([content], { type: mimeType });
   const url = URL.createObjectURL(blob);
@@ -877,7 +887,7 @@ function loadTabData(tabId) {
       break;
     case 'analysis':
       runAdvancedAnalysis();
-      initCharts(); // Ensure anomaly chart is initialized
+      initCharts();
       break;
     case 'communes':
       populateCommuneTable();
