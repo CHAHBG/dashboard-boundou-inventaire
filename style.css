@@ -1,26 +1,20 @@
-/* styles.css */
 :root {
-    /* Couleurs PROCASF */
     --procasf-rouge: #A4161A;
     --procasf-vert: #2E7D32;
     --procasf-bleu: #003087;
     --procasf-jaune: #FFC107;
     --procasf-brun: #4E342E;
-    
-    /* Couleurs BET-PLUS SA */
     --betplus-bleu: #1E40AF;
     --betplus-jaune: #FBBF24;
     --betplus-gris: #1F2937;
-    
-    /* Couleurs système */
     --blanc: #FFFFFF;
     --text-primary: #1F2937;
     --text-secondary: #6B7280;
     --background-light: #F9FAFB;
     --background-card: #FFFFFF;
-    --shadow-light: 0 4px 16px rgba(0, 0, 0, 0.1);
-    --shadow-heavy: 0 20px 40px rgba(0, 0, 0, 0.15);
-    --border-radius: 16px;
+    --shadow-light: 0 4px 16px rgba(0, 0, 0, 0.08);
+    --shadow-heavy: 0 20px 40px rgba(0, 0, 0, 0.13);
+    --border-radius: 20px;
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -46,6 +40,7 @@ body {
     line-height: 1.6;
     min-height: 100vh;
     transition: var(--transition);
+    overflow-x: hidden;
 }
 
 .dashboard-container {
@@ -57,6 +52,32 @@ body {
     box-shadow: var(--shadow-heavy);
     overflow: hidden;
     position: relative;
+}
+
+.dashboard-guide {
+    background: var(--background-card);
+    border-left: 5px solid var(--betplus-bleu);
+    border-radius: 18px;
+    box-shadow: 0 2px 22px rgba(30,64,175,0.07), var(--shadow-light);
+    padding: 1.6rem 2rem;
+    margin: 2rem 0 2.5rem 0;
+}
+
+.dashboard-guide h2 {
+    color: var(--betplus-bleu);
+    margin-bottom: 1rem;
+    font-weight: 800;
+}
+
+.dashboard-guide ul {
+    margin-left: 1.2rem;
+    list-style: disc;
+    color: var(--text-secondary);
+    font-size: 1.08rem;
+}
+
+.dashboard-guide ul li {
+    margin-bottom: 0.6rem;
 }
 
 /* Header moderne */
@@ -352,6 +373,12 @@ body {
     margin-bottom: 2rem;
 }
 
+.ia-charts-section {
+    grid-template-columns: 1fr 1fr;
+    gap: 2.2rem;
+    margin-bottom: 1.5rem;
+}
+
 .chart-card {
     background: var(--background-card);
     border-radius: var(--border-radius);
@@ -487,6 +514,41 @@ body {
     overflow: hidden;
 }
 
+.table-container .btn-download {
+    background: linear-gradient(135deg, var(--betplus-jaune), var(--procasf-jaune));
+    color: var(--procasf-bleu);
+    font-size: 1.1em;
+    padding: 7px 12px;
+    border-radius: 8px;
+    border: none;
+    margin-right: 6px;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 2px 6px rgba(255,193,7,0.10);
+}
+
+.table-container .btn-download:hover {
+    background: linear-gradient(135deg, var(--procasf-jaune), var(--betplus-jaune));
+    color: var(--procasf-rouge);
+    transform: scale(1.07);
+}
+
+.table-container .btn-share {
+    background: rgba(30,64,175,0.08);
+    color: var(--betplus-bleu);
+    font-size: 1.1em;
+    padding: 7px 12px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.table-container .btn-share:hover {
+    background: var(--betplus-bleu);
+    color: #fff;
+}
+
 .table-header {
     padding: 1.5rem;
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
@@ -590,6 +652,12 @@ td {
     }
 }
 
+@media (max-width: 900px) {
+    .ia-charts-section { 
+        grid-template-columns: 1fr; 
+    }
+}
+
 /* Mode sombre */
 [data-theme="dark"] .chart-card,
 [data-theme="dark"] .kpi-card,
@@ -659,4 +727,21 @@ td {
 
 .ia-insights table {
     margin-top: 1rem;
+}
+
+.ia-anomaly-list {
+    list-style: disc inside;
+    padding-left: 0.5rem;
+    color: #D32F2F;
+    font-weight: 600;
+    font-size: 1.05rem;
+}
+
+.ia-anomaly-list li {
+    margin-bottom: 0.5em;
+    background: #ffebee;
+    border-radius: 7px;
+    padding: 0.28em 0.7em;
+    color: #b71c1c;
+    box-shadow: 0 2px 6px #ffebee40;
 }
