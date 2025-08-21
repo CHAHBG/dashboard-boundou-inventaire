@@ -45,6 +45,9 @@
                     <button class="refresh-btn" onclick="refreshData()">
                         <i class="fas fa-sync-alt"></i>
                     </button>
+                    <button class="guide-toggle" onclick="toggleGuide()">
+                        <i class="fas fa-info-circle"></i> Guide
+                    </button>
                 </div>
             </div>
         </header>
@@ -70,33 +73,10 @@
             </div>
         </nav>
 
-        <section class="dashboard-guide">
-            <h2><i class="fas fa-info-circle"></i> Guide d'utilisation</h2>
-            <ul>
-                <li>
-                    <b>Navigation :</b> Utilisez les onglets pour accéder aux vues Tableau de bord, Analyse IA, Communes, Qualité et Rapports.
-                </li>
-                <li>
-                    <b>KPI & Graphiques :</b> Visualisez les indicateurs clés et explorez les graphiques interactifs. Survolez chaque élément pour plus de détails.
-                </li>
-                <li>
-                    <b>Filtres avancés :</b> Affinez par commune, statut ou période. Combinez la recherche textuelle et les filtres pour cibler les résultats.
-                </li>
-                <li>
-                    <b>Analyse IA :</b> Lancez l’analyse pour obtenir des jauges IA, des prédictions, anomalies et recommandations.
-                </li>
-                <li>
-                    <b>Export & Rapports :</b> Générez des rapports personnalisés (PDF, Excel, CSV, JSON) depuis l’onglet Rapports. 
-                </li>
-                <li>
-                    <b>Mode sombre :</b> Activez-le dans le header pour un meilleur confort visuel.
-                </li>
-                <li>
-                    <b>Interactions :</b> Cliquez sur les icônes “œil” ou “éditer” dans les tableaux pour afficher plus de détails ou modifier (fonctionnalité à venir).
-                </li>
-            </ul>
-        </section>
+        <!-- Dynamic User Guide -->
+        <section class="dashboard-guide"></section>
 
+        <!-- Main Content -->
         <main class="main-content">
             <div class="tab-content active" id="dashboard">
                 <div class="kpi-grid" id="kpiGrid"></div>
@@ -118,10 +98,10 @@
                     </div>
                     <div class="chart-card shadowed">
                         <div class="chart-header">
-                            <h3 class="chart-title"><i class="fas fa-calendar-alt"></i> Tendance Mensuelle</h3>
+                            <h3 class="chart-title"><i class="fas fa-chart-line"></i> Tendance des Conflits</h3>
                         </div>
                         <div class="chart-container">
-                            <canvas id="monthlyTrendChart"></canvas>
+                            <canvas id="conflictTrendChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -130,10 +110,10 @@
                         <h3 class="chart-title"><i class="fas fa-chart-bar"></i> Performance par Commune</h3>
                         <div class="chart-controls">
                             <select id="metricSelector">
-                                <option value="individuelles">Parcelles Individuelles</option>
-                                <option value="collectives">Parcelles Collectives</option>
-                                <option value="conflits">Conflits</option>
-                                <option value="qualite">Indice de Qualité</option>
+                                <option value="Parcelles individuelles">Parcelles Individuelles</option>
+                                <option value="Parcelles collectives">Parcelles Collectives</option>
+                                <option value="Conflits (Parcelles à la fois individuelle et collecvive)">Conflits</option>
+                                <option value="Total enregistrement (Parcelles apres netoyage)">Parcelles Traitées</option>
                             </select>
                         </div>
                     </div>
@@ -145,9 +125,7 @@
             <div class="tab-content" id="analysis">
                 <div class="ia-container">
                     <h2><i class="fas fa-robot"></i> Analyse IA & Insights avancés</h2>
-                    <p>
-                        Cette section utilise des algorithmes avancés pour détecter corrélations, anomalies, tendances et fournit des recommandations intelligentes.
-                    </p>
+                    <p>Cette section utilise des algorithmes avancés pour détecter corrélations, anomalies, tendances et fournit des recommandations intelligentes.</p>
                     <div class="ia-kpi-gauges">
                         <div class="ia-gauge-card">
                             <canvas id="gaugeValidation"></canvas>
@@ -169,7 +147,7 @@
                     <div class="charts-section ia-charts-section">
                         <div class="chart-card">
                             <div class="chart-header">
-                                <h3 class="chart-title"><i class="fas fa-fire"></i> Top 5 Communes - Taux de conflits (%)</h3>
+                                <h3 class="chart-title"><i class="fas fa-fire"></i> Anomalies Principales</h3>
                             </div>
                             <div class="chart-container" style="height:270px;">
                                 <canvas id="communeConflictChart"></canvas>
