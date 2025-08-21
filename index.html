@@ -1,4 +1,3 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -8,15 +7,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-gauge@0.4.3/dist/chartjs-gauge.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 </head>
 <body>
     <div class="dashboard-container">
         <!-- Header -->
-        <header class="header">
+        <header class="header enhanced-header">
             <div class="header-content">
                 <div class="logo-section">
-                    <div class="logo-icon">
+                    <div class="logo-icon animated-logo">
                         <i class="fas fa-map-marked-alt"></i>
                     </div>
                     <div class="logo-text">
@@ -24,7 +24,6 @@
                         <p>Dashboard Enquête Foncière</p>
                     </div>
                 </div>
-                
                 <div class="header-stats">
                     <div class="stat-item">
                         <span class="stat-value" id="headerTotalFiles">0</span>
@@ -39,7 +38,6 @@
                         <span class="stat-label">Succès</span>
                     </div>
                 </div>
-                
                 <div class="header-actions">
                     <button class="theme-toggle" onclick="toggleTheme()">
                         <i class="fas fa-moon" id="themeIcon"></i>
@@ -58,7 +56,7 @@
                     <i class="fas fa-tachometer-alt"></i> Tableau de bord
                 </button>
                 <button class="tab-btn" data-tab="analysis">
-                    <i class="fas fa-chart-line"></i> Analyse avancée
+                    <i class="fas fa-robot"></i> Analyse IA
                 </button>
                 <button class="tab-btn" data-tab="communes">
                     <i class="fas fa-map"></i> Communes
@@ -72,135 +70,40 @@
             </div>
         </nav>
 
-        <!-- Contenu principal -->
+        <section class="dashboard-guide">
+            <h2><i class="fas fa-info-circle"></i> Guide d'utilisation</h2>
+            <ul>
+                <li>
+                    <b>Navigation :</b> Utilisez les onglets pour accéder aux vues Tableau de bord, Analyse IA, Communes, Qualité et Rapports.
+                </li>
+                <li>
+                    <b>KPI & Graphiques :</b> Visualisez les indicateurs clés et explorez les graphiques interactifs. Survolez chaque élément pour plus de détails.
+                </li>
+                <li>
+                    <b>Filtres avancés :</b> Affinez par commune, statut ou période. Combinez la recherche textuelle et les filtres pour cibler les résultats.
+                </li>
+                <li>
+                    <b>Analyse IA :</b> Lancez l’analyse pour obtenir des jauges IA, des prédictions, anomalies et recommandations.
+                </li>
+                <li>
+                    <b>Export & Rapports :</b> Générez des rapports personnalisés (PDF, Excel, CSV, JSON) depuis l’onglet Rapports. 
+                </li>
+                <li>
+                    <b>Mode sombre :</b> Activez-le dans le header pour un meilleur confort visuel.
+                </li>
+                <li>
+                    <b>Interactions :</b> Cliquez sur les icônes “œil” ou “éditer” dans les tableaux pour afficher plus de détails ou modifier (fonctionnalité à venir).
+                </li>
+            </ul>
+        </section>
+
         <main class="main-content">
-            <!-- Onglet Tableau de bord -->
             <div class="tab-content active" id="dashboard">
-                <!-- KPI Cards augmentées -->
-                <div class="kpi-grid">
-                    <div class="kpi-card">
-                        <div class="kpi-header">
-                            <div class="kpi-icon files">
-                                <i class="fas fa-file-alt"></i>
-                            </div>
-                            <div class="kpi-menu">
-                                <button class="kpi-menu-btn">
-                                    <i class="fas fa-ellipsis-v"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="kpi-title">Fichiers Traités</div>
-                        <div class="kpi-value" id="kpiFilesProcessed">--</div>
-                        <div class="kpi-trend trend-positive">
-                            <i class="fas fa-arrow-up"></i>
-                            <span id="kpiFilesSuccess">--% de succès</span>
-                        </div>
-                    </div>
-
-                    <div class="kpi-card">
-                        <div class="kpi-header">
-                            <div class="kpi-icon parcels">
-                                <i class="fas fa-map"></i>
-                            </div>
-                        </div>
-                        <div class="kpi-title">Total Parcelles</div>
-                        <div class="kpi-value" id="kpiTotalParcels">--</div>
-                        <div class="kpi-trend trend-neutral">
-                            <i class="fas fa-minus"></i>
-                            <span>Après nettoyage</span>
-                        </div>
-                    </div>
-
-                    <div class="kpi-card">
-                        <div class="kpi-header">
-                            <div class="kpi-icon conflicts">
-                                <i class="fas fa-exclamation-triangle"></i>
-                            </div>
-                        </div>
-                        <div class="kpi-title">Conflits Globaux</div>
-                        <div class="kpi-value" id="kpiGlobalConflicts">--</div>
-                        <div class="kpi-trend trend-negative">
-                            <i class="fas fa-arrow-down"></i>
-                            <span id="kpiConflictPercentage">--% du total</span>
-                        </div>
-                    </div>
-
-                    <div class="kpi-card">
-                        <div class="kpi-header">
-                            <div class="kpi-icon quality">
-                                <i class="fas fa-broom"></i>
-                            </div>
-                        </div>
-                        <div class="kpi-title">Taux de Nettoyage</div>
-                        <div class="kpi-value" id="kpiCleaningRate">--%</div>
-                        <div class="kpi-trend trend-positive">
-                            <i class="fas fa-arrow-up"></i>
-                            <span>Doublons supprimés</span>
-                        </div>
-                    </div>
-
-                    <div class="kpi-card">
-                        <div class="kpi-header">
-                            <div class="kpi-icon parcels">
-                                <i class="fas fa-user"></i>
-                            </div>
-                        </div>
-                        <div class="kpi-title">Parcelles Individuelles</div>
-                        <div class="kpi-value" id="kpiIndivParcels">--</div>
-                        <div class="kpi-trend trend-neutral">
-                            <i class="fas fa-percentage"></i>
-                            <span id="kpiIndivRate">--%</span>
-                        </div>
-                    </div>
-
-                    <div class="kpi-card">
-                        <div class="kpi-header">
-                            <div class="kpi-icon parcels">
-                                <i class="fas fa-users"></i>
-                            </div>
-                        </div>
-                        <div class="kpi-title">Parcelles Collectives</div>
-                        <div class="kpi-value" id="kpiCollParcels">--</div>
-                        <div class="kpi-trend trend-neutral">
-                            <i class="fas fa-percentage"></i>
-                            <span id="kpiCollRate">--%</span>
-                        </div>
-                    </div>
-
-                    <div class="kpi-card">
-                        <div class="kpi-header">
-                            <div class="kpi-icon conflicts">
-                                <i class="fas fa-gavel"></i>
-                            </div>
-                        </div>
-                        <div class="kpi-title">Parcelles Conflictuelles</div>
-                        <div class="kpi-value" id="kpiConflictParcels">--</div>
-                        <div class="kpi-trend trend-negative">
-                            <i class="fas fa-percentage"></i>
-                            <span id="kpiConflictRate">--%</span>
-                        </div>
-                    </div>
-
-                    <div class="kpi-card">
-                        <div class="kpi-header">
-                            <div class="kpi-icon quality">
-                                <i class="fas fa-link-slash"></i>
-                            </div>
-                        </div>
-                        <div class="kpi-title">Parcelles Sans Jointure</div>
-                        <div class="kpi-value" id="kpiNoJoinParcels">--</div>
-                        <div class="kpi-trend trend-negative">
-                            <i class="fas fa-percentage"></i>
-                            <span id="kpiNoJoinRate">--%</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Graphiques -->
+                <div class="kpi-grid" id="kpiGrid"></div>
                 <div class="charts-section">
-                    <div class="chart-card">
+                    <div class="chart-card shadowed">
                         <div class="chart-header">
-                            <h3 class="chart-title">Répartition des Parcelles</h3>
+                            <h3 class="chart-title"><i class="fas fa-chart-pie"></i> Répartition des Parcelles</h3>
                             <div class="chart-controls">
                                 <select id="chartTypeSelector">
                                     <option value="doughnut">Graphique en anneau</option>
@@ -213,21 +116,18 @@
                             <canvas id="parcelDistributionChart"></canvas>
                         </div>
                     </div>
-
-                    <div class="chart-card">
+                    <div class="chart-card shadowed">
                         <div class="chart-header">
-                            <h3 class="chart-title">Tendance Mensuelle</h3>
+                            <h3 class="chart-title"><i class="fas fa-calendar-alt"></i> Tendance Mensuelle</h3>
                         </div>
                         <div class="chart-container">
                             <canvas id="monthlyTrendChart"></canvas>
                         </div>
                     </div>
                 </div>
-
-                <!-- Graphique pleine largeur -->
-                <div class="chart-card full-width">
+                <div class="chart-card full-width shadowed">
                     <div class="chart-header">
-                        <h3 class="chart-title">Performance par Commune</h3>
+                        <h3 class="chart-title"><i class="fas fa-chart-bar"></i> Performance par Commune</h3>
                         <div class="chart-controls">
                             <select id="metricSelector">
                                 <option value="individuelles">Parcelles Individuelles</option>
@@ -242,22 +142,57 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Onglet Analyse avancée -->
             <div class="tab-content" id="analysis">
-                <div class="analysis-container">
-                    <h2>Analyse Avancée par IA</h2>
-                    <p>Cette section utilise des algorithmes d'IA pour analyser les correlations, tendances et prévisions basées sur les données du rapport.</p>
-                    <button class="btn btn-primary" onclick="runAdvancedAnalysis()">Lancer l'Analyse IA</button>
-                    <div id="iaInsights" class="ia-insights">
-                        <!-- Contenu généré par IA -->
+                <div class="ia-container">
+                    <h2><i class="fas fa-robot"></i> Analyse IA & Insights avancés</h2>
+                    <p>
+                        Cette section utilise des algorithmes avancés pour détecter corrélations, anomalies, tendances et fournit des recommandations intelligentes.
+                    </p>
+                    <div class="ia-kpi-gauges">
+                        <div class="ia-gauge-card">
+                            <canvas id="gaugeValidation"></canvas>
+                            <div class="ia-gauge-label">Validation</div>
+                        </div>
+                        <div class="ia-gauge-card">
+                            <canvas id="gaugeConsistency"></canvas>
+                            <div class="ia-gauge-label">Cohérence</div>
+                        </div>
+                        <div class="ia-gauge-card">
+                            <canvas id="gaugeCritical"></canvas>
+                            <div class="ia-gauge-label">Erreurs Critiques</div>
+                        </div>
+                        <div class="ia-gauge-card">
+                            <canvas id="gaugeForecast"></canvas>
+                            <div class="ia-gauge-label">Prévision Conflits</div>
+                        </div>
+                    </div>
+                    <div class="charts-section ia-charts-section">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3 class="chart-title"><i class="fas fa-fire"></i> Top 5 Communes - Taux de conflits (%)</h3>
+                            </div>
+                            <div class="chart-container" style="height:270px;">
+                                <canvas id="communeConflictChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3 class="chart-title"><i class="fas fa-exclamation"></i> Anomalies & Alertes IA</h3>
+                            </div>
+                            <div class="chart-container">
+                                <ul id="iaAnomalyList" class="ia-anomaly-list"></ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="iaInsights" class="ia-insights enhanced-insights"></div>
+                    <div style="text-align:center; margin-top:2rem;">
+                        <button class="btn btn-primary" onclick="runAdvancedAnalysis()">
+                            <i class="fas fa-magic"></i> Relancer l'Analyse IA
+                        </button>
                     </div>
                 </div>
             </div>
-
-            <!-- Onglet Communes -->
             <div class="tab-content" id="communes">
-                <!-- Filtres -->
                 <div class="filters-panel">
                     <div class="filters-grid">
                         <div class="filter-group">
@@ -288,14 +223,15 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Tableau des communes -->
                 <div class="table-container">
                     <div class="table-header">
                         <h3 class="table-title">Détails par Commune</h3>
                         <input type="text" class="search-input" placeholder="Rechercher une commune..." id="communeSearch">
                     </div>
                     <div class="table-wrapper">
+                        <button class="btn btn-secondary" id="exportCommuneTableBtn" style="margin: 1rem 0;">
+                            <i class="fas fa-file-csv"></i> Exporter CSV
+                        </button>
                         <table>
                             <thead>
                                 <tr>
@@ -321,76 +257,27 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Onglet Qualité -->
             <div class="tab-content" id="quality">
                 <div class="charts-section">
                     <div class="chart-card">
                         <div class="chart-header">
-                            <h3 class="chart-title">Indicateurs de Qualité</h3>
+                            <h3 class="chart-title"><i class="fas fa-tasks"></i> Indicateurs de Qualité</h3>
                         </div>
                         <div class="chart-container">
                             <canvas id="qualityMetricsChart"></canvas>
                         </div>
                     </div>
-
                     <div class="chart-card">
                         <div class="chart-header">
-                            <h3 class="chart-title">Évolution de la Qualité</h3>
+                            <h3 class="chart-title"><i class="fas fa-chart-line"></i> Évolution de la Qualité</h3>
                         </div>
                         <div class="chart-container">
                             <canvas id="qualityTrendChart"></canvas>
                         </div>
                     </div>
                 </div>
-
-                <!-- Métriques détaillées -->
-                <div class="kpi-grid">
-                    <div class="kpi-card">
-                        <div class="kpi-header">
-                            <div class="kpi-icon" style="background: linear-gradient(135deg, var(--procasf-vert), #4CAF50);">
-                                <i class="fas fa-check-circle"></i>
-                            </div>
-                        </div>
-                        <div class="kpi-title">Taux de Validation</div>
-                        <div class="kpi-value" id="validationRate">--</div>
-                        <div class="kpi-trend trend-positive">
-                            <i class="fas fa-arrow-up"></i>
-                            <span>Données validées</span>
-                        </div>
-                    </div>
-
-                    <div class="kpi-card">
-                        <div class="kpi-header">
-                            <div class="kpi-icon" style="background: linear-gradient(135deg, var(--procasf-rouge), #F44336);">
-                                <i class="fas fa-exclamation-circle"></i>
-                            </div>
-                        </div>
-                        <div class="kpi-title">Erreurs Critiques</div>
-                        <div class="kpi-value" id="criticalErrors">--</div>
-                        <div class="kpi-trend trend-negative">
-                            <i class="fas fa-arrow-down"></i>
-                            <span>À corriger</span>
-                        </div>
-                    </div>
-
-                    <div class="kpi-card">
-                        <div class="kpi-header">
-                            <div class="kpi-icon" style="background: linear-gradient(135deg, var(--procasf-jaune), var(--betplus-jaune));">
-                                <i class="fas fa-balance-scale"></i>
-                            </div>
-                        </div>
-                        <div class="kpi-title">Cohérence</div>
-                        <div class="kpi-value" id="dataConsistency">--</div>
-                        <div class="kpi-trend trend-positive">
-                            <i class="fas fa-arrow-up"></i>
-                            <span>Score global</span>
-                        </div>
-                    </div>
-                </div>
+                <div class="kpi-grid" id="qualityKpiGrid"></div>
             </div>
-
-            <!-- Onglet Rapports -->
             <div class="tab-content" id="reports">
                 <div class="filters-panel">
                     <div class="filters-grid">
@@ -419,7 +306,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="table-container">
                     <div class="table-header">
                         <h3 class="table-title">Historique des Rapports</h3>
