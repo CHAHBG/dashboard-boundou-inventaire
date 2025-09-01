@@ -1214,45 +1214,29 @@ function generateReport(reportType, format) {
 // Initialize Dashboard
 async function initializeDashboard() {
   try {
-    showLoadingOverlay('Chargement du tableau de bord...');
-    
-    // Charger les données principales
-    await fetchAllData();
-    
-    // Mettre à jour les éléments du tableau de bord
-    updateHeaderStats();
+    // showLoadingOverlay('Chargement du tableau de bord...');
+    // Charger les données principales et mettre à jour le dashboard
     await updateKPIs();
-  await initCharts();
-  // Show insight banner
-  showInsightBanner();
-    await generateDataInsights();
-    
-    // Créer les visualisations avancées
-    initPredictiveCharts();
-    initAnomalyDetection();
-    initQualityMetrics();
-    initTemporalAnalysis();
-    
+    await initCharts();
+    showInsightBanner();
     // Peupler les tableaux et listes
     populateCommuneTable();
     populateReportHistory();
     populateIssuesTable();
     populateProblematicParcelsTable();
     populateActivityTable();
-    populateRecommendations();
-    
     // Configurer les interactions
     setupEventListeners();
     setupAdvancedInteractions();
-    
-    hideLoadingOverlay();
+    // hideLoadingOverlay();
     showWelcomeMessage();
   } catch (error) {
     console.error('Erreur lors de l\'initialisation du tableau de bord:', error);
-    hideLoadingOverlay();
-    showErrorMessage('Impossible de charger le tableau de bord. Veuillez réessayer.');
+    // hideLoadingOverlay();
+    // showErrorMessage('Impossible de charger le tableau de bord. Veuillez réessayer.');
   }
 }
+window.initializeDashboard = initializeDashboard;
 
 // Afficher un message de bienvenue avec des insights clés
 function showWelcomeMessage() {
