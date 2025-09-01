@@ -1,3 +1,12 @@
+// Ensure we're in a browser environment
+if (typeof window !== 'undefined') {
+  // Fix for Favicon 404 error
+  const link = document.createElement('link');
+  link.rel = 'shortcut icon';
+  link.href = 'data:image/x-icon;,';
+  document.head.appendChild(link);
+}
+
 // Variables globales
 let dashboardData = null;
 let charts = {};
@@ -1302,6 +1311,8 @@ async function initializeDashboard() {
     // showErrorMessage('Impossible de charger le tableau de bord. Veuillez réessayer.');
   }
 }
+
+// Explicitly make the function globally available
 window.initializeDashboard = initializeDashboard;
 
 // Show a random dashboard insight for user guidance
@@ -1327,20 +1338,29 @@ function showDashboardInsights() {
   if (main) main.prepend(banner);
 }
 
+// Show insight banner at the top of the dashboard
+function showInsightBanner() {
+  if (document.getElementById('insightBanner')) return;
+  const banner = document.createElement('div');
+  banner.id = 'insightBanner';
+  banner.className = 'insight-banner';
+  banner.innerHTML = `
+    <div class="insight-banner-content">
+      <i class="fas fa-lightbulb"></i>
+      <span><strong>Progression:</strong> 78% des parcelles traitées, <strong>9.93%</strong> de doublons éliminés, <strong>211</strong> parcelles conflictuelles à surveiller. <span class="insight-tip">Survolez les graphiques pour plus de détails.</span></span>
+    <button class="insight-close"><i class="fas fa-times"></i></button>
+  </div>
+  `;
+  document.querySelector('.main-content').prepend(banner);
+  
+  // Add close button functionality
+  banner.querySelector('.insight-close').addEventListener('click', function() {
+    banner.remove();
+  });
+}
+
 // Show welcome message and insights
 function showWelcomeMessage() {
-  // Show a beautiful insight banner at the top of the dashboard
-  function showInsightBanner() {
-    if (document.getElementById('insightBanner')) return;
-    const banner = document.createElement('div');
-    banner.id = 'insightBanner';
-    banner.className = 'insight-banner';
-    banner.innerHTML = `
-      <div class="insight-banner-content">
-        <i class="fas fa-lightbulb"></i>
-        <span><strong>Progression:</strong> 78% des parcelles traitées, <strong>9.93%</strong> de doublons éliminés, <strong>211</strong> parcelles conflictuelles à surveiller. <span class="insight-tip">Survolez les graphiques pour plus de détails.</span></span>
-      <button class="insight-close"><i class="fas fa-times"></i></button>
-    </div>
   `;
   document.body.prepend(banner);
   banner.querySelector('.insight-close').addEventListener('click', () => banner.remove());
@@ -1743,8 +1763,78 @@ document.addEventListener('DOMContentLoaded', () => {
     icon.className = savedTheme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
   }
   if (document.getElementById('kpiGrid')) {
-    initializeDashboard();
+    // Make sure we have access to the function
+    if (typeof window.initializeDashboard === 'function') {
+      window.initializeDashboard();
+    } else if (typeof initializeDashboard === 'function') {
+      initializeDashboard();
+    } else {
+      console.error('Dashboard initialization function not found');
+    }
   } else {
     console.error('Critical element #kpiGrid not found');
   }
+  
+  // Add final validation check
+  setTimeout(() => {
+    if (typeof dashboardData === 'undefined' || !dashboardData) {
+      console.warn('Dashboard data not loaded after DOMContentLoaded - attempting recovery');
+      if (typeof loadRecoveryScript === 'function') {
+        loadRecoveryScript().then(() => {
+          if (typeof window.fixDashboard === 'function') {
+            window.fixDashboard();
+          }
+        });
+      }
+    }
+  }, 2000);
+});
+
+// Add fallback definitions for critical functions
+if (typeof showInsightBanner !== 'function') {
+  window.showInsightBanner = function() {
+    console.warn('Using fallback showInsightBanner function');
+    if (document.getElementById('insightBanner')) return;
+    const banner = document.createElement('div');
+    banner.id = 'insightBanner';
+    banner.className = 'insight-banner';
+    banner.innerHTML = `
+      <div class="insight-banner-content">
+        <i class="fas fa-lightbulb"></i>
+        <span><strong>Progression:</strong> 78% des parcelles traitées, <strong>9.93%</strong> de doublons éliminés, <strong>211</strong> parcelles conflictuelles à surveiller.</span>
+        <button class="insight-close"><i class="fas fa-times"></i></button>
+      </div>
+    `;
+    const mainContent = document.querySelector('.main-content');
+    if (mainContent) mainContent.prepend(banner);
+    
+    const closeBtn = banner.querySelector('.insight-close');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', function() {
+        banner.remove();
+      });
+    }
+  };
+}
+
+// Ensure the dashboard initializes even if there are issues with DOMContentLoaded
+window.addEventListener('load', function() {
+  console.log('Window load event fired, checking if dashboard is initialized...');
+  setTimeout(() => {
+    try {
+      if (!dashboardData) {
+        console.log('Dashboard not initialized by DOMContentLoaded, initializing now...');
+        if (typeof window.initializeDashboard === 'function') {
+          window.initializeDashboard();
+        } else if (typeof initializeDashboard === 'function') {
+          initializeDashboard();
+        } else {
+          console.error('Could not find initializeDashboard function');
+          alert('Dashboard initialization failed. Please refresh the page or check console for errors.');
+        }
+      }
+    } catch (error) {
+      console.error('Error during backup initialization:', error);
+    }
+  }, 500);
 });

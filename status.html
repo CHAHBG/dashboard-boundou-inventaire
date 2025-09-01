@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Dashboard Status Check</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f7fa;
+      color: #333;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    h1 {
+      color: #2c3e50;
+      margin-top: 0;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 10px;
+    }
+    
+    .status-card {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+    
+    .status-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    
+    .status-title {
+      font-weight: bold;
+      font-size: 18px;
+      margin: 0;
+    }
+    
+    .status-indicator {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    
+    .status-ok {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    
+    .status-error {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    
+    .status-warning {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+    
+    .status-content {
+      font-family: monospace;
+      white-space: pre-wrap;
+      background-color: #f8f9fa;
+      padding: 10px;
+      border-radius: 4px;
+      font-size: 14px;
+      overflow-x: auto;
+    }
+    
+    .action-buttons {
+      margin-top: 20px;
+    }
+    
+    .btn {
+      background-color: #4CAF50;
+      border: none;
+      color: white;
+      padding: 10px 15px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 4px 2px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    
+    .btn-primary {
+      background-color: #007bff;
+    }
+    
+    .btn-warning {
+      background-color: #ffc107;
+      color: #212529;
+    }
+    
+    .btn-danger {
+      background-color: #dc3545;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Dashboard Status Check</h1>
+    
+    <div class="status-card">
+      <div class="status-header">
+        <h2 class="status-title">System Status</h2>
+        <span class="status-indicator" id="system-status">Checking...</span>
+      </div>
+      <div class="status-content" id="system-details">Running diagnostic checks...</div>
+    </div>
+    
+    <div class="status-card">
+      <div class="status-header">
+        <h2 class="status-title">Dashboard Files</h2>
+        <span class="status-indicator" id="files-status">Checking...</span>
+      </div>
+      <div class="status-content" id="files-details">Checking files...</div>
+    </div>
+    
+    <div class="status-card">
+      <div class="status-header">
+        <h2 class="status-title">Data Status</h2>
+        <span class="status-indicator" id="data-status">Checking...</span>
+      </div>
+      <div class="status-content" id="data-details">Checking data files...</div>
+    </div>
+    
+    <div class="action-buttons">
+      <a href="index.html" class="btn btn-primary">Go to Dashboard</a>
+      <a href="index.html?debug=true" class="btn btn-warning">Debug Mode</a>
+      <a href="backup.html" class="btn">Backup Version</a>
+      <button id="fix-dashboard" class="btn btn-danger">Repair Dashboard</button>
+    </div>
+  </div>
+
+  <!-- Include the original dashboard scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+  <script src="app.js"></script>
+  <script src="dashboard-recovery.js"></script>
+  <script src="dashboard-status.js"></script>
+  
+  <script>
+    // Simple status check
+    function runDiagnostics() {
+      // Check system status
+      let systemStatus = document.getElementById('system-status');
+      let systemDetails = document.getElementById('system-details');
+      
+      try {
+        const browserInfo = {
+          userAgent: navigator.userAgent,
+          platform: navigator.platform,
+          language: navigator.language,
+          cookiesEnabled: navigator.cookieEnabled,
+          localStorage: typeof localStorage !== 'undefined',
+          sessionStorage: typeof sessionStorage !== 'undefined'
+        };
+        
+        systemStatus.className = 'status-indicator status-ok';
+        systemStatus.textContent = 'OK';
+        systemDetails.textContent = JSON.stringify(browserInfo, null, 2);
+      } catch (error) {
+        systemStatus.className = 'status-indicator status-error';
+        systemStatus.textContent = 'Error';
+        systemDetails.textContent = `Error checking system: ${error.message}`;
+      }
+      
+      // Check files
+      let filesStatus = document.getElementById('files-status');
+      let filesDetails = document.getElementById('files-details');
+      
+      const requiredFiles = [
+        { name: 'index.html', loaded: true },
+        { name: 'app.js', loaded: typeof initializeDashboard === 'function' || typeof window.initializeDashboard === 'function' },
+        { name: 'style.css', loaded: document.styleSheets.length > 0 },
+        { name: 'dashboard-recovery.js', loaded: typeof window.fixDashboard === 'function' },
+        { name: 'Chart.js', loaded: typeof Chart !== 'undefined' }
+      ];
+      
+      const missingFiles = requiredFiles.filter(file => !file.loaded);
+      
+      if (missingFiles.length === 0) {
+        filesStatus.className = 'status-indicator status-ok';
+        filesStatus.textContent = 'OK';
+        filesDetails.textContent = `All required files found:\n${requiredFiles.map(f => `✓ ${f.name}`).join('\n')}`;
+      } else {
+        filesStatus.className = 'status-indicator status-error';
+        filesStatus.textContent = 'Missing Files';
+        filesDetails.textContent = `${requiredFiles.map(f => `${f.loaded ? '✓' : '✗'} ${f.name}`).join('\n')}`;
+      }
+      
+      // Check data
+      let dataStatus = document.getElementById('data-status');
+      let dataDetails = document.getElementById('data-details');
+      
+      if (typeof dashboardData !== 'undefined' && dashboardData) {
+        dataStatus.className = 'status-indicator status-ok';
+        dataStatus.textContent = 'OK';
+        dataDetails.textContent = `Dashboard data loaded successfully.\nRecords: ${dashboardData.length || 'Unknown'}`;
+      } else {
+        fetch('dashboard_data_complete.json')
+          .then(response => {
+            if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+            return response.json();
+          })
+          .then(data => {
+            dataStatus.className = 'status-indicator status-ok';
+            dataStatus.textContent = 'Available';
+            dataDetails.textContent = `Dashboard data available but not loaded.\nRecords in file: ${data.length}`;
+          })
+          .catch(error => {
+            dataStatus.className = 'status-indicator status-error';
+            dataStatus.textContent = 'Error';
+            dataDetails.textContent = `Error checking data: ${error.message}`;
+          });
+      }
+    }
+    
+    // Add fix dashboard functionality
+    document.getElementById('fix-dashboard').addEventListener('click', function() {
+      if (typeof window.fixDashboard === 'function') {
+        const result = window.fixDashboard();
+        alert(result ? 'Dashboard repair completed successfully.' : 'Dashboard repair failed.');
+      } else {
+        alert('Repair function not available. Try refreshing the page.');
+      }
+    });
+    
+    // Run diagnostics when page loads
+    window.addEventListener('DOMContentLoaded', runDiagnostics);
+  </script>
+</body>
+</html>

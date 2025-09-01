@@ -5,7 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Tableau de bord pour l'enquête foncière PROCASF - Visualisation des données parcellaires et analyses des jointures">
   <meta name="keywords" content="PROCASF, BET-PLUS, enquête foncière, parcelles, cadastre, Sénégal">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Tableau de Bord - Enquête Foncière</title>
+  
+  <!-- Favicon to avoid 404 errors -->
+  <link rel="icon" href="data:image/x-icon;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD///8D////I////zz///9G////Rv///zz///8j////AwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP///yP///+K////yf///+j////o////yf///4r///8jAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP///4r////////0////9P///////P///4oAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////yf////T///+z////s/////T////JAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP///+j///+z////YP///2D///+z////6AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD////o////s////2D///9g////s////+gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP///8n////0////s////7P////0////yQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////iv////////T////0////////iv8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD///8j////iv///8n////o////yf///4r///8jAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD///8D////I////zz///88////I////wMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//8AAP//AAD//wAA+B8AAPAPAADgBwAAwAMAAMADAADAAwAAwAMAAOAHAADwDwAA+B8AAP//AAD//wAA//8AAA==" type="image/x-icon">
   
   <!-- Preloading critical resources -->
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
@@ -26,6 +32,48 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js" defer></script>
   <script src="app.js" defer></script>
+  <!-- Recovery script - loads only if needed -->
+  <script>
+    function loadRecoveryScript() {
+      console.warn('Loading recovery script...');
+      var script = document.createElement('script');
+      script.src = 'dashboard-recovery.js';
+      document.head.appendChild(script);
+      return new Promise((resolve) => {
+        script.onload = () => {
+          console.log('Recovery script loaded');
+          resolve();
+        };
+      });
+    }
+  </script>
+  <!-- Error handler -->
+  <script>
+    window.onerror = function(message, source, lineno, colno, error) {
+      console.error('Error caught:', message, 'at', source, ':', lineno);
+      // If initialization failed, try to recover
+      if (message.includes('initializeDashboard') || message.includes('not defined')) {
+        console.warn('Attempting to recover from initialization error...');
+        loadRecoveryScript().then(() => {
+          setTimeout(() => {
+            try {
+              if (typeof window.fixDashboard === 'function') {
+                window.fixDashboard();
+              } else if (typeof window.initializeDashboard === 'function') {
+                window.initializeDashboard();
+              } else {
+                console.error('Could not recover, initialization functions not available');
+                alert('Une erreur est survenue lors du chargement. Essayez de rafraîchir la page.');
+              }
+            } catch (err) {
+              console.error('Recovery attempt failed:', err);
+            }
+          }, 1000);
+        });
+      }
+      return true; // prevents the default error handling
+    };
+  </script>
   
   <!-- Add this script to handle animations and enhancements -->
   <script>

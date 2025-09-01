@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tableau de Bord - Version de secours</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #333;
+      margin-top: 0;
+    }
+    .message {
+      background-color: #f8f9fa;
+      border-left: 4px solid #28a745;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    .error {
+      border-left-color: #dc3545;
+    }
+    button {
+      background-color: #4CAF50;
+      border: none;
+      color: white;
+      padding: 10px 15px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 4px 2px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    pre {
+      background-color: #f8f9fa;
+      padding: 15px;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Tableau de Bord - Version de secours</h1>
+    
+    <div class="message">
+      <p>Cette page est une version simplifiée du tableau de bord, utilisée en cas de problème avec la version principale.</p>
+    </div>
+    
+    <div id="errorInfo" class="message error" style="display: none;">
+      <h3>Erreur détectée</h3>
+      <p id="errorDetails"></p>
+      <pre id="errorStack"></pre>
+    </div>
+    
+    <div>
+      <button onclick="window.location.href='index.html'">Retourner au tableau de bord</button>
+      <button onclick="loadDashboardData()">Charger les données</button>
+      <button onclick="checkInitialization()">Vérifier l'initialisation</button>
+      <button onclick="reloadPage()">Recharger la page</button>
+    </div>
+    
+    <div id="dashboard-data" style="margin-top: 20px;"></div>
+  </div>
+
+  <script>
+    // Simple error handler
+    window.onerror = function(message, source, lineno, colno, error) {
+      document.getElementById('errorInfo').style.display = 'block';
+      document.getElementById('errorDetails').textContent = `${message} at ${source}:${lineno}`;
+      if (error && error.stack) {
+        document.getElementById('errorStack').textContent = error.stack;
+      }
+      return true;
+    };
+    
+    function loadDashboardData() {
+      document.getElementById('dashboard-data').innerHTML = '<p>Chargement des données en cours...</p>';
+      
+      fetch('dashboard_data_complete.json')
+        .then(response => response.json())
+        .then(data => {
+          let html = '<h3>Données chargées avec succès</h3>';
+          html += `<p>Nombre total de parcelles: ${data.length}</p>`;
+          html += '<pre>' + JSON.stringify(data.slice(0, 2), null, 2) + '</pre>';
+          document.getElementById('dashboard-data').innerHTML = html;
+        })
+        .catch(error => {
+          document.getElementById('dashboard-data').innerHTML = 
+            `<p>Erreur lors du chargement des données: ${error.message}</p>`;
+        });
+    }
+    
+    function checkInitialization() {
+      const scriptTag = document.createElement('script');
+      scriptTag.src = 'app.js';
+      scriptTag.onload = function() {
+        try {
+          if (typeof window.initializeDashboard === 'function') {
+            alert('La fonction d\'initialisation a été trouvée et peut être appelée.');
+          } else {
+            alert('La fonction d\'initialisation n\'a pas été trouvée dans app.js.');
+          }
+        } catch (error) {
+          alert(`Erreur lors de la vérification: ${error.message}`);
+        }
+      };
+      scriptTag.onerror = function() {
+        alert('Impossible de charger le fichier app.js');
+      };
+      document.head.appendChild(scriptTag);
+    }
+    
+    function reloadPage() {
+      window.location.reload(true);
+    }
+  </script>
+</body>
+</html>

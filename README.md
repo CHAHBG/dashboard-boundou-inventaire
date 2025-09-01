@@ -9,6 +9,7 @@ Dashboard de suivi en temps réel du post-traitement des données de l'Enquête 
 - [Utilisation](#utilisation)
 - [Configuration](#configuration)
 - [API et Intégrations](#api-et-intégrations)
+- [Outils de dépannage](#outils-de-dépannage)
 - [Dépannage](#dépannage)
 
 ## ✨ Fonctionnalités
@@ -80,15 +81,28 @@ Dashboard de suivi en temps réel du post-traitement des données de l'Enquête 
 ## 📁 Structure des fichiers
 
 ```
-PROCASEF-Dashboard/
-├── index.html                    # Interface principale
-├── app.js                       # Logique JavaScript
-├── style.css                    # Styles (votre fichier)
-├── EDL_PostTraitement.json      # Données source
-├── README.md                    # Documentation
-└── assets/ (optionnel)
-    ├── images/
-    └── docs/
+dashboard-boundou-inventaire/
+├── index.html                # Page principale du dashboard
+├── app.js                    # Logique principale et fonctionnalités
+├── style.css                 # Styles principaux
+├── additional_styles.css     # Styles additionnels
+├── advanced_viz_styles.css   # Styles pour visualisations avancées
+├── insights_styles.css       # Styles pour les insights
+├── dashboard-recovery.js     # Outils de récupération et réparation
+├── dashboard-status.js       # Vérification de l'état du dashboard
+├── backup.html               # Version de secours du dashboard
+├── status.html               # Page de diagnostic
+├── server.js                 # Serveur Express complet
+├── simple_server.js          # Serveur simple pour tests
+├── data/                     # Données JSON et fichiers d'analyse
+│   ├── dashboard_data_complete.json
+│   ├── dashboard_kpis.json
+│   ├── communes_data.json
+│   └── ...
+└── datafordashboard/         # Rapports et analyses détaillées
+    ├── Parcel_Join_Analysis_Report.xlsx
+    ├── duplicate_removal.log
+    └── ...
 ```
 
 ## 📖 Utilisation
@@ -322,5 +336,45 @@ setInterval(() => {
 
 ---
 
+## 🛠️ Outils de dépannage
+
+### Diagnostic rapide
+Accéder à `status.html` pour un rapport complet sur l'état du dashboard.
+
+### Récupération automatique
+En cas de problème d'initialisation, le dashboard tente automatiquement de:
+1. Recharger les ressources critiques
+2. Utiliser des fonctions de secours
+3. Restaurer l'état par défaut
+
+### Utilisation des outils de récupération
+Si le dashboard ne se charge pas correctement:
+1. Ouvrez la console du navigateur (F12)
+2. Exécutez `fixDashboard()` pour tenter une réparation automatique
+3. Utilisez `checkDashboardState()` pour diagnostiquer les problèmes
+4. En dernier recours, accédez à `backup.html` pour une version simplifiée
+
+## ⚠️ Dépannage
+
+### Problèmes courants
+
+#### Le dashboard ne se charge pas
+- Vérifier la console pour les erreurs (F12)
+- S'assurer que les fichiers JSON sont bien formés
+- Essayer `fixDashboard()` dans la console
+- Accéder à `status.html` pour diagnostiquer le problème
+
+#### Les graphiques ne s'affichent pas
+- Vérifier que Chart.js est correctement chargé
+- Inspecter les données avec `console.log(dashboardData)`
+- Essayer de recharger la page avec Ctrl+F5
+
+#### Les filtres ne fonctionnent pas
+- Réinitialiser tous les filtres (bouton "Réinitialiser")
+- Vérifier les erreurs dans la console
+- S'assurer que le format des données est correct
+
+---
+
 **Développé pour le Projet PROCASEF - Région du Boundou, Sénégal**  
-*Dashboard de suivi EDL - Version 1.0.0*
+*Dashboard de suivi EDL - Version 2.1.0*
