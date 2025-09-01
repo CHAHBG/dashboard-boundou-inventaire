@@ -5,6 +5,46 @@
   width: 100%;
 }
 
+/* Enhanced KPI cards */
+.kpi-card {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.kpi-card:hover {
+  transform: translateY(-8px) !important;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.kpi-card:hover::before {
+  transform: scale(1.5);
+  opacity: 0.2;
+}
+
+/* Enhanced chart cards */
+.chart-card {
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+}
+
+.chart-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--betplus-bleu), var(--procasf-vert));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.chart-card:hover::after {
+  opacity: 1;
+}
+
 .visualization-tabs {
   display: flex;
   border-bottom: 1px solid var(--border-color);

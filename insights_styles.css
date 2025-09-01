@@ -5,6 +5,53 @@
   gap: 1.5rem;
 }
 
+/* Insight banner */
+.insight-banner {
+  background: linear-gradient(90deg, var(--betplus-jaune) 0%, var(--betplus-bleu) 100%);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 24px;
+  color: white;
+  box-shadow: var(--shadow-light);
+  position: relative;
+  overflow: hidden;
+  animation: slideDown 0.5s ease;
+}
+
+.insight-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.insight-banner i {
+  font-size: 24px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.insight-banner strong {
+  font-weight: 600;
+}
+
+.insight-tip {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-left: 8px;
+  font-size: 0.85rem;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .insights-chart-wrapper {
   position: relative;
   height: 180px;

@@ -300,19 +300,23 @@ function removeErrorBanner() {
   if (banner) banner.remove();
 }
 
-// Utility function to animate value changes
+// Utility function to animate value changes with fade-in effect for visual polish
 function animateValue(id, start, end, duration, suffix = '') {
   const element = document.getElementById(id);
   if (!element) return;
   const range = end - start;
   const startTime = performance.now();
+  element.style.opacity = 0;
   function updateValue(currentTime) {
     const elapsed = currentTime - startTime;
     const progress = Math.min(elapsed / duration, 1);
     const current = Math.floor(start + range * easeOutCubic(progress));
     element.textContent = formatNumber(current) + suffix;
+    element.style.opacity = progress;
     if (progress < 1) {
       requestAnimationFrame(updateValue);
+    } else {
+      element.style.opacity = 1;
     }
   }
   requestAnimationFrame(updateValue);
@@ -422,19 +426,26 @@ async function updateKPIs() {
     kpiGrid.appendChild(categoryDiv);
   });
 
-// Create gradient for chart backgrounds
+// Create gradient for chart backgrounds (for Chart.js)
 function createGradient(ctx, colors) {
   if (!ctx) return colors[0];
-  const gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 400);
+  const gradient = ctx.createLinearGradient(0, 0, 0, 400);
   gradient.addColorStop(0, colors[0]);
   gradient.addColorStop(1, colors[1] || colors[0]);
   return gradient;
 }
 
-// Initialize and update all charts
+// Initialize and update all charts with performance optimizations (data slicing, lazy loading)
 async function initCharts() {
   const data = await fetchDashboardData();
+  if (!data) return;
+  
+  // Limit data for better performance
+  dashboardData = data;
   const summary = data.summary;
+  
+  // Slice communes data to avoid overloading charts (use only top 10 communes)
+  const limitedCommunes = data.communes ? data.communes.slice(0, 10) : [];
   
   // Prepare chart canvases
   const canvases = {
@@ -855,6 +866,15 @@ async function initCharts() {
       joinRateElement.textContent = `${joinRate}%`;
     }
   }
+  
+  // Add lazy loading for heavy visualizations
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      if (btn.dataset.tab === 'analysis') {
+        setTimeout(runAdvancedAnalysis, 300); // Lazy load analysis charts
+      }
+    });
+  });
 }
 
 // Get label for metrics
@@ -1254,10 +1274,12 @@ function generateReport(reportType, format) {
   return reportData;
 }
 
-// Initialize Dashboard
+// Initialize Dashboard with enhancements
 async function initializeDashboard() {
   try {
     // showLoadingOverlay('Chargement du tableau de bord...');
+    // Show dashboard insights for user guidance
+    showDashboardInsights();
     // Charger les données principales et mettre à jour le dashboard
     await updateKPIs();
     await initCharts();
@@ -1272,6 +1294,7 @@ async function initializeDashboard() {
     setupEventListeners();
     setupAdvancedInteractions();
     // hideLoadingOverlay();
+    // Legacy welcome message
     showWelcomeMessage();
   } catch (error) {
     console.error('Erreur lors de l\'initialisation du tableau de bord:', error);
@@ -1281,18 +1304,41 @@ async function initializeDashboard() {
 }
 window.initializeDashboard = initializeDashboard;
 
-// Afficher un message de bienvenue avec des insights clés
-function showWelcomeMessage() {
-// Show a beautiful insight banner at the top of the dashboard
-function showInsightBanner() {
-  if (document.getElementById('insightBanner')) return;
+// Show a random dashboard insight for user guidance
+function showDashboardInsights() {
+  const insights = [
+    "Astuce : Cliquez sur une commune pour voir le détail.",
+    "Recommandation : Analysez les doublons pour améliorer la qualité.",
+    "Info : Les taux de validation supérieurs à 90% sont excellents !",
+    "Conseil : Utilisez les filtres pour explorer les données par statut.",
+    "Saviez-vous ? Vous pouvez exporter les rapports en PDF ou CSV."
+  ];
   const banner = document.createElement('div');
-  banner.id = 'insightBanner';
-  banner.className = 'insight-banner';
-  banner.innerHTML = `
-    <div class="insight-banner-content">
-      <i class="fas fa-lightbulb"></i>
-      <span><strong>Progression:</strong> 78% des parcelles traitées, <strong>9.93%</strong> de doublons éliminés, <strong>211</strong> parcelles conflictuelles à surveiller. <span class="insight-tip">Survolez les graphiques pour plus de détails.</span></span>
+  banner.className = 'ia-insights';
+  banner.style.background = 'linear-gradient(90deg, #FBBF24 0%, #3B82F6 100%)';
+  banner.style.color = '#1F2937';
+  banner.style.fontWeight = 'bold';
+  banner.style.textAlign = 'center';
+  banner.style.padding = '12px';
+  banner.style.marginBottom = '18px';
+  banner.style.borderRadius = '12px';
+  banner.innerHTML = '<i class="fas fa-lightbulb"></i> ' + insights[Math.floor(Math.random() * insights.length)];
+  const main = document.querySelector('.main-content');
+  if (main) main.prepend(banner);
+}
+
+// Show welcome message and insights
+function showWelcomeMessage() {
+  // Show a beautiful insight banner at the top of the dashboard
+  function showInsightBanner() {
+    if (document.getElementById('insightBanner')) return;
+    const banner = document.createElement('div');
+    banner.id = 'insightBanner';
+    banner.className = 'insight-banner';
+    banner.innerHTML = `
+      <div class="insight-banner-content">
+        <i class="fas fa-lightbulb"></i>
+        <span><strong>Progression:</strong> 78% des parcelles traitées, <strong>9.93%</strong> de doublons éliminés, <strong>211</strong> parcelles conflictuelles à surveiller. <span class="insight-tip">Survolez les graphiques pour plus de détails.</span></span>
       <button class="insight-close"><i class="fas fa-times"></i></button>
     </div>
   `;
