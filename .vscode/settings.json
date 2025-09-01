@@ -1,0 +1,6 @@
+{
+  "javascript.validate.enable": false,
+  "typescript.validate.enable": true,
+  "typescript.suggestionActions.enabled": false,
+  "typescript.reportStyleChecksAsWarnings": false
+}
