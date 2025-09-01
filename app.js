@@ -193,68 +193,111 @@ const realData = {
   ]
 };
 
-// Fetch JSON data from data folder
+// Fetch JSON data from data folder with robust error handling and UI error banner
 async function fetchDashboardData() {
-  try {
-    // List of all JSON files to load
-    const files = [
-      'Rapport_Post_traitement.json',
-      'communes_data.json',
-      'dashboard_data_complete.json',
-      'dashboard_kpis.json',
-      'duplicate_removal_log.json',
-      'duplicate_removal_summary.json',
-      'nettoyage_doublon_idup.json',
-      'parcel_join_conflicts.json',
-      'problematic_parcels_summary.json',
-      'rapport_jointure.json'
-    ];
+  // List of all JSON files to load
+  const files = [
+    'Rapport_Post_traitement.json',
+    'communes_data.json',
+    'dashboard_data_complete.json',
+    'dashboard_kpis.json',
+    'duplicate_removal_log.json',
+    'duplicate_removal_summary.json',
+    'nettoyage_doublon_idup.json',
+    'parcel_join_conflicts.json',
+    'problematic_parcels_summary.json',
+    'rapport_jointure.json'
+  ];
 
-    // Fetch all files in parallel
-    const responses = await Promise.all(files.map(f => fetch('data/' + f)));
-    const jsons = await Promise.all(responses.map(r => r.ok ? r.json() : null));
+  const dataMap = {};
+  const failedFiles = [];
+  let hadError = false;
 
-    // Map file names to their data
-    const dataMap = {};
-    files.forEach((f, i) => {
-      dataMap[f.replace('.json', '')] = jsons[i];
-    });
-
-    // Example: extract summary from Rapport_Post_traitement.json if available
-    let summary = {};
-    if (dataMap['Rapport_Post_traitement'] && dataMap['Rapport_Post_traitement']['Rapport sommaire']) {
-      summary = dataMap['Rapport_Post_traitement']['Rapport sommaire'].reduce((acc, item) => {
-        const key = item.date?.toLowerCase().replace(/ /g, '_');
-        let value = item['2025_08_19_19_17_47'];
-        if (typeof value === 'string' && value.includes('%')) {
-          value = parseFloat(value.replace('%', '')) || 0;
-        }
-        if (key) acc[key] = value;
-        return acc;
-      }, {});
+  // Fetch all files in parallel, log which fail
+  const responses = await Promise.all(files.map(async (f) => {
+    try {
+      const res = await fetch('data/' + f);
+      if (!res.ok) {
+        failedFiles.push(f);
+        hadError = true;
+        return null;
+      }
+      return await res.json();
+    } catch (err) {
+      failedFiles.push(f);
+      hadError = true;
+      return null;
     }
+  }));
 
-    // Merge all data into one object for dashboard use
-    return {
-      summary: {
-        ...realData.summary,
-        ...summary
-      },
-      communes_data: dataMap['communes_data'],
-      dashboard_data_complete: dataMap['dashboard_data_complete'],
-      dashboard_kpis: dataMap['dashboard_kpis'],
-      duplicate_removal_log: dataMap['duplicate_removal_log'],
-      duplicate_removal_summary: dataMap['duplicate_removal_summary'],
-      nettoyage_doublon_idup: dataMap['nettoyage_doublon_idup'],
-      parcel_join_conflicts: dataMap['parcel_join_conflicts'],
-      problematic_parcels_summary: dataMap['problematic_parcels_summary'],
-      rapport_jointure: dataMap['rapport_jointure'],
-      ...realData
-    };
-  } catch (error) {
-    console.error('Error fetching JSON, using fallback data:', error);
-    return realData;
+  files.forEach((f, i) => {
+    dataMap[f.replace('.json', '')] = responses[i];
+  });
+
+  // Example: extract summary from Rapport_Post_traitement.json if available
+  let summary = {};
+  if (dataMap['Rapport_Post_traitement'] && dataMap['Rapport_Post_traitement']['Rapport sommaire']) {
+    summary = dataMap['Rapport_Post_traitement']['Rapport sommaire'].reduce((acc, item) => {
+      const key = item.date?.toLowerCase().replace(/ /g, '_');
+      let value = item['2025_08_19_19_17_47'];
+      if (typeof value === 'string' && value.includes('%')) {
+        value = parseFloat(value.replace('%', '')) || 0;
+      }
+      if (key) acc[key] = value;
+      return acc;
+    }, {});
   }
+
+  // Merge all data into one object for dashboard use, fallback to partial data
+  const merged = {
+    summary: {
+      ...realData.summary,
+      ...summary
+    },
+    communes_data: dataMap['communes_data'],
+    dashboard_data_complete: dataMap['dashboard_data_complete'],
+    dashboard_kpis: dataMap['dashboard_kpis'],
+    duplicate_removal_log: dataMap['duplicate_removal_log'],
+    duplicate_removal_summary: dataMap['duplicate_removal_summary'],
+    nettoyage_doublon_idup: dataMap['nettoyage_doublon_idup'],
+    parcel_join_conflicts: dataMap['parcel_join_conflicts'],
+    problematic_parcels_summary: dataMap['problematic_parcels_summary'],
+    rapport_jointure: dataMap['rapport_jointure'],
+    ...realData
+  };
+
+  // Show error banner if any file failed
+  if (hadError) {
+    showErrorBanner('Certains fichiers de données n\'ont pas pu être chargés :<br>' + failedFiles.map(f => `<b>${f}</b>`).join(', ') + '<br>Le tableau de bord utilise les données disponibles.');
+    console.error('Fichiers JSON manquants ou non chargés:', failedFiles);
+  } else {
+    removeErrorBanner();
+  }
+  return merged;
+}
+
+// Show a visible error banner at the top of the dashboard
+function showErrorBanner(message) {
+  let banner = document.getElementById('dashboardErrorBanner');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'dashboardErrorBanner';
+    banner.style.background = '#ffcccc';
+    banner.style.color = '#a4161a';
+    banner.style.padding = '16px';
+    banner.style.fontWeight = 'bold';
+    banner.style.textAlign = 'center';
+    banner.style.position = 'sticky';
+    banner.style.top = '0';
+    banner.style.zIndex = '9999';
+    document.body.prepend(banner);
+  }
+  banner.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ' + message;
+}
+
+function removeErrorBanner() {
+  const banner = document.getElementById('dashboardErrorBanner');
+  if (banner) banner.remove();
 }
 
 // Utility function to animate value changes
