@@ -106,7 +106,46 @@ const realData = {
     cleaningRate: 9.93,
     jointuresIndividuelles: 14,
     jointuresCollectives: 14,
-    memeIDUP: 9,
+    memeIDUP: 9
+  },
+  communes: [
+    { nom: 'BALA', brutes: 912, individuelles: 718, collectives: 144, conflits: 0, qualite: 96, statut: 'SUCCÈS' },
+    { nom: 'BALLOU', brutes: 1551, individuelles: 359, collectives: 277, conflits: 0, qualite: 70, statut: 'SUCCÈS' },
+    { nom: 'BANDAFASSI', brutes: 11731, individuelles: 2681, collectives: 736, conflits: 15, qualite: 92, statut: 'SUCCÈS' },
+    { nom: 'BEMBOU', brutes: 5885, individuelles: 1542, collectives: 407, conflits: 5, qualite: 93, statut: 'SUCCÈS' },
+    { nom: 'DIMBOLI', brutes: 6474, individuelles: 2409, collectives: 410, conflits: 2, qualite: 90, statut: 'SUCCÈS' },
+    { nom: 'DINDEFELLO', brutes: 5725, individuelles: 1492, collectives: 249, conflits: 10, qualite: 95, statut: 'SUCCÈS' },
+    { nom: 'FONGOLEMBI', brutes: 5001, individuelles: 870, collectives: 541, conflits: 1, qualite: 94, statut: 'SUCCÈS' },
+    { nom: 'GABOU', brutes: 2003, individuelles: 601, collectives: 301, conflits: 0, qualite: 75, statut: 'SUCCÈS' },
+    { nom: 'KOAR', brutes: 101, individuelles: 58, collectives: 30, conflits: 0, qualite: 92, statut: 'SUCCÈS' },
+    { nom: 'MISSIRAH', brutes: 6844, individuelles: 3548, collectives: 781, conflits: 34, qualite: 88, statut: 'SUCCÈS' },
+    { nom: 'MOUDERY', brutes: 1009, individuelles: 419, collectives: 310, conflits: 3, qualite: 80, statut: 'SUCCÈS' },
+    { nom: 'NDOGA_BABACAR', brutes: 4759, individuelles: 0, collectives: 0, conflits: 0, qualite: 50, statut: 'ERREUR' },
+    { nom: 'NETTEBOULOU', brutes: 3919, individuelles: 840, collectives: 538, conflits: 56, qualite: 65, statut: 'SUCCÈS' },
+    { nom: 'SINTHIOU_MALEME', brutes: 2778, individuelles: 1348, collectives: 103, conflits: 0, qualite: 85, statut: 'SUCCÈS' },
+    { nom: 'TOMBORONKOTO', brutes: 56834, individuelles: 8205, collectives: 539, conflits: 9, qualite: 98, statut: 'SUCCÈS' }
+  ],
+  quality: {
+    validationRate: 93.3,
+    criticalErrors: 9,
+    consistency: 92.87,
+    completude: 92.1,
+    precision: 87.5,
+    integrite: 91.3
+  },
+  reportsHistory: [], // Données fictives supprimées
+  iaAnalysis: {
+    correlation: {
+      brutes_conflits: 0.067,
+      indiv_conflits: 0.186,
+      coll_conflits: 0.587
+    },
+    regression: {
+      slope: 0.0000765,
+      intercept: 8.41,
+      r_value: 0.067,
+      p_value: 0.812
+    },
     forecast: 9.18,
     quality: {
       validation: 93.3,
@@ -157,71 +196,40 @@ const realData = {
 // Fetch JSON data from data folder
 async function fetchDashboardData() {
   try {
-    // Load all required data files from the data folder
-    const [dashboardDataResponse, kpisResponse, communesResponse, duplicateAnalysisResponse, joinAnalysisResponse] = await Promise.all([
-      fetch('data/dashboard_data_complete_new.json'),
-      fetch('data/dashboard_kpis.json'),
-      fetch('data/communes_data.json'),
-      fetch('data/duplicate_analysis.json'),
-      fetch('data/join_analysis.json')
-    ]);
-    
-    if (!dashboardDataResponse.ok || !kpisResponse.ok || !communesResponse.ok || 
-        !duplicateAnalysisResponse.ok || !joinAnalysisResponse.ok) {
-      throw new Error('Failed to fetch one or more JSON files');
-    }
-    
-    const dashboardMainData = await dashboardDataResponse.json();
-    const kpisData = await kpisResponse.json();
-    const communesData = await communesResponse.json();
-    const duplicateAnalysisData = await duplicateAnalysisResponse.json();
-    const joinAnalysisData = await joinAnalysisResponse.json();
-    
-    console.log("Loaded dashboard data:", dashboardMainData);
-    console.log("Loaded KPIs data:", kpisData);
-    console.log("Loaded communes data:", communesData);
-    
-    // Integrate data from all sources
+    const response = await fetch('data/Rapport_Post_traitement.json');
+    if (!response.ok) throw new Error('Failed to fetch JSON');
+    const jsonData = await response.json();
+    const summary = jsonData['Rapport sommaire'].reduce((acc, item) => {
+      const key = item.date.toLowerCase().replace(/ /g, '_');
+      let value = item['2025_08_19_19_17_47'];
+      if (typeof value === 'string' && value.includes('%')) {
+        value = parseFloat(value.replace('%', '')) || 0;
+      }
+      acc[key] = value;
+      return acc;
+    }, {});
     return {
       summary: {
         ...realData.summary,
-        // Use proper data from JSON files
-        totalFiles: kpisData.kpi_summary?.total_files?.value || realData.summary.totalFiles,
-        totalParcels: kpisData.kpi_summary?.total_parcels?.value || realData.summary.totalParcels,
-        indivParcels: kpisData.kpi_summary?.individual_parcels?.value || realData.summary.indivParcels,
-        collParcels: kpisData.kpi_summary?.collective_parcels?.value || realData.summary.collParcels,
-        conflictParcels: kpisData.kpi_summary?.problematic_parcels?.value || realData.summary.conflictParcels,
-        noJoinParcels: kpisData.kpi_summary?.unjoined_parcels?.value || realData.summary.noJoinParcels,
-        cleaningRate: kpisData.kpi_summary?.duplicate_removal_rate?.value || realData.summary.cleaningRate,
-        
-        // Calculate rates from kpi data
-        indivRate: kpisData.kpi_summary?.individual_parcels?.percent_of_total || realData.summary.indivRate,
-        collRate: kpisData.kpi_summary?.collective_parcels?.percent_of_total || realData.summary.collRate,
-        conflictRate: kpisData.kpi_summary?.problematic_parcels?.percent_of_total || realData.summary.conflictRate,
-        noJoinRate: kpisData.kpi_summary?.unjoined_parcels?.percent_of_total || realData.summary.noJoinRate,
-        
-        // Additional KPIs
-        success: kpisData.kpi_summary?.success_files?.value || realData.summary.success,
-        failures: kpisData.kpi_summary?.failed_files?.value || realData.summary.failures,
-        dataQuality: kpisData.kpi_summary?.data_quality?.value || 100 - realData.summary.cleaningRate,
-        jointuresIndividuelles: joinAnalysisData.summary?.individual_joins || realData.summary.jointuresIndividuelles,
-        jointuresCollectives: joinAnalysisData.summary?.collective_joins || realData.summary.jointuresCollectives,
-        memeIDUP: joinAnalysisData.summary?.same_idup_files || realData.summary.memeIDUP,
-        successRate: kpisData.kpi_summary?.success_rate?.value || realData.summary.successRate,
-        globalConflicts: kpisData.kpi_summary?.problematic_parcels?.value || realData.summary.globalConflicts,
-        
-        // Add commune-specific data
-        communes: communesData,
-        
-        // Add analysis details
-        duplicateAnalysis: duplicateAnalysisData,
-        joinAnalysis: joinAnalysisData,
-        
-        // Processing efficiency
-        processingEfficiency: kpisData.kpi_summary?.processing_efficiency?.value || 95
+        totalFiles: summary['fichiers_traités'] || realData.summary.totalFiles,
+        success: summary['succès'] || realData.summary.success,
+        failures: summary['échecs'] || realData.summary.failures,
+        globalConflicts: summary['conflits_globaux'] || realData.summary.globalConflicts,
+        totalParcels: summary['total_enregistrement_(parcelles_apres_netoyage)'] || realData.summary.totalParcels,
+        indivParcels: summary['parcelles_individuelles'] || realData.summary.indivParcels,
+        collParcels: summary['parcelles_collectives'] || realData.summary.collParcels,
+        conflictParcels: summary['conflits_(parcelles_à_la_fois_individuelle_et_collecvive)'] || realData.summary.conflictParcels,
+        noJoinParcels: summary['pas_de_jointure_(pas_d\'idup_ou_ancien_idup_ndoga)'] || realData.summary.noJoinParcels,
+        indivRate: summary['taux_des_parcelles_individuelles'] || realData.summary.indivRate,
+        collRate: summary['taux_des_parcelles_collectives'] || realData.summary.collRate,
+        conflictRate: summary['taux_des_parcelles_conflictuelles'] || realData.summary.conflictRate,
+        noJoinRate: summary['taux_des_parcelles_sans_jointure'] || realData.summary.noJoinRate,
+        jointuresIndividuelles: summary['fichiers_jointures_individuelles'] || realData.summary.jointuresIndividuelles,
+        jointuresCollectives: summary['fichiers_jointures_collectives'] || realData.summary.jointuresCollectives,
+        memeIDUP: summary['fichiers_avec_même_idup_individuelle_et_collective'] || realData.summary.memeIDUP,
+        successRate: summary['succès'] ? (summary['succès'] / summary['fichiers_traités'] * 100).toFixed(1) : realData.summary.successRate
       },
-      quality: dashboardMainData.quality || realData.quality,
-      iaAnalysis: dashboardMainData.iaAnalysis || realData.iaAnalysis
+      ...realData
     };
   } catch (error) {
     console.error('Error fetching JSON, using fallback data:', error);
@@ -444,34 +452,15 @@ async function initCharts() {
   // Commune Performance Chart
   if (canvases.commune) {
     if (charts.communePerformance) charts.communePerformance.destroy();
-    
-    // Use commune data from the new structure
-    let communeData;
-    if (Array.isArray(data.communes)) {
-      communeData = data.communes;
-    } else if (data.summary.communes && Array.isArray(data.summary.communes)) {
-      communeData = data.summary.communes;
-    } else {
-      communeData = [];
-    }
-    
-    const communes = communeData.map(c => c.nom || c.name || c.commune);
+    const communes = data.communes.map(c => c.nom);
     const metric = document.getElementById('metricSelector')?.value || 'individuelles';
-    
     charts.communePerformance = new Chart(canvases.commune, {
       type: 'bar',
       data: {
         labels: communes,
         datasets: [{
           label: getMetricLabel(metric),
-          data: communeData.map(c => {
-            // Support different data structures
-            if (metric === 'individuelles') return c.individuelles || c.individual_parcels;
-            if (metric === 'collectives') return c.collectives || c.collective_parcels;
-            if (metric === 'conflits') return c.conflits || c.conflict_parcels;
-            if (metric === 'qualite') return c.qualite || c.quality || c.data_quality;
-            return c[metric];
-          }),
+          data: data.communes.map(c => c[metric]),
           backgroundColor: communes.map(() => createGradient(canvases.commune, themeColors.gradients.primary)),
           borderRadius: 8,
           borderSkipped: false

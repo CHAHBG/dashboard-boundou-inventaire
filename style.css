@@ -11,7 +11,7 @@
   --text-primary: #1F2937;
   --text-secondary: #6B7280;
   --background-light: #F9FAFB;
-  --background-card: #FFFFFF;
+  /* Copied from style_enhanced.css */
   --shadow-light: 0 4px 16px rgba(0, 0, 0, 0.1);
   --shadow-heavy: 0 20px 40px rgba(0, 0, 0, 0.15);
   --border-radius: 16px;
