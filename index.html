@@ -3,323 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Tableau de bord pour l'enquête foncière PROCASF - Visualisation des données parcellaires et analyses des jointures">
-  <meta name="keywords" content="PROCASF, BET-PLUS, enquête foncière, parcelles, cadastre, Sénégal">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
   <title>Tableau de Bord - Enquête Foncière</title>
-  
-  <!-- Favicon to avoid 404 errors -->
-  <link rel="icon" href="data:image/x-icon;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD///8D////I////zz///9G////Rv///zz///8j////AwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP///yP///+K////yf///+j////o////yf///4r///8jAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP///4r////////0////9P///////P///4oAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////yf////T///+z////s/////T////JAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP///+j///+z////YP///2D///+z////6AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD////o////s////2D///9g////s////+gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP///8n////0////s////7P////0////yQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////iv////////T////0////////iv8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD///8j////iv///8n////o////yf///4r///8jAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD///8D////I////zz///88////I////wMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//8AAP//AAD//wAA+B8AAPAPAADgBwAAwAMAAMADAADAAwAAwAMAAOAHAADwDwAA+B8AAP//AAD//wAA//8AAA==" type="image/x-icon">
-  
-  <!-- Preloading critical resources -->
-  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-  <link rel="preload" href="style.css" as="style">
-  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" as="style">
-  
-  <!-- Stylesheets -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="additional_styles.css">
-  <link rel="stylesheet" href="advanced_viz_styles.css">
-  <link rel="stylesheet" href="insights_styles.css">
-  <link rel="stylesheet" href="temp_css_additions.css">
-  
-  <!-- Core initialization script (loads first) -->
-  <script>
-    console.log('EDL Dashboard initialization sequence started');
-    
-    // Global state tracker
-    window.EDL_DASHBOARD = {
-      loaded: false,
-      scriptsLoaded: {},
-      ready: false,
-      init: null,
-      errors: [],
-      startTime: new Date(),
-      loadTime: null
-    };
-    
-    // Error tracking
-    window.onerror = function(msg, url, lineNo, columnNo, error) {
-      if (window.EDL_DASHBOARD) {
-        window.EDL_DASHBOARD.errors.push({
-          time: new Date(),
-          message: msg,
-          url: url,
-          line: lineNo,
-          column: columnNo,
-          error: error ? error.stack : null
-        });
-        console.warn('Error caught by global handler:', msg, 'at', url, ':', lineNo);
-      }
-      return false; // Let default error handler run as well
-    };
-    
-    // Load script helper function with better error handling
-    function loadScript(src, id, isAsync = false) {
-      return new Promise((resolve, reject) => {
-        console.log(`Loading script: ${src}${id ? ' ('+id+')' : ''}`);
-        
-        // Check if already loaded
-        if (window.EDL_DASHBOARD.scriptsLoaded[src]) {
-          console.log(`Script already loaded: ${src}`);
-          resolve();
-          return;
-        }
-        
-        // Create script element
-        const script = document.createElement('script');
-        script.src = src;
-        if (id) script.id = id;
-        if (isAsync) script.async = true;
-        
-        // Handle success
-        script.onload = () => {
-          window.EDL_DASHBOARD.scriptsLoaded[src] = true;
-          console.log(`✓ Script loaded successfully: ${src}`);
-          resolve();
-        };
-        
-        // Handle error
-        script.onerror = (err) => {
-          console.error(`✗ Failed to load script: ${src}`, err);
-          window.EDL_DASHBOARD.errors.push({
-            type: 'script-load-error', 
-            src, 
-            time: new Date(),
-            error: err
-          });
-          
-          // Try to load the script again with a timeout
-          setTimeout(() => {
-            console.log(`Retrying script load: ${src}`);
-            const retryScript = document.createElement('script');
-            retryScript.src = src + '?retry=' + Date.now(); // Cache busting
-            if (id) retryScript.id = id + '-retry';
-            retryScript.onload = () => {
-              window.EDL_DASHBOARD.scriptsLoaded[src] = true;
-              console.log(`✓ Retry successful: ${src}`);
-              resolve();
-            };
-            retryScript.onerror = () => {
-              console.error(`✗ Retry failed for script: ${src}`);
-              reject(new Error(`Failed to load script: ${src} (after retry)`));
-            };
-            document.head.appendChild(retryScript);
-          }, 1000);
-        };
-        
-        // Add to document
-        document.head.appendChild(script);
-      });
-    }
-    
-    // Dashboard initialization stub - acts as a placeholder until the real function loads
-    window.initializeDashboard = function() {
-      console.log('Initialization requested before app.js is fully loaded');
-      return new Promise((resolve, reject) => {
-        // Try to find the real init function
-        const checkInit = () => {
-          if (window.EDL_DASHBOARD && window.EDL_DASHBOARD.init && typeof window.EDL_DASHBOARD.init === 'function') {
-            console.log('Found proper initialization function, executing now');
-            try {
-              window.EDL_DASHBOARD.init().then(resolve).catch(reject);
-            } catch (e) {
-              console.error('Error during initialization:', e);
-              reject(e);
-            }
-          } else {
-            console.log('Waiting for initialization function to be available...');
-            setTimeout(checkInit, 300);
-          }
-        };
-        checkInit();
-      });
-    };
-  </script>
-  
-  <!-- Load recovery script first to ensure it's available if anything goes wrong -->
-  <script src="dashboard-recovery.js" id="dashboard-recovery-script"></script>
-  
-  <!-- Load critical scripts immediately -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-  
-  <!-- Primary application script -->
-  <script src="app.js" id="main-app-script"></script>
-  
-  <!-- Secondary scripts loaded async -->
-  <script>
-    // Once DOM is ready, load non-critical scripts in parallel
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log('DOM content loaded, loading secondary scripts');
-      
-      Promise.all([
-        loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js', 'jspdf-script', true),
-        loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js', 'jspdf-autotable-script', true)
-      ]).then(() => {
-        console.log('All secondary scripts loaded successfully');
-      }).catch(err => {
-        console.warn('Some secondary scripts failed to load:', err);
-      });
-    });
-  </script>
-  
-  <!-- Recovery and initialization management -->
-  <script>
-    // Initialize dashboard when ready
-    // Add initialization check when DOM is ready
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log('DOM content loaded, initializing dashboard');
-      
-      // Ensure dashboard is initialized (with timeout)
-      setTimeout(() => {
-        try {
-          if (!window.EDL_DASHBOARD.ready) {
-            console.log('Initializing dashboard after DOM content loaded');
-            if (typeof initializeDashboard === 'function') {
-              initializeDashboard().catch(err => {
-                console.error('Dashboard initialization failed:', err);
-              });
-            }
-          }
-        } catch (err) {
-          console.error('Error during initialization check:', err);
-        }
-      }, 500); // Give some time for scripts to parse and execute
-      
-      // Backup check for dashboard data
-      setTimeout(() => {
-        if ((typeof dashboardData === 'undefined' || !dashboardData) && !window.EDL_DASHBOARD.ready) {
-          console.warn('Dashboard data not loaded after timeout, trying recovery');
-          triggerRecovery();
-        }
-      }, 3000);
-    });
-    
-    // Primary recovery function
-    function triggerRecovery() {
-      console.warn('Triggering dashboard recovery sequence');
-      
-      if (typeof window.fixDashboard === 'function') {
-        console.log('Using fixDashboard recovery function');
-        window.fixDashboard();
-      } else if (window.EDL_DASHBOARD && window.EDL_DASHBOARD.init && typeof window.EDL_DASHBOARD.init === 'function') {
-        console.log('Using EDL_DASHBOARD init function');
-        window.EDL_DASHBOARD.init();
-      } else if (typeof initializeDashboard === 'function') {
-        console.log('Using global initializeDashboard function');
-        initializeDashboard();
-      } else {
-        console.error('Recovery failed - no initialization functions available');
-        alert('Erreur de chargement du tableau de bord. Veuillez actualiser la page.');
-      }
-    }
-    
-    // Global error handler
-    window.onerror = function(message, source, lineno, colno, error) {
-      // Log error details
-      console.error('Error caught:', message, 'at', source, ':', lineno);
-      if (window.EDL_DASHBOARD) {
-        window.EDL_DASHBOARD.errors.push({
-          message, source, lineno, time: new Date(), 
-          stack: error?.stack || 'No stack available'
-        });
-      }
-      
-      // If initialization related, trigger recovery
-      if (message.includes('initializeDashboard') || 
-          message.includes('not defined') || 
-          message.includes('undefined') ||
-          message.includes('null')) {
-        console.warn('Detected initialization-related error, triggering recovery');
-        triggerRecovery();
-      }
-      
-      return false; // allows default error handling too
-    };
-    
-    // Set load timestamp
-    if (window.EDL_DASHBOARD) {
-      window.EDL_DASHBOARD.loadTime = new Date();
-      console.log('Dashboard load time:', 
-        (window.EDL_DASHBOARD.loadTime - window.EDL_DASHBOARD.startTime), 'ms');
-    }
-    
-    // Run initialization when window is fully loaded
-    window.addEventListener('load', function() {
-      console.log('Window load event fired, checking dashboard state');
-      
-      // Final check to ensure dashboard is initialized
-      setTimeout(() => {
-        if (!window.EDL_DASHBOARD || !window.EDL_DASHBOARD.ready) {
-          console.log('Dashboard not ready after window load, initializing now');
-          if (typeof initializeDashboard === 'function') {
-            initializeDashboard().catch(err => {
-              console.error('Dashboard initialization failed after window load:', err);
-              triggerRecovery();
-            });
-          } else {
-            console.error('No initialization function available after window load');
-            triggerRecovery();
-          }
-        }
-      }, 1000);
-    });
-  </script>
-  
-  <!-- Add this script to handle animations and enhancements -->
-  <script>
-    // Initialize scroll reveal animations
-    document.addEventListener('DOMContentLoaded', function() {
-      // Handle loading overlay
-      setTimeout(() => {
-        const overlay = document.getElementById('loading-overlay');
-        if (overlay) {
-          overlay.style.opacity = '0';
-          setTimeout(() => { overlay.style.display = 'none'; }, 500);
-        }
-      }, 800);
-      
-      // Initialize scroll animations if supported
-      if ('IntersectionObserver' in window) {
-        const observer = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('revealed');
-              observer.unobserve(entry.target);
-            }
-          });
-        }, { threshold: 0.1 });
-
-        document.querySelectorAll('.reveal-animation').forEach(el => {
-          observer.observe(el);
-        });
-      } else {
-        // Fallback for browsers that don't support IntersectionObserver
-        document.querySelectorAll('.reveal-animation').forEach(el => {
-          el.classList.add('revealed');
-        });
-      }
-    });
-  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+  <script src="app.js"></script>
 </head>
 <body>
-  <!-- Loading overlay -->
-  <div id="loading-overlay" class="loading-overlay">
-    <div class="loader-container">
-      <div class="loader"></div>
-      <p>Chargement du tableau de bord...</p>
-    </div>
-  </div>
-  
   <div class="dashboard-container">
     <header class="header">
       <div class="header-content">
         <div class="logo-section">
-          <div class="logo-icon" aria-hidden="true"><i class="fas fa-map"></i></div>
+          <div class="logo-icon"><i class="fas fa-map"></i></div>
           <div class="logo-text">
             <h1>Enquête Foncière</h1>
             <p>PROCASF & BET-PLUS SA</p>
@@ -346,39 +44,26 @@
       </div>
     </header>
 
-    <nav class="nav-container" aria-label="Navigation principale">
-      <div class="nav-tabs" role="tablist">
-        <button class="tab-btn active" data-tab="dashboard" role="tab" aria-selected="true" aria-controls="dashboard">
-          <i class="fas fa-chart-line" aria-hidden="true"></i> Tableau de Bord
-        </button>
-        <button class="tab-btn" data-tab="communes" role="tab" aria-selected="false" aria-controls="communes">
-          <i class="fas fa-map-marker-alt" aria-hidden="true"></i> Communes
-        </button>
-        <button class="tab-btn" data-tab="quality" role="tab" aria-selected="false" aria-controls="quality">
-          <i class="fas fa-check-circle" aria-hidden="true"></i> Qualité
-        </button>
-        <button class="tab-btn" data-tab="analysis" role="tab" aria-selected="false" aria-controls="analysis">
-          <i class="fas fa-microscope" aria-hidden="true"></i> Analyse
-        </button>
-        <button class="tab-btn" data-tab="reports" role="tab" aria-selected="false" aria-controls="reports">
-          <i class="fas fa-file-alt" aria-hidden="true"></i> Rapports
-        </button>
+    <nav class="nav-container">
+      <div class="nav-tabs">
+        <button class="tab-btn active" data-tab="dashboard">Tableau de Bord</button>
+        <button class="tab-btn" data-tab="communes">Communes</button>
+        <button class="tab-btn" data-tab="quality">Qualité</button>
+        <button class="tab-btn" data-tab="analysis">Analyse</button>
+        <button class="tab-btn" data-tab="reports">Rapports</button>
       </div>
     </nav>
 
-    <main class="main-content" aria-live="polite">
+    <main class="main-content">
       <!-- Dashboard Tab -->
-      <div id="dashboard" class="tab-content active" role="tabpanel" aria-labelledby="tab-dashboard">
-        <!-- Dashboard insights banner will be inserted here by JS -->
-        <div id="kpiGrid" class="kpi-grid" aria-label="Indicateurs de performance clés"></div>
-        
-        <div class="charts-section" aria-label="Section des graphiques">
-          <div class="chart-card reveal-animation">
+      <div id="dashboard" class="tab-content active">
+        <div id="kpiGrid" class="kpi-grid"></div>
+        <div class="charts-section">
+          <div class="chart-card">
             <div class="chart-header">
               <h3 class="chart-title">Distribution des Parcelles</h3>
               <div class="chart-controls">
-                <label for="chartTypeSelector" class="visually-hidden">Type de graphique</label>
-                <select id="chartTypeSelector" aria-label="Changer le type de graphique">
+                <select id="chartTypeSelector">
                   <option value="doughnut">Donut</option>
                   <option value="pie">Pie</option>
                   <option value="bar">Bar</option>
@@ -386,49 +71,7 @@
               </div>
             </div>
             <div class="chart-container">
-              <canvas id="parcelDistributionChart" aria-label="Graphique de distribution des parcelles"></canvas>
-            </div>
-          </div>
-          <div class="chart-card reveal-animation" data-delay="100">
-            <div class="chart-header">
-              <h3 class="chart-title">Heatmap Taux de Doublons</h3>
-              <div class="chart-actions">
-                <button class="chart-info-btn" aria-label="Plus d'informations" title="Informations sur ce graphique">
-                  <i class="fas fa-info-circle" aria-hidden="true"></i>
-                </button>
-              </div>
-            </div>
-            <div class="chart-container">
-              <canvas id="heatmapChart" aria-label="Graphique de chaleur des taux de doublons par commune"></canvas>
-            </div>
-          </div>
-          <div class="chart-card reveal-animation" data-delay="200">
-            <div class="chart-header">
-              <h3 class="chart-title">Répartition Parcelles Problématiques</h3>
-              <div class="chart-actions">
-                <button class="chart-info-btn" aria-label="Plus d'informations" title="Informations sur ce graphique">
-                  <i class="fas fa-info-circle" aria-hidden="true"></i>
-                </button>
-              </div>
-            </div>
-            <div class="chart-container">
-              <canvas id="problemPieChart" aria-label="Graphique de répartition des parcelles problématiques"></canvas>
-            </div>
-          </div>
-          <div class="chart-card">
-            <div class="chart-header">
-              <h3 class="chart-title">Top Communes Sans Jointure</h3>
-            </div>
-            <div class="chart-container">
-              <canvas id="topUnjoinedChart"></canvas>
-            </div>
-          </div>
-          <div class="chart-card">
-            <div class="chart-header">
-              <h3 class="chart-title">Top Communes Taux de Doublons</h3>
-            </div>
-            <div class="chart-container">
-              <canvas id="topDuplicateChart"></canvas>
+              <canvas id="parcelDistributionChart"></canvas>
             </div>
           </div>
           <div class="chart-card full-width">
@@ -508,7 +151,7 @@
         </div>
       </div>
 
-      <!-- Copied from index_enhanced.html -->
+      <!-- Quality Tab -->
       <div id="quality" class="tab-content">
         <div class="charts-section">
           <div class="chart-card full-width">

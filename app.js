@@ -1,338 +1,9 @@
-// @ts-nocheck
-/* This file contains template literals with HTML that TypeScript analyzer 
-   might misinterpret. Disable TypeScript checking for this file. */
-
-// Ensure we're in a browser environment and initialize global state
-if (typeof window !== 'undefined') {
-  // If global state not initialized yet, create it
-  if (!window.EDL_DASHBOARD) {
-    window.EDL_DASHBOARD = {
-      loaded: false,
-      scriptsLoaded: {},
-      ready: false,
-      init: null,
-      errors: []
-    };
-  }
-  
-  console.log('App.js loading, setting up environment...');
-  
-  // Fix for Favicon 404 error
-  const link = document.createElement('link');
-  link.rel = 'shortcut icon';
-  link.href = 'data:image/x-icon;,';
-  document.head.appendChild(link);
-  
-  // Mark app.js as loaded
-  window.EDL_DASHBOARD.loaded = true;
-  window.EDL_DASHBOARD.loadTime = new Date();
-}
-
-// Loading indicator functions
-function showLoadingIndicator(message = 'Chargement en cours...') {
-  let overlay = document.getElementById('loading-overlay');
-  if (!overlay) {
-    overlay = document.createElement('div');
-    overlay.id = 'loading-overlay';
-    overlay.style.position = 'fixed';
-    overlay.style.top = '0';
-    overlay.style.left = '0';
-    overlay.style.width = '100%';
-    overlay.style.height = '100%';
-    overlay.style.backgroundColor = 'rgba(0,0,0,0.5)';
-    overlay.style.display = 'flex';
-    overlay.style.justifyContent = 'center';
-    overlay.style.alignItems = 'center';
-    overlay.style.zIndex = '9999';
-    overlay.style.transition = 'opacity 0.3s ease';
-    
-    const loaderContainer = document.createElement('div');
-    loaderContainer.style.backgroundColor = 'white';
-    loaderContainer.style.padding = '20px';
-    loaderContainer.style.borderRadius = '10px';
-    loaderContainer.style.textAlign = 'center';
-    loaderContainer.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
-    
-    const loader = document.createElement('div');
-    loader.style.border = '5px solid #f3f3f3';
-    loader.style.borderTop = '5px solid #3498db';
-    loader.style.borderRadius = '50%';
-    loader.style.width = '40px';
-    loader.style.height = '40px';
-    loader.style.margin = '0 auto 10px auto';
-    loader.style.animation = 'spin 2s linear infinite';
-    
-    const messageElem = document.createElement('p');
-    messageElem.textContent = message;
-    messageElem.style.margin = '10px 0 0 0';
-    messageElem.style.fontFamily = 'sans-serif';
-    
-    loaderContainer.appendChild(loader);
-    loaderContainer.appendChild(messageElem);
-    overlay.appendChild(loaderContainer);
-    
-    // Add spin animation
-    const style = document.createElement('style');
-    style.textContent = '@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }';
-    document.head.appendChild(style);
-    
-    document.body.appendChild(overlay);
-  } else {
-    const messageElem = overlay.querySelector('p');
-    if (messageElem) {
-      messageElem.textContent = message;
-    }
-    overlay.style.display = 'flex';
-  }
-  overlay.style.opacity = '1';
-  
-  console.log('Loading indicator shown:', message);
-}
-
-function hideLoadingIndicator() {
-  const overlay = document.getElementById('loading-overlay');
-  if (overlay) {
-    overlay.style.opacity = '0';
-    setTimeout(() => {
-      overlay.style.display = 'none';
-    }, 300);
-    console.log('Loading indicator hidden');
-  }
-}
-
-// Show welcome message function
-function showWelcomeMessage() {
-  console.log('Showing welcome message');
-  
-  // Check if welcome message already shown
-  if (localStorage.getItem('welcomeShown')) {
-    return;
-  }
-  
-  // Create welcome message element
-  const welcomeEl = document.createElement('div');
-  welcomeEl.id = 'welcome-message';
-  welcomeEl.style.position = 'fixed';
-  welcomeEl.style.top = '20px';
-  welcomeEl.style.right = '20px';
-  welcomeEl.style.backgroundColor = '#fff';
-  welcomeEl.style.padding = '15px 20px';
-  welcomeEl.style.borderRadius = '5px';
-  welcomeEl.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
-  welcomeEl.style.zIndex = '1000';
-  welcomeEl.style.maxWidth = '300px';
-  welcomeEl.style.animation = 'slideIn 0.5s ease-out forwards';
-  
-  welcomeEl.innerHTML = `
-    <h3 style="margin-top:0;color:#1E40AF">Bienvenue au Tableau de Bord</h3>
-    <p>Données chargées avec succès. Explorez les visualisations et analyses disponibles.</p>
-    <button id="welcome-close" style="background:#3B82F6;color:#fff;border:none;padding:5px 10px;border-radius:3px;cursor:pointer;float:right">Fermer</button>
-  `;
-  
-  // Add animation
-  const style = document.createElement('style');
-  style.textContent = `
-    @keyframes slideIn {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-  `;
-  document.head.appendChild(style);
-  
-  // Add to DOM
-  document.body.appendChild(welcomeEl);
-  
-  // Add close button handler
-  document.getElementById('welcome-close').addEventListener('click', function() {
-    welcomeEl.style.display = 'none';
-    localStorage.setItem('welcomeShown', 'true');
-  });
-  
-  // Auto-hide after 8 seconds
-  setTimeout(() => {
-    if (welcomeEl.parentNode) {
-      welcomeEl.style.animation = 'slideIn 0.5s ease-out reverse forwards';
-      setTimeout(() => {
-        if (welcomeEl.parentNode) welcomeEl.parentNode.removeChild(welcomeEl);
-      }, 500);
-    }
-  }, 8000);
-}
-
-// Show error message
-function showErrorMessage(message) {
-  console.error('ERROR:', message);
-  
-  // Create error message element
-  const errorEl = document.createElement('div');
-  errorEl.id = 'error-message';
-  errorEl.style.position = 'fixed';
-  errorEl.style.top = '20px';
-  errorEl.style.left = '50%';
-  errorEl.style.transform = 'translateX(-50%)';
-  errorEl.style.backgroundColor = '#FEF2F2';
-  errorEl.style.color = '#B91C1C';
-  errorEl.style.padding = '15px 20px';
-  errorEl.style.borderRadius = '5px';
-  errorEl.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
-  errorEl.style.zIndex = '9999';
-  errorEl.style.maxWidth = '80%';
-  
-  errorEl.innerHTML = `
-    <div style="display:flex;align-items:center">
-      <i class="fas fa-exclamation-triangle" style="margin-right:10px;font-size:20px"></i>
-      <div>
-        <h3 style="margin-top:0;margin-bottom:5px">Erreur</h3>
-        <p style="margin:0">${message}</p>
-      </div>
-      <button id="error-close" style="background:transparent;border:none;margin-left:15px;cursor:pointer;font-size:20px;color:#B91C1C">&times;</button>
-    </div>
-  `;
-  
-  // Add to DOM
-  document.body.appendChild(errorEl);
-  
-  // Add close button handler
-  document.getElementById('error-close').addEventListener('click', function() {
-    errorEl.style.display = 'none';
-  });
-  
-  // Auto-hide after 10 seconds
-  setTimeout(() => {
-    if (errorEl.parentNode) {
-      errorEl.style.opacity = '0';
-      errorEl.style.transition = 'opacity 0.5s';
-      setTimeout(() => {
-        if (errorEl.parentNode) errorEl.parentNode.removeChild(errorEl);
-      }, 500);
-    }
-  }, 10000);
-}
-
-// Setup event listeners
-function setupEventListeners() {
-  console.log('Setting up event listeners');
-  // Implementation can be expanded later
-}
-
-// Load dashboard data from JSON files
-async function loadDashboardData() {
-  console.log('Loading dashboard data...');
-  try {
-    // First try to load from data/ directory
-    const response = await fetch('data/dashboard_data_complete.json');
-    if (response.ok) {
-      const data = await response.json();
-      dashboardData = data;
-      return data;
-    } else {
-      throw new Error('Could not load dashboard_data_complete.json');
-    }
-  } catch (error) {
-    console.error('Error loading dashboard data:', error);
-    
-    // Try fallback data from dashboard_json directory
-    try {
-      const fallbackResponse = await fetch('dashboard_json/dashboard_data_complete.json');
-      if (fallbackResponse.ok) {
-        const data = await fallbackResponse.json();
-        dashboardData = data;
-        return data;
-      } else {
-        throw new Error('Could not load fallback data');
-      }
-    } catch (fallbackError) {
-      console.error('Error loading fallback data:', fallbackError);
-      
-      // Use hardcoded data as last resort
-      console.log('Using hardcoded data as fallback');
-      dashboardData = realData;
-      return realData;
-    }
-  }
-}
-
-  // Initialize main dashboard view
-function initializeMainDashboard() {
-  console.log('Initializing main dashboard view');
-  try {
-    // If dashboard data is available, update UI components
-    if (dashboardData) {
-      // Update KPIs if the function exists
-      if (typeof updateKPIs === 'function') {
-        try {
-          updateKPIs().catch(err => {
-            console.error('Error in updateKPIs:', err);
-            // If updateKPIs fails, try to render a simplified version
-            renderSimplifiedKPIs();
-          });
-        } catch (kpiError) {
-          console.error('Error in updateKPIs:', kpiError);
-          renderSimplifiedKPIs();
-        }
-      }
-      
-      // Initialize charts if the function exists
-      if (typeof initCharts === 'function') {
-        try {
-          // Ensure redraw after charts initialize to handle hidden->visible canvases
-          initCharts()
-            .then(() => {
-              try { if (typeof redrawCharts === 'function') redrawCharts(); } catch(e) { console.warn('redrawCharts after initCharts failed', e); }
-            })
-            .catch(err => {
-              console.error('Error in initCharts:', err);
-            });
-        } catch (chartError) {
-          console.error('Error initializing charts:', chartError);
-        }
-      }
-      
-      console.log('Dashboard components initialized successfully');
-    } else {
-      console.warn('No dashboard data available for initialization');
-    }
-  } catch (error) {
-    console.error('Error in initializeMainDashboard:', error);
-  }
-}
-
-// Simplified KPI rendering if the main function fails
-function renderSimplifiedKPIs() {
-  console.log('Rendering simplified KPIs');
-  const kpiGrid = document.getElementById('kpiGrid');
-  if (!kpiGrid) return;
-  
-  // Clear and add a simple message
-  kpiGrid.innerHTML = `
-    <div class="kpi-category">
-      <div class="category-header">
-        <div class="category-icon"><i class="fas fa-info-circle"></i></div>
-        <h3>Information</h3>
-      </div>
-      <div class="kpi-cards">
-        <div class="kpi-card primary">
-          <div class="kpi-content">
-            <span class="kpi-label">Total Parcelles</span>
-            <span class="kpi-value">36,471</span>
-          </div>
-        </div>
-        <div class="kpi-card success">
-          <div class="kpi-content">
-            <span class="kpi-label">Taux de Succès</span>
-            <span class="kpi-value">93.3%</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-}// Variables globales
+// Variables globales
 let dashboardData = null;
 let charts = {};
 let currentTheme = 'light';
-let currentFilters = { commune: '', status: '', date: '', period: 'all' };
+let currentFilters = { commune: '', status: '', date: '' };
 let reportHistory = []; // Liste dynamique pour l'historique des rapports
-let insightData = {}; // Données pour les insights IA
 
 // Couleurs du thème
 const themeColors = {
@@ -348,69 +19,11 @@ const themeColors = {
     jaune: '#FBBF24',
     gris: '#1F2937'
   },
-  dashboard: {
-    primary: '#3B82F6',
-    secondary: '#10B981',
-    warning: '#F59E0B',
-    danger: '#EF4444',
-    info: '#6366F1',
-    dark: '#1F2937',
-    light: '#F3F4F6',
-    yellow: '#FBBF24',
-    orange: '#F97316',
-    teal: '#14B8A6',
-    indigo: '#6366F1'
-  },
   gradients: {
-    primary: ['#1E40AF', '#3B82F6'],
-    secondary: ['#047857', '#10B981'],
-    warning: ['#D97706', '#F59E0B'],
-    danger: ['#B91C1C', '#EF4444'],
-    success: ['#15803D', '#22C55E']
-  },
-  charts: {
-    pieColors: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#6366F1', '#8B5CF6', '#EC4899', '#14B8A6', '#F97316', '#84CC16'],
-    lineColors: {
-      primary: '#3B82F6',
-      secondary: '#10B981',
-      warning: '#F59E0B',
-      danger: '#EF4444'
-    }
-  }
-};
-
-// Options par défaut pour les charts
-const chartDefaults = {
-  animation: {
-    duration: 1000,
-    easing: 'easeOutQuart'
-  },
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: {
-      position: 'bottom',
-      labels: {
-        boxWidth: 12,
-        padding: 15,
-        font: {
-          size: 11
-        }
-      }
-    },
-    tooltip: {
-      backgroundColor: 'rgba(17, 24, 39, 0.8)',
-      titleFont: {
-        size: 13,
-        weight: 'bold'
-      },
-      bodyFont: {
-        size: 12
-      },
-      padding: 12,
-      cornerRadius: 4,
-      boxPadding: 6
-    }
+    primary: ['#1E40AF', '#003087'],
+    secondary: ['#2E7D32', '#4CAF50'],
+    warning: ['#A4161A', '#F44336'],
+    success: ['#FFC107', '#FBBF24']
   }
 };
 
@@ -480,171 +93,66 @@ const realData = {
       consistency: 92.87,
       critical: 9
     }
-  },
-  communes: [
-    {nom: 'BANDAFASSI', brutes: 3900, individuelles: 2735, collectives: 753, conflits: 12, qualite: 92.3, statut: 'Complété'},
-    {nom: 'DIMBOLI', brutes: 3268, individuelles: 2401, collectives: 532, conflits: 15, qualite: 91.6, statut: 'Complété'},
-    {nom: 'DINDEFELLO', brutes: 1845, individuelles: 1378, collectives: 380, conflits: 15, qualite: 93.4, statut: 'Complété'},
-    {nom: 'NETTEBOULOU', brutes: 3382, individuelles: 2313, collectives: 677, conflits: 70, qualite: 90.7, statut: 'Complété'},
-    {nom: 'BALLOU', brutes: 1417, individuelles: 1109, collectives: 242, conflits: 45, qualite: 98.5, statut: 'Complété'},
-    {nom: 'MISSIRAH', brutes: 6446, individuelles: 4216, collectives: 230, conflits: 0, qualite: 92.1, statut: 'Complété'},
-    {nom: 'TOMBORONKOTO', brutes: 10688, individuelles: 8235, collectives: 549, conflits: 12, qualite: 88.6, statut: 'Complété'},
-    {nom: 'SINTHIOU_MALEME', brutes: 1700, individuelles: 3535, collectives: 1021, conflits: 26, qualite: 90.9, statut: 'Complété'},
-    {nom: 'FONGOLEMBI', brutes: 1546, individuelles: 1282, collectives: 139, conflits: 15, qualite: 90.4, statut: 'Complété'},
-    {nom: 'BALA', brutes: 911, individuelles: 800, collectives: 97, conflits: 5, qualite: 94.2, statut: 'Complété'},
-    {nom: 'BEMBOU', brutes: 2083, individuelles: 1867, collectives: 125, conflits: 0, qualite: 94.8, statut: 'Complété'},
-    {nom: 'GABOU', brutes: 1662, individuelles: 1441, collectives: 210, conflits: 0, qualite: 95.9, statut: 'Complété'},
-    {nom: 'KOAR', brutes: 101, individuelles: 87, collectives: 10, conflits: 4, qualite: 96.3, statut: 'Complété'},
-    {nom: 'MOUDERY', brutes: 1004, individuelles: 900, collectives: 100, conflits: 4, qualite: 98.0, statut: 'Complété'},
-    {nom: 'NDOGA_BABACAR', brutes: 3157, individuelles: 2790, collectives: 350, conflits: 17, qualite: 71.2, statut: 'En cours'}
-  ],
-  issues: [
-    {type: 'Doublons IDUP', count: 4280, impact: 'Élevé', status: 'Résolu'},
-    {type: 'Parcelles conflictuelles', count: 211, impact: 'Moyen', status: 'Résolu'},
-    {type: 'Pas de jointure', count: 7475, impact: 'Moyen', status: 'En cours'},
-    {type: 'Erreurs de géométrie', count: 157, impact: 'Faible', status: 'En cours'},
-    {type: 'Attributs manquants', count: 2103, impact: 'Faible', status: 'En attente'}
-  ],
-  problematicParcels: [
-    {idup: '1312010100259', commune: 'BANDAFASSI', issue: 'Conflit individuelle/collective', status: 'Résolu'},
-    {idup: '1312020100056', commune: 'DIMBOLI', issue: 'Doublon', status: 'Résolu'},
-    {idup: '0512030103277', commune: 'BALLOU', issue: 'Conflit individuelle/collective', status: 'Résolu'},
-    {idup: '0512030103276', commune: 'BALLOU', issue: 'Conflit individuelle/collective', status: 'Résolu'},
-    {idup: '0512030103274', commune: 'BALLOU', issue: 'Conflit individuelle/collective', status: 'En cours'}
-  ],
-  activityLog: [
-    {date: '2025-08-19', action: 'Nettoyage doublons', commune: 'BANDAFASSI', user: 'Système'},
-    {date: '2025-08-19', action: 'Jointure parcelles', commune: 'BANDAFASSI', user: 'Système'},
-    {date: '2025-08-19', action: 'Export données', commune: 'Toutes', user: 'admin'},
-    {date: '2025-08-18', action: 'Import fichiers bruts', commune: 'NDOGA_BABACAR', user: 'technicien1'},
-    {date: '2025-08-17', action: 'Correction conflits', commune: 'BALLOU', user: 'technicien2'}
-  ]
+  }
 };
 
-// Fetch JSON data from data folder with robust error handling and UI error banner
+// Fetch JSON data
 async function fetchDashboardData() {
-  // List of all JSON files to load
-  const files = [
-    'Rapport_Post_traitement.json',
-    'communes_data.json',
-    'dashboard_data_complete.json',
-    'dashboard_kpis.json',
-    'duplicate_removal_log.json',
-    'duplicate_removal_summary.json',
-    'nettoyage_doublon_idup.json',
-    'parcel_join_conflicts.json',
-    'problematic_parcels_summary.json',
-    'rapport_jointure.json'
-  ];
-
-  const dataMap = {};
-  const failedFiles = [];
-  let hadError = false;
-
-  // Fetch all files in parallel, log which fail
-  const responses = await Promise.all(files.map(async (f) => {
-    try {
-      const res = await fetch('data/' + f);
-      if (!res.ok) {
-        failedFiles.push(f);
-        hadError = true;
-        return null;
-      }
-      return await res.json();
-    } catch (err) {
-      failedFiles.push(f);
-      hadError = true;
-      return null;
-    }
-  }));
-
-  files.forEach((f, i) => {
-    dataMap[f.replace('.json', '')] = responses[i];
-  });
-
-  // Example: extract summary from Rapport_Post_traitement.json if available
-  let summary = {};
-  if (dataMap['Rapport_Post_traitement'] && dataMap['Rapport_Post_traitement']['Rapport sommaire']) {
-    summary = dataMap['Rapport_Post_traitement']['Rapport sommaire'].reduce((acc, item) => {
-      const key = item.date?.toLowerCase().replace(/ /g, '_');
+  try {
+    const response = await fetch('data/Rapport_Post_traitement.json');
+    if (!response.ok) throw new Error('Failed to fetch JSON');
+    const jsonData = await response.json();
+    const summary = jsonData['Rapport sommaire'].reduce((acc, item) => {
+      const key = item.date.toLowerCase().replace(/ /g, '_');
       let value = item['2025_08_19_19_17_47'];
       if (typeof value === 'string' && value.includes('%')) {
         value = parseFloat(value.replace('%', '')) || 0;
       }
-      if (key) acc[key] = value;
+      acc[key] = value;
       return acc;
     }, {});
+    return {
+      summary: {
+        ...realData.summary,
+        totalFiles: summary['fichiers_traités'] || realData.summary.totalFiles,
+        success: summary['succès'] || realData.summary.success,
+        failures: summary['échecs'] || realData.summary.failures,
+        globalConflicts: summary['conflits_globaux'] || realData.summary.globalConflicts,
+        totalParcels: summary['total_enregistrement_(parcelles_apres_netoyage)'] || realData.summary.totalParcels,
+        indivParcels: summary['parcelles_individuelles'] || realData.summary.indivParcels,
+        collParcels: summary['parcelles_collectives'] || realData.summary.collParcels,
+        conflictParcels: summary['conflits_(parcelles_à_la_fois_individuelle_et_collecvive)'] || realData.summary.conflictParcels,
+        noJoinParcels: summary['pas_de_jointure_(pas_d\'idup_ou_ancien_idup_ndoga)'] || realData.summary.noJoinParcels,
+        indivRate: summary['taux_des_parcelles_individuelles'] || realData.summary.indivRate,
+        collRate: summary['taux_des_parcelles_collectives'] || realData.summary.collRate,
+        conflictRate: summary['taux_des_parcelles_conflictuelles'] || realData.summary.conflictRate,
+        noJoinRate: summary['taux_des_parcelles_sans_jointure'] || realData.summary.noJoinRate,
+        jointuresIndividuelles: summary['fichiers_jointures_individuelles'] || realData.summary.jointuresIndividuelles,
+        jointuresCollectives: summary['fichiers_jointures_collectives'] || realData.summary.jointuresCollectives,
+        memeIDUP: summary['fichiers_avec_même_idup_individuelle_et_collective'] || realData.summary.memeIDUP,
+        successRate: summary['succès'] ? (summary['succès'] / summary['fichiers_traités'] * 100).toFixed(1) : realData.summary.successRate
+      },
+      ...realData
+    };
+  } catch (error) {
+    console.error('Error fetching JSON, using fallback data:', error);
+    return realData;
   }
-
-  // Merge all data into one object for dashboard use, fallback to partial data
-  const merged = {
-    summary: {
-      ...realData.summary,
-      ...summary
-    },
-    communes_data: dataMap['communes_data'],
-    dashboard_data_complete: dataMap['dashboard_data_complete'],
-    dashboard_kpis: dataMap['dashboard_kpis'],
-    duplicate_removal_log: dataMap['duplicate_removal_log'],
-    duplicate_removal_summary: dataMap['duplicate_removal_summary'],
-    nettoyage_doublon_idup: dataMap['nettoyage_doublon_idup'],
-    parcel_join_conflicts: dataMap['parcel_join_conflicts'],
-    problematic_parcels_summary: dataMap['problematic_parcels_summary'],
-    rapport_jointure: dataMap['rapport_jointure'],
-    ...realData
-  };
-
-  // Show error banner if any file failed
-  if (hadError) {
-    showErrorBanner('Certains fichiers de données n\'ont pas pu être chargés :<br>' + failedFiles.map(f => `<b>${f}</b>`).join(', ') + '<br>Le tableau de bord utilise les données disponibles.');
-    console.error('Fichiers JSON manquants ou non chargés:', failedFiles);
-  } else {
-    removeErrorBanner();
-  }
-  return merged;
 }
 
-// Show a visible error banner at the top of the dashboard
-function showErrorBanner(message) {
-  let banner = document.getElementById('dashboardErrorBanner');
-  if (!banner) {
-    banner = document.createElement('div');
-    banner.id = 'dashboardErrorBanner';
-    banner.style.background = '#ffcccc';
-    banner.style.color = '#a4161a';
-    banner.style.padding = '16px';
-    banner.style.fontWeight = 'bold';
-    banner.style.textAlign = 'center';
-    banner.style.position = 'sticky';
-    banner.style.top = '0';
-    banner.style.zIndex = '9999';
-    document.body.prepend(banner);
-  }
-  banner.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ' + message;
-}
-
-function removeErrorBanner() {
-  const banner = document.getElementById('dashboardErrorBanner');
-  if (banner) banner.remove();
-}
-
-// Utility function to animate value changes with fade-in effect for visual polish
+// Utility function to animate value changes
 function animateValue(id, start, end, duration, suffix = '') {
   const element = document.getElementById(id);
   if (!element) return;
   const range = end - start;
   const startTime = performance.now();
-  element.style.opacity = 0;
   function updateValue(currentTime) {
     const elapsed = currentTime - startTime;
     const progress = Math.min(elapsed / duration, 1);
     const current = Math.floor(start + range * easeOutCubic(progress));
     element.textContent = formatNumber(current) + suffix;
-    element.style.opacity = progress;
     if (progress < 1) {
       requestAnimationFrame(updateValue);
-    } else {
-      element.style.opacity = 1;
     }
   }
   requestAnimationFrame(updateValue);
@@ -670,347 +178,159 @@ async function updateKPIs() {
   kpiGrid.innerHTML = ''; // Clear existing content
   const summary = data.summary;
 
-  // Update header stats
-  const headerElements = {
-    headerTotalFiles: summary?.totalFiles || 15,
-    headerTotalParcels: summary?.totalParcels || 36000,
-    headerSuccessRate: `${summary?.successRate || 93}%`
-  };
-
-  Object.entries(headerElements).forEach(([id, value]) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.textContent = typeof value === 'number' ? formatNumber(value) : value;
-    }
-  });
-
-  // Create KPI Categories
-  const kpiCategories = [
+  // Grouped KPI data for better organization
+  const kpiGroups = [
     {
-      name: 'Parcelles',
-      icon: 'fa-map-marker-alt',
+      category: 'Traitement des Fichiers',
       kpis: [
-        { label: 'Total', value: summary?.totalParcels || 36471, color: 'primary' },
-        { label: 'Individuelles', value: summary?.indivParcels || 25090, color: 'success', percentage: summary?.indivRate || 68.8 },
-        { label: 'Collectives', value: summary?.collParcels || 5366, color: 'info', percentage: summary?.collRate || 14.7 },
-        { label: 'Conflictuelles', value: summary?.conflictParcels || 135, color: 'warning', percentage: summary?.conflictRate || 0.4 },
-        { label: 'Sans jointure', value: summary?.noJoinParcels || 5880, color: 'danger', percentage: summary?.noJoinRate || 16.1 }
+        { id: 'kpiFilesProcessed', value: summary.totalFiles, label: 'Fichiers Traités', icon: 'files' },
+        { id: 'kpiFilesSuccess', value: `${summary.success} succès / ${summary.failures} échecs`, label: 'Succès/Échecs', icon: 'quality' },
+        { id: 'kpiSuccessRate', value: summary.successRate, label: 'Taux de Succès', icon: 'quality', suffix: '%' }
       ]
     },
     {
-      name: 'Qualité',
-      icon: 'fa-check-circle',
+      category: 'Parcelles',
       kpis: [
-        { label: 'Score global', value: `${summary.dataQuality || 90}%`, color: 'success' },
-        { label: 'Taux de nettoyage', value: `${summary.cleaningRate || 10}%`, color: 'info' },
-        { label: 'Validation', value: `${summary.quality?.validation || data.quality?.validationRate || 93.3}%`, color: 'primary' },
-        { label: 'Problèmes critiques', value: summary.quality?.critical || data.quality?.criticalErrors || 9, color: 'danger' }
+        { id: 'kpiTotalParcels', value: summary.totalParcels, label: 'Total Parcelles', icon: 'parcels' },
+        { id: 'kpiIndivParcels', value: summary.indivParcels, label: 'Parcelles Individuelles', icon: 'parcels' },
+        { id: 'kpiCollParcels', value: summary.collParcels, label: 'Parcelles Collectives', icon: 'parcels' },
+        { id: 'kpiNoJoinParcels', value: summary.noJoinParcels, label: 'Sans Jointure', icon: 'quality' }
       ]
     },
     {
-      name: 'Traitement',
-      icon: 'fa-cogs',
+      category: 'Taux',
       kpis: [
-        { label: 'Fichiers traités', value: summary?.totalFiles || 15, color: 'primary' },
-        { label: 'Succès', value: summary?.success || 14, color: 'success', percentage: summary?.successRate || 93.3 },
-        { label: 'Jointures individuelles', value: summary?.jointuresIndividuelles || 14, color: 'info' },
-        { label: 'Jointures collectives', value: summary?.jointuresCollectives || 14, color: 'warning' }
+        { id: 'kpiIndivRate', value: summary.indivRate, label: 'Taux Individuelles', icon: 'parcels', suffix: '%' },
+        { id: 'kpiCollRate', value: summary.collRate, label: 'Taux Collectives', icon: 'parcels', suffix: '%' },
+        { id: 'kpiNoJoinRate', value: summary.noJoinRate, label: 'Taux Sans Jointure', icon: 'quality', suffix: '%' }
+      ]
+    },
+    {
+      category: 'Conflits et Jointures',
+      kpis: [
+        { id: 'kpiGlobalConflicts', value: summary.globalConflicts, label: 'Conflits Globaux', icon: 'conflicts' },
+        { id: 'kpiConflictParcels', value: summary.conflictParcels, label: 'Parcelles en Conflit', icon: 'conflicts' },
+        { id: 'kpiConflictRate', value: summary.conflictRate, label: 'Taux Conflits', icon: 'conflicts', suffix: '%' },
+        { id: 'kpiJointuresIndividuelles', value: summary.jointuresIndividuelles, label: 'Jointures Individuelles', icon: 'files' },
+        { id: 'kpiJointuresCollectives', value: summary.jointuresCollectives, label: 'Jointures Collectives', icon: 'files' },
+        { id: 'kpiMemeIDUP', value: summary.memeIDUP, label: 'Même IDUP Indiv/Coll', icon: 'conflicts' }
       ]
     }
   ];
 
-  // Create KPI cards grouped by category
-  kpiCategories.forEach(category => {
+  kpiGroups.forEach(group => {
     const categoryDiv = document.createElement('div');
     categoryDiv.className = 'kpi-category';
-    
-    // Create category header
-    const categoryHeader = document.createElement('div');
-    categoryHeader.className = 'category-header';
-    categoryHeader.innerHTML = `
-      <div class="category-icon"><i class="fas ${category.icon}"></i></div>
-      <h3>${category.name}</h3>
-    `;
+    const categoryHeader = document.createElement('h3');
+    categoryHeader.className = 'kpi-category-header';
+    categoryHeader.textContent = group.category;
     categoryDiv.appendChild(categoryHeader);
-    
-    // Create KPI cards container
-    const kpiCardsDiv = document.createElement('div');
-    kpiCardsDiv.className = 'kpi-cards';
-    
-    // Add individual KPI cards
-    category.kpis.forEach(kpi => {
-      const kpiCard = document.createElement('div');
-      kpiCard.className = `kpi-card ${kpi.color}`;
-      let percentageHTML = '';
-      
-      if (kpi.percentage !== undefined) {
-        const icon = kpi.percentage > 0 ? 'fa-arrow-up' : 'fa-arrow-down';
-        const percentClass = kpi.percentage > 0 ? 'positive' : 'negative';
-        percentageHTML = `<span class="kpi-percent ${percentClass}"><i class="fas ${icon}"></i> ${Math.abs(kpi.percentage).toFixed(1)}%</span>`;
-      }
-      
-      kpiCard.innerHTML = `
-        <div class="kpi-content">
-          <span class="kpi-label">${kpi.label}</span>
-          <span class="kpi-value">${formatNumber(kpi.value)}</span>
-          ${percentageHTML}
+    const groupGrid = document.createElement('div');
+    groupGrid.className = 'kpi-group-grid';
+    group.kpis.forEach(kpi => {
+      const card = document.createElement('div');
+      card.className = `kpi-card kpi-icon-${kpi.icon}`;
+      card.innerHTML = `
+        <div class="kpi-header">
+          <span class="kpi-icon ${kpi.icon}"><i class="fas fa-${kpi.icon === 'files' ? 'file-alt' : kpi.icon === 'parcels' ? 'map' : kpi.icon === 'conflicts' ? 'exclamation-triangle' : 'check-circle'}"></i></span>
+          <button class="kpi-menu-btn"><i class="fas fa-ellipsis-v"></i></button>
         </div>
+        <div class="kpi-title">${kpi.label}</div>
+        <div class="kpi-value" id="${kpi.id}">${typeof kpi.value === 'string' ? kpi.value : formatNumber(kpi.value)}${kpi.suffix || ''}</div>
       `;
-      kpiCardsDiv.appendChild(kpiCard);
+      groupGrid.appendChild(card);
+      if (typeof kpi.value === 'number') {
+        animateValue(kpi.id, 0, kpi.value, 1000, kpi.suffix || '');
+      }
     });
-    
-    categoryDiv.appendChild(kpiCardsDiv);
+    categoryDiv.appendChild(groupGrid);
     kpiGrid.appendChild(categoryDiv);
   });
 
-// Create gradient for chart backgrounds (for Chart.js)
-function createGradient(canvasOrCtx, colors) {
-  // Accept either a canvas element or a 2D context
-  let ctx = canvasOrCtx;
-  try {
-    if (canvasOrCtx && typeof canvasOrCtx.getContext === 'function') {
-      ctx = canvasOrCtx.getContext('2d');
-    }
-  } catch (e) {
-    // ignore and fallback
-  }
-  if (!ctx || typeof ctx.createLinearGradient !== 'function') {
-    // Fallback to the first color if we can't create a gradient
-    return (colors && colors[0]) || '#BBBBBB';
-  }
-  const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-  gradient.addColorStop(0, colors[0]);
-  gradient.addColorStop(1, colors[1] || colors[0]);
-  return gradient;
-}
-
-// Ensure arrays contain numeric values (replace non-numeric with 0)
-function sanitizeArray(arr) {
-  if (!Array.isArray(arr)) return [];
-  return arr.map(v => {
-    const n = typeof v === 'number' ? v : parseFloat(v);
-    return Number.isFinite(n) ? n : 0;
+  // Animate KPI cards
+  gsap.from('.kpi-card', {
+    duration: 0.6,
+    y: 30,
+    opacity: 0,
+    stagger: 0.1,
+    ease: 'power2.out'
   });
+
+  // Update header stats
+  animateValue('headerTotalFiles', 0, summary.totalFiles, 1000);
+  animateValue('headerTotalParcels', 0, summary.totalParcels, 1000);
+  animateValue('headerSuccessRate', 0, summary.successRate, 1000, '%');
 }
 
-// Initialize and update all charts with performance optimizations (data slicing, lazy loading)
+// Initialize Charts
 async function initCharts() {
   const data = await fetchDashboardData();
-  if (!data) return;
-  
-  // Limit data for better performance
   dashboardData = data;
   const summary = data.summary;
-  
-  // Slice communes data to avoid overloading charts (use only top 10 communes)
-  const limitedCommunes = data.communes ? data.communes.slice(0, 10) : [];
-  
-  // Prepare chart canvases
   const canvases = {
-    parcelDistribution: document.getElementById('parcelDistributionChart'),
-    commune: document.getElementById('communePerformanceChart'),
-    trend: document.getElementById('trendChart'),
-    duplicate: document.getElementById('duplicateChart'),
-    join: document.getElementById('joinChart'),
-    heatmap: document.getElementById('heatmapChart'),
-    problemPie: document.getElementById('problemPieChart'),
-    topUnjoined: document.getElementById('topUnjoinedChart'),
-    topDuplicate: document.getElementById('topDuplicateChart')
+    parcel: document.getElementById('parcelDistributionChart')?.getContext('2d'),
+    commune: document.getElementById('communePerformanceChart')?.getContext('2d'),
+    quality: document.getElementById('qualityMetricsChart')?.getContext('2d'),
+    anomaly: document.getElementById('communeConflictChart')?.getContext('2d')
   };
-  // --- NEW: Heatmap for duplicate rates by commune ---
-  if (canvases.heatmap && data.dashboard_kpis && data.dashboard_kpis.top_communes) {
-    if (charts.heatmap) charts.heatmap.destroy();
-  const labels = (data.dashboard_kpis.top_communes.by_duplicate_rate || []).map(c => c.commune || '');
-  const values = sanitizeArray((data.dashboard_kpis.top_communes.by_duplicate_rate || []).map(c => c.value));
-    charts.heatmap = new Chart(canvases.heatmap, {
-      type: 'bar',
-      data: {
-        labels: labels,
-        datasets: [{
-          label: 'Taux de doublons (%)',
-          data: values,
-          backgroundColor: labels.map(() => createGradient(canvases.heatmap, themeColors.gradients.warning)),
-          borderRadius: 8,
-          borderSkipped: false
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { grid: { display: false }, border: { display: false } },
-          y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.1)' }, border: { display: false } }
-        },
-        animation: { duration: 1200 }
-      }
-    });
-  }
 
-  // --- NEW: Pie chart for problematic/unjoined/conflicted parcels ---
-  if (canvases.problemPie && data.dashboard_kpis) {
-    if (charts.problemPie) charts.problemPie.destroy();
-    const kpi = data.dashboard_kpis.kpi_summary;
-  charts.problemPie = new Chart(canvases.problemPie, {
-      type: 'pie',
-      data: {
-        labels: ['Parcelles Problématiques', 'Parcelles Sans Jointure', 'Parcelles Conflituelles'],
-        datasets: [{
-      data: sanitizeArray([kpi?.problematic_parcels?.value, kpi?.unjoined_parcels?.value, kpi?.problematic_parcels?.value]),
-          backgroundColor: ['#F44336', '#9CA3AF', '#FFC107'],
-          borderWidth: 2,
-          borderColor: '#FFFFFF'
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { position: 'bottom' } }
-      }
-    });
-  }
+  // Log canvas availability for debugging
+  console.log('Canvas availability:', canvases);
 
-  // --- NEW: Top communes by unjoined parcels ---
-  if (canvases.topUnjoined && data.dashboard_kpis && data.dashboard_kpis.top_communes) {
-    if (charts.topUnjoined) charts.topUnjoined.destroy();
-  const labels = (data.dashboard_kpis.top_communes.by_unjoined_parcels || []).map(c => c.commune || '');
-  const values = sanitizeArray((data.dashboard_kpis.top_communes.by_unjoined_parcels || []).map(c => c.value));
-    charts.topUnjoined = new Chart(canvases.topUnjoined, {
-      type: 'bar',
-      data: {
-        labels: labels,
-        datasets: [{
-          label: 'Parcelles sans jointure',
-          data: values,
-          backgroundColor: labels.map(() => createGradient(canvases.topUnjoined, themeColors.gradients.danger)),
-          borderRadius: 8,
-          borderSkipped: false
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { grid: { display: false }, border: { display: false } },
-          y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.1)' }, border: { display: false } }
-        },
-        animation: { duration: 1200 }
-      }
-    });
-  }
-
-  // --- NEW: Top communes by duplicate rate ---
-  if (canvases.topDuplicate && data.dashboard_kpis && data.dashboard_kpis.top_communes) {
-    if (charts.topDuplicate) charts.topDuplicate.destroy();
-  const labels = (data.dashboard_kpis.top_communes.by_duplicate_rate || []).map(c => c.commune || '');
-  const values = sanitizeArray((data.dashboard_kpis.top_communes.by_duplicate_rate || []).map(c => c.value));
-    charts.topDuplicate = new Chart(canvases.topDuplicate, {
-      type: 'bar',
-      data: {
-        labels: labels,
-        datasets: [{
-          label: 'Taux de doublons (%)',
-          data: values,
-          backgroundColor: labels.map(() => createGradient(canvases.topDuplicate, themeColors.gradients.warning)),
-          borderRadius: 8,
-          borderSkipped: false
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { grid: { display: false }, border: { display: false } },
-          y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.1)' }, border: { display: false } }
-        },
-        animation: { duration: 1200 }
-      }
-    });
-  }
-  
-  // Update total parcels count in the UI
-  if (document.getElementById('totalParcelsCount')) {
-    document.getElementById('totalParcelsCount').textContent = formatNumber(summary.totalParcels);
-  }
-  
   // Parcel Distribution Chart
-  if (canvases.parcelDistribution) {
+  if (canvases.parcel) {
     if (charts.parcelDistribution) charts.parcelDistribution.destroy();
-    
-    const chartType = document.getElementById('chartTypeSelector')?.value || 'doughnut';
-  const labels = ['Individuelles', 'Collectives', 'Conflictuelles', 'Sans jointure'];
-  const values = sanitizeArray([summary.indivParcels, summary.collParcels, summary.conflictParcels, summary.noJoinParcels]);
-    
-    // Colors for the different parcel types
-    const backgroundColors = chartType === 'bar' ? 
-      [createGradient(canvases.parcelDistribution, themeColors.gradients.secondary),
-       createGradient(canvases.parcelDistribution, themeColors.gradients.primary),
-       createGradient(canvases.parcelDistribution, themeColors.gradients.warning),
-       createGradient(canvases.parcelDistribution, ['#9CA3AF', '#6B7280'])] :
-      ['#4CAF50', '#1E40AF', '#F44336', '#9CA3AF'];
-      
-  charts.parcelDistribution = new Chart(canvases.parcelDistribution, {
-      type: chartType,
+    charts.parcelDistribution = new Chart(canvases.parcel, {
+      type: document.getElementById('chartTypeSelector')?.value || 'doughnut',
       data: {
-        labels: labels,
+        labels: ['Individuelles', 'Collectives', 'Conflits', 'Sans Jointure'],
         datasets: [{
-          label: 'Parcelles',
-      data: values,
-          backgroundColor: backgroundColors,
-          borderWidth: chartType === 'bar' ? 0 : 2,
-          borderColor: '#FFFFFF',
-          borderRadius: chartType === 'bar' ? 8 : 0,
-          borderSkipped: false,
+          data: [summary.indivParcels, summary.collParcels, summary.conflictParcels, summary.noJoinParcels],
+          backgroundColor: [
+            createGradient(canvases.parcel, themeColors.gradients.primary),
+            createGradient(canvases.parcel, themeColors.gradients.secondary),
+            createGradient(canvases.parcel, themeColors.gradients.warning),
+            createGradient(canvases.parcel, themeColors.gradients.success)
+          ],
+          borderWidth: 0,
           hoverOffset: 10
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        cutout: chartType === 'doughnut' ? '60%' : undefined,
         plugins: {
-          legend: {
-            position: chartType === 'bar' ? 'top' : 'bottom',
-            labels: {
-              font: { family: 'Inter, sans-serif' },
-              padding: 15
-            }
-          },
+          legend: { position: 'bottom', labels: { padding: 20, usePointStyle: true, font: { size: 12 } } },
           tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            titleColor: '#fff',
+            bodyColor: '#fff',
             callbacks: {
-              label: function(context) {
-                let label = context.label || '';
-                let value = context.raw;
-                let percentage = Math.round(value / summary.totalParcels * 1000) / 10;
-                return `${label}: ${formatNumber(value)} (${percentage}%)`;
-              }
+              label: (context) => `${context.label}: ${formatNumber(context.raw)} (${(context.raw / summary.totalParcels * 100).toFixed(1)}%)`
             }
           }
         },
-        scales: chartType === 'bar' ? {
-          x: { grid: { display: false }, border: { display: false } },
-          y: { beginAtZero: true, grid: { color: 'rgba(0, 0, 0, 0.1)' }, border: { display: false } }
-        } : undefined
+        cutout: '60%',
+        animation: { animateRotate: true, duration: 1000 }
       }
     });
+  } else {
+    console.warn('Parcel distribution canvas not found');
   }
-  
+
   // Commune Performance Chart
   if (canvases.commune) {
     if (charts.communePerformance) charts.communePerformance.destroy();
-  const communes = (data.communes || []).map(c => c.nom || '');
-  const metric = document.getElementById('metricSelector')?.value || 'individuelles';
-  const metricData = sanitizeArray((data.communes || []).map(c => c[metric]));
-  charts.communePerformance = new Chart(canvases.commune, {
+    const communes = data.communes.map(c => c.nom);
+    const metric = document.getElementById('metricSelector')?.value || 'individuelles';
+    charts.communePerformance = new Chart(canvases.commune, {
       type: 'bar',
       data: {
         labels: communes,
         datasets: [{
           label: getMetricLabel(metric),
-      data: metricData,
-      backgroundColor: communes.map(() => createGradient(canvases.commune, themeColors.gradients.primary)),
+          data: data.communes.map(c => c[metric]),
+          backgroundColor: communes.map(() => createGradient(canvases.commune, themeColors.gradients.primary)),
           borderRadius: 8,
           borderSkipped: false
         }]
@@ -1023,556 +343,182 @@ async function initCharts() {
           x: { grid: { display: false }, border: { display: false } },
           y: { beginAtZero: true, grid: { color: 'rgba(0, 0, 0, 0.1)', drawBorder: false }, border: { display: false } }
         },
-        animation: { duration: 1000 }
+        animation: { duration: 1000, delay: (context) => context.dataIndex * 100 }
       }
     });
+  } else {
+    console.warn('Commune performance canvas not found');
   }
-  
-  // Trend Chart - Shows evolution over time
-  if (canvases.trend) {
-    if (charts.trend) charts.trend.destroy();
-    
-    // Sample data for trend over time
-    const dates = ['05/19', '05/26', '06/02', '06/09', '06/16', '06/23', '06/30', '07/07', '07/14', '07/21', '07/28', '08/04', '08/11', '08/19'];
-    const totalProgress = [5000, 8500, 12000, 15500, 19000, 21500, 24000, 26500, 28000, 31000, 33500, 36000, 39500, 43110];
-    const cleanedData = [4800, 8000, 11000, 14000, 17500, 19800, 22000, 24000, 25500, 28000, 30500, 32800, 35500, 38830];
-    
-  charts.trend = new Chart(canvases.trend, {
-      type: 'line',
+
+  // Quality Metrics Chart
+  if (canvases.quality) {
+    if (charts.qualityMetrics) charts.qualityMetrics.destroy();
+    charts.qualityMetrics = new Chart(canvases.quality, {
+      type: 'radar',
       data: {
-        labels: dates,
-        datasets: [
-          {
-            label: 'Données brutes',
-      data: sanitizeArray(totalProgress),
-            borderColor: '#1E40AF',
-            backgroundColor: 'rgba(30, 64, 175, 0.1)',
-            borderWidth: 2,
-            tension: 0.3,
-            fill: true
-          },
-          {
-            label: 'Données nettoyées',
-            data: sanitizeArray(cleanedData),
-            borderColor: '#10B981',
-            backgroundColor: 'rgba(16, 185, 129, 0.05)',
-            borderWidth: 2,
-            tension: 0.3,
-            fill: true
-          }
-        ]
+        labels: ['Validation', 'Cohérence', 'Complétude', 'Précision', 'Intégrité'],
+        datasets: [{
+          label: 'Score de qualité',
+          data: [data.quality.validationRate, data.quality.consistency, data.quality.completude, data.quality.precision, data.quality.integrite],
+          backgroundColor: `${themeColors.procasf.vert}40`,
+          borderColor: themeColors.procasf.vert,
+          borderWidth: 2,
+          pointBackgroundColor: themeColors.procasf.vert
+        }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        scales: {
-          x: { grid: { display: false }, border: { display: false } },
-          y: { 
-            beginAtZero: true,
-            grid: { color: 'rgba(0, 0, 0, 0.05)' },
-            border: { display: false },
-            ticks: {
-              callback: function(value) {
-                if (value >= 1000) {
-                  return (value / 1000) + 'k';
-                }
-                return value;
-              }
-            }
-          }
-        },
-        plugins: {
-          tooltip: {
-            callbacks: {
-              label: function(context) {
-                let label = context.dataset.label || '';
-                let value = context.raw;
-                return `${label}: ${formatNumber(value)} parcelles`;
-              }
-            }
-          }
-        },
-        animation: { duration: 2000 },
-        interaction: { mode: 'index', intersect: false }
+        plugins: { legend: { display: false } },
+        scales: { r: { beginAtZero: true, max: 100, grid: { color: 'rgba(0, 0, 0, 0.1)' } } }
       }
     });
+  } else {
+    console.warn('Quality metrics canvas not found');
   }
-  
-  // Duplicate Chart - Shows duplicate analysis
-  if (canvases.duplicate && data.summary.duplicateRemoval) {
-    if (charts.duplicate) charts.duplicate.destroy();
-    
-    // Get data from duplicate removal summary
-    const dupData = data.summary.duplicateRemoval;
-    const fileStats = dupData.file_statistics || [];
-    
-    let labels, values, colors;
-    
-    // Check if we have chart_data or need to extract from file_statistics
-    if (dupData.chart_data && dupData.chart_data.labels) {
-      labels = dupData.chart_data.labels;
-      values = dupData.chart_data.duplicate_rates;
-      colors = labels.map(() => {
-        const r = Math.floor(Math.random() * 100) + 100;
-        const g = Math.floor(Math.random() * 100) + 100;
-        const b = Math.floor(Math.random() * 150) + 50;
-        return `rgb(${r}, ${g}, ${b})`;
-      });
-    } else {
-      // Extract from file_statistics
-      labels = fileStats.map(f => f.input_file.replace('_SANS_DOUBLON.gpkg', ''));
-      values = fileStats.map(f => f.removal_rate);
-      colors = labels.map(() => {
-        const r = Math.floor(Math.random() * 100) + 100;
-        const g = Math.floor(Math.random() * 100) + 100;
-        const b = Math.floor(Math.random() * 150) + 50;
-        return `rgb(${r}, ${g}, ${b})`;
-      });
-    }
-    
-    charts.duplicate = new Chart(canvases.duplicate, {
+
+  // IA Anomaly Chart
+  if (canvases.anomaly) {
+    if (charts.anomalyChart) charts.anomalyChart.destroy();
+    charts.anomalyChart = new Chart(canvases.anomaly, {
       type: 'bar',
       data: {
-        labels: labels,
-      datasets: [{
-      label: 'Taux de doublons (%)',
-      data: sanitizeArray(values),
-          backgroundColor: colors,
-          borderRadius: 6,
-          borderWidth: 0
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { 
-          legend: { display: false },
-          tooltip: {
-            callbacks: {
-              label: function(context) {
-                return `Taux de doublons: ${context.raw.toFixed(2)}%`;
-              }
-            }
-          }
-        },
-        scales: {
-          x: { grid: { display: false }, border: { display: false } },
-          y: { 
-            beginAtZero: true,
-            grid: { color: 'rgba(0, 0, 0, 0.05)' },
-            border: { display: false },
-            ticks: {
-              callback: function(value) {
-                return value + '%';
-              }
-            }
-          }
-        }
-      }
-    });
-    
-    // Update duplicate rate display
-    const duplicateRateElement = document.getElementById('duplicateRate');
-    if (duplicateRateElement) {
-      duplicateRateElement.textContent = `${dupData.summary?.overall_duplicate_removal_rate || '9.93'}%`;
-    }
-  }
-  
-  // Join Chart - Shows parcel join analysis
-  if (canvases.join) {
-    if (charts.join) charts.join.destroy();
-    
-    // Parcel join data
-    const joinData = {
-      labels: ['Individuelle', 'Collective', 'Conflit', 'Sans jointure'],
-      data: [summary.indivParcels, summary.collParcels, summary.conflictParcels, summary.noJoinParcels]
-    };
-    
-  charts.join = new Chart(canvases.join, {
-      type: 'pie',
-      data: {
-        labels: joinData.labels,
+        labels: ['Conflits', 'Échecs', 'Corrélation Collectives-Conflits'],
         datasets: [{
-      data: sanitizeArray(joinData.data),
-          backgroundColor: ['#4CAF50', '#1E40AF', '#F44336', '#9CA3AF'],
-          borderWidth: 2,
-          borderColor: '#FFFFFF'
+          label: 'Occurrences',
+          data: [
+            summary.conflictParcels,
+            summary.failures,
+            data.iaAnalysis.correlation.coll_conflits * 100
+          ],
+          backgroundColor: [
+            createGradient(canvases.anomaly, themeColors.gradients.warning),
+            createGradient(canvases.anomaly, themeColors.gradients.success),
+            createGradient(canvases.anomaly, themeColors.gradients.primary)
+          ],
+          borderRadius: 8
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: {
-          tooltip: {
-            callbacks: {
-              label: function(context) {
-                const value = context.raw;
-                const total = joinData.data.reduce((sum, val) => sum + val, 0);
-                const percentage = Math.round(value / total * 1000) / 10;
-                return `${formatNumber(value)} parcelles (${percentage}%)`;
-              }
-            }
-          }
-        }
+        scales: { y: { beginAtZero: true } }
       }
     });
-    
-    // Update join rate display
-    const joinRateElement = document.getElementById('joinRate');
-    if (joinRateElement) {
-      const joinedParcels = summary.indivParcels + summary.collParcels + summary.conflictParcels;
-      const joinRate = (joinedParcels / summary.totalParcels * 100).toFixed(2);
-      joinRateElement.textContent = `${joinRate}%`;
-    }
+  } else {
+    console.warn('Anomaly chart canvas not found');
   }
-  
-  // Add lazy loading for heavy visualizations
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', e => {
-      if (btn.dataset.tab === 'analysis') {
-        setTimeout(runAdvancedAnalysis, 300); // Lazy load analysis charts
+
+  // Event listeners for chart updates
+  const chartTypeSelector = document.getElementById('chartTypeSelector');
+  if (chartTypeSelector) {
+    chartTypeSelector.addEventListener('change', () => {
+      if (charts.parcelDistribution) {
+        charts.parcelDistribution.config.type = chartTypeSelector.value;
+        charts.parcelDistribution.options.cutout = chartTypeSelector.value === 'doughnut' ? '60%' : 0;
+        charts.parcelDistribution.update();
       }
     });
-  });
-}
+  }
 
-// Get label for metrics
-function getMetricLabel(metric) {
-  const labels = {
-    'individuelles': 'Parcelles individuelles',
-    'collectives': 'Parcelles collectives',
-    'conflits': 'Parcelles conflictuelles',
-    'qualite': 'Qualité des données (%)',
-    'brutes': 'Parcelles brutes'
-  };
-  return labels[metric] || metric;
-}
-
-// Populate issues table
-function populateIssuesTable() {
-  const tbody = document.getElementById('issuesTableBody');
-  if (!tbody || !dashboardData) return;
-
-  tbody.innerHTML = '';
-  dashboardData.issues.forEach(issue => {
-    const row = document.createElement('tr');
-    const impactClass = issue.impact === 'Élevé' ? 'high' : issue.impact === 'Moyen' ? 'medium' : 'low';
-    const statusClass = issue.status === 'Résolu' ? 'success' : issue.status === 'En cours' ? 'warning' : 'danger';
-    
-    row.innerHTML = `
-      <td>${issue.type}</td>
-      <td>${formatNumber(issue.count)}</td>
-      <td><span class="impact-badge ${impactClass}">${issue.impact}</span></td>
-      <td><span class="status-badge ${statusClass.toLowerCase()}">${issue.status}</span></td>
-    `;
-    tbody.appendChild(row);
-  });
-}
-
-// Populate problematic parcels table
-function populateProblematicParcelsTable() {
-  const tbody = document.getElementById('problematicParcelsTableBody');
-  if (!tbody || !dashboardData) return;
-
-  tbody.innerHTML = '';
-  dashboardData.problematicParcels.forEach(parcel => {
-    const row = document.createElement('tr');
-    const statusClass = parcel.status === 'Résolu' ? 'success' : parcel.status === 'En cours' ? 'warning' : 'danger';
-    
-    row.innerHTML = `
-      <td>${parcel.idup}</td>
-      <td>${parcel.commune}</td>
-      <td>${parcel.issue}</td>
-      <td><span class="status-badge ${statusClass.toLowerCase()}">${parcel.status}</span></td>
-      <td>
-        <button class="btn-icon" title="Voir détails"><i class="fas fa-eye"></i></button>
-        <button class="btn-icon" title="Éditer"><i class="fas fa-edit"></i></button>
-        <button class="btn-icon" title="Résoudre"><i class="fas fa-check-circle"></i></button>
-      </td>
-    `;
-    tbody.appendChild(row);
-  });
-}
-
-// Populate activity table
-function populateActivityTable() {
-  const tbody = document.getElementById('activityTableBody');
-  if (!tbody || !dashboardData) return;
-
-  tbody.innerHTML = '';
-  dashboardData.activityLog.forEach(activity => {
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>${activity.date}</td>
-      <td>${activity.action}</td>
-      <td>${activity.commune}</td>
-      <td>${activity.user}</td>
-    `;
-    tbody.appendChild(row);
-  });
-}
-
-// Populate Commune Table
-function populateCommuneTable() {
-  const tbody = document.getElementById('communeTableBody');
-  if (!tbody || !dashboardData) return;
-
-  tbody.innerHTML = '';
-  
-  // Get commune data from the appropriate location
-  const communeData = dashboardData.summary.communes || dashboardData.communes || [];
-  
-  communeData.forEach(commune => {
-    // Handle both old and new data structure
-    const communeNom = commune.nom || commune.name || commune.commune;
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td><strong>${communeNom}</strong></td>
-      <td>${formatNumber(commune.brutes || commune.original_records || 0)}</td>
-      <td>${formatNumber(commune.individuelles || commune.individual_parcels || 0)}</td>
-      <td>${formatNumber(commune.collectives || commune.collective_parcels || 0)}</td>
-      <td>${formatNumber(commune.conflits || commune.conflict_parcels || 0)}</td>
-      <td>${commune.qualite || commune.quality || commune.data_quality || 0}%</td>
-      <td><span class="status-badge ${(commune.statut || 'normal').toLowerCase()}">${commune.statut || 'Normal'}</span></td>
-      <td>
-        <button class="btn-icon" title="Voir détails"><i class="fas fa-eye"></i></button>
-        <button class="btn-icon" title="Modifier"><i class="fas fa-edit"></i></button>
-      </td>
-    `;
-    tbody.appendChild(row);
-  });
-
-  // Populate commune filter
-  const communeFilter = document.getElementById('communeFilter');
-  if (communeFilter) {
-    communeFilter.innerHTML = '<option value="">Toutes les communes</option>';
-    // Use the same commune data source as above
-    const communeData = dashboardData.summary.communes || dashboardData.communes || [];
-    communeData.forEach(commune => {
-      const communeNom = commune.nom || commune.name || commune.commune;
-      const option = document.createElement('option');
-      option.value = communeNom;
-      option.textContent = communeNom;
-      communeFilter.appendChild(option);
+  const metricSelector = document.getElementById('metricSelector');
+  if (metricSelector) {
+    metricSelector.addEventListener('change', () => {
+      if (charts.communePerformance) {
+        const metric = metricSelector.value;
+        charts.communePerformance.data.datasets[0].label = getMetricLabel(metric);
+        charts.communePerformance.data.datasets[0].data = data.communes.map(c => c[metric]);
+        charts.communePerformance.update();
+      }
     });
   }
 }
 
-// Populate files grid
-function populateFilesGrid() {
-  const filesGrid = document.getElementById('filesGrid');
-  if (!filesGrid) return;
-
-  filesGrid.innerHTML = '';
-  
-  const fileTypes = [
-    { name: 'BALA_SANS_DOUBLON.gpkg', type: 'gpkg', size: '2.3 MB', date: '19/08/2025' },
-    { name: 'BALLOU_SANS_DOUBLON.gpkg', type: 'gpkg', size: '3.1 MB', date: '19/08/2025' },
-    { name: 'BANDAFASSI_SANS_DOUBLON.gpkg', type: 'gpkg', size: '8.7 MB', date: '19/08/2025' },
-    { name: 'dashboard_kpis.json', type: 'json', size: '4.2 KB', date: '19/08/2025' },
-    { name: 'communes_data.json', type: 'json', size: '15.6 KB', date: '19/08/2025' },
-    { name: 'duplicate_analysis.json', type: 'json', size: '24.3 KB', date: '19/08/2025' },
-    { name: 'parcels_shapefile.shp', type: 'shp', size: '45.2 MB', date: '18/08/2025' },
-    { name: 'Rapport Jointure.docx', type: 'docx', size: '1.5 MB', date: '19/08/2025' }
-  ];
-  
-  fileTypes.forEach(file => {
-    let icon;
-    switch(file.type) {
-      case 'gpkg': icon = 'fa-database'; break;
-      case 'json': icon = 'fa-code'; break;
-      case 'shp': icon = 'fa-map'; break;
-      case 'docx': icon = 'fa-file-word'; break;
-      default: icon = 'fa-file'; break;
-    }
-    
-    const fileCard = document.createElement('div');
-    fileCard.className = 'file-card';
-    fileCard.innerHTML = `
-      <div class="file-icon">
-        <i class="fas ${icon}"></i>
-      </div>
-      <div class="file-info">
-        <div class="file-name">${file.name}</div>
-        <div class="file-meta">
-          <span>${file.size}</span>
-          <span>${file.date}</span>
-        </div>
-      </div>
-      <div class="file-actions">
-        <button class="btn-icon" title="Télécharger"><i class="fas fa-download"></i></button>
-        <button class="btn-icon" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
-      </div>
-    `;
-    filesGrid.appendChild(fileCard);
-  });
-}
-
-// Populate reports list
-function populateReportHistory() {
-  const reportsList = document.getElementById('reportsList');
-  if (!reportsList) return;
-
-  reportsList.innerHTML = '';
-  
-  // Generate some sample reports
-  if (reportHistory.length === 0) {
-    reportHistory = [
-      { id: 'R2025081901', name: 'Rapport sommaire - Toutes communes', type: 'summary', date: '19/08/2025', size: '1.2 MB' },
-      { id: 'R2025081902', name: 'Rapport détaillé - BANDAFASSI', type: 'detailed', date: '19/08/2025', size: '3.4 MB' },
-      { id: 'R2025081903', name: 'Rapport d\'anomalies - Doublons', type: 'anomaly', date: '19/08/2025', size: '850 KB' },
-      { id: 'R2025081801', name: 'Rapport sommaire - Toutes communes', type: 'summary', date: '18/08/2025', size: '1.2 MB' },
-      { id: 'R2025081701', name: 'Rapport détaillé - TOMBORONKOTO', type: 'detailed', date: '17/08/2025', size: '4.1 MB' },
-      { id: 'R2025081601', name: 'Rapport d\'anomalies - Jointures', type: 'anomaly', date: '16/08/2025', size: '720 KB' }
-    ];
+// Enhanced IA Analysis
+async function runAdvancedAnalysis() {
+  const data = await fetchDashboardData();
+  dashboardData = data;
+  const insightsDiv = document.getElementById('iaInsights');
+  const anomalyList = document.getElementById('iaAnomalyList');
+  if (!insightsDiv || !anomalyList) {
+    console.warn('IA elements not found, skipping IA analysis');
+    return;
   }
-  
-  reportHistory.forEach(report => {
-    let icon;
-    switch(report.type) {
-      case 'summary': icon = 'fa-file-alt'; break;
-      case 'detailed': icon = 'fa-file-contract'; break;
-      case 'anomaly': icon = 'fa-exclamation-circle'; break;
-      default: icon = 'fa-file'; break;
-    }
-    
-    const reportItem = document.createElement('div');
-    reportItem.className = 'report-item';
-    reportItem.dataset.id = report.id;
-    reportItem.innerHTML = `
-      <div class="report-icon">
-        <i class="fas ${icon}"></i>
-      </div>
-      <div class="report-info">
-        <div class="report-name">${report.name}</div>
-        <div class="report-meta">
-          <span>${report.date}</span>
-          <span>${report.size}</span>
-          <span class="report-type ${report.type}">${report.type}</span>
-        </div>
-      </div>
-    `;
-    reportsList.appendChild(reportItem);
-    
-    // Add click event to show report preview
-    reportItem.addEventListener('click', () => showReportPreview(report));
-  });
-}
 
-// Show report preview
-function showReportPreview(report) {
-  const previewEl = document.getElementById('reportPreview');
-  if (!previewEl) return;
-  
-  // Remove placeholder
-  previewEl.innerHTML = '';
-  
-  // Create preview content
-  const previewContent = document.createElement('div');
-  previewContent.className = 'preview-document';
-  previewContent.innerHTML = `
-    <div class="document-header">
-      <h2>${report.name}</h2>
-      <div class="document-meta">
-        <span><i class="fas fa-calendar"></i> ${report.date}</span>
-        <span><i class="fas fa-file-alt"></i> ${report.type}</span>
-        <span><i class="fas fa-weight"></i> ${report.size}</span>
-      </div>
-    </div>
-    <div class="document-content">
-      <div class="document-section">
-        <h3>Résumé</h3>
-        <p>Ce rapport présente ${report.type === 'summary' ? 'un résumé' : report.type === 'detailed' ? 'une analyse détaillée' : 'les anomalies'} 
-           des données foncières ${report.name.includes('Toutes') ? 'pour toutes les communes' : `pour la commune de ${report.name.split('-')[1].trim()}`}.</p>
-      </div>
-      <div class="document-section">
-        <h3>Statistiques principales</h3>
-        <div class="stats-grid">
-          <div class="stat-item">
-            <span class="stat-value">38,830</span>
-            <span class="stat-label">Parcelles traitées</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-value">90.07%</span>
-            <span class="stat-label">Qualité des données</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-value">4,280</span>
-            <span class="stat-label">Doublons supprimés</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-value">15/15</span>
-            <span class="stat-label">Communes traitées</span>
-          </div>
-        </div>
-      </div>
-      <div class="document-section">
-        <h3>Graphiques</h3>
-        <div class="document-placeholder">
-          [Graphiques du rapport]
-        </div>
-      </div>
-      <div class="document-section">
-        <h3>Détails</h3>
-        <div class="document-placeholder">
-          [Contenu détaillé du rapport]
-        </div>
-      </div>
-    </div>
-    <div class="document-footer">
-      <p>Rapport généré automatiquement le ${report.date} à 14:25</p>
-      <p>PROCASEF & BET-PLUS SA - Confidentiel</p>
-    </div>
-  `;
-  previewEl.appendChild(previewContent);
-  
-  // Add active class to selected report
-  document.querySelectorAll('.report-item').forEach(item => {
-    item.classList.toggle('active', item.dataset.id === report.id);
-  });
-}
+  insightsDiv.innerHTML = '<div class="spinner"></div><p>Analyse IA en cours...</p>';
+  anomalyList.innerHTML = '';
 
-// Generate and display chart gauges
-function runAdvancedAnalysis() {
   setTimeout(() => {
-    // Create gauge charts
+    const analysis = data.iaAnalysis;
+    const summary = data.summary;
+
+    // Anomaly Detection
+    const anomalies = [];
+    if (summary.failures > 1) anomalies.push(`Échecs élevés: ${summary.failures} fichiers en erreur.`);
+    if (summary.conflictParcels > 100) anomalies.push(`Conflits élevés: ${summary.conflictParcels} parcelles en conflit.`);
+    if (analysis.correlation.coll_conflits > 0.5) anomalies.push(`Forte corrélation entre parcelles collectives et conflits: ${analysis.correlation.coll_conflits.toFixed(3)}.`);
+    if (summary.memeIDUP > 5) anomalies.push(`Nombre élevé de fichiers avec même IDUP: ${summary.memeIDUP}.`);
+
+    anomalies.forEach(anomaly => {
+      const li = document.createElement('li');
+      li.textContent = anomaly;
+      anomalyList.appendChild(li);
+    });
+
+    // Insights
+    insightsDiv.innerHTML = `
+      <h3>Insights IA</h3>
+      <p><strong>Corrélation brutes-conflits</strong>: ${analysis.correlation.brutes_conflits.toFixed(3)} (faible impact des parcelles brutes sur les conflits).</p>
+      <p><strong>Corrélation individuelles-conflits</strong>: ${analysis.correlation.indiv_conflits.toFixed(3)} (corrélation modérée).</p>
+      <p><strong>Corrélation collectives-conflits</strong>: ${analysis.correlation.coll_conflits.toFixed(3)} (forte relation entre parcelles collectives et conflits).</p>
+      <p><strong>Régression pour conflits vs brutes</strong>: Slope = ${analysis.regression.slope.toFixed(6)}, R-value = ${analysis.regression.r_value.toFixed(3)} (faible prédiction linéaire).</p>
+      <p><strong>Prévision conflits</strong>: ${analysis.forecast.toFixed(2)} conflits estimés pour 10,000 parcelles.</p>
+      <p><strong>Qualité</strong>: Validation = ${summary.successRate}%, Cohérence = ${analysis.quality.consistency.toFixed(2)}%, Erreurs critiques = ${analysis.quality.critical}.</p>
+    `;
+
+    // IA Gauges
     const gauges = [
-      { id: 'qualityGauge', value: 90.07, color: '#10B981', maxValue: 100 }
+      { id: 'gaugeValidation', value: summary.successRate, label: 'Validation', max: 100 },
+      { id: 'gaugeConsistency', value: analysis.quality.consistency, label: 'Cohérence', max: 100 },
+      { id: 'gaugeCritical', value: summary.failures, label: 'Erreurs Critiques', max: 20 },
+      { id: 'gaugeForecast', value: analysis.forecast, label: 'Prévision Conflits', max: 50 }
     ];
-    
+
     gauges.forEach(g => {
-      const canvas = document.getElementById(g.id);
-      if (canvas) {
-        new Chart(canvas, {
+      const ctx = document.getElementById(g.id)?.getContext('2d');
+      if (ctx) {
+        if (charts[g.id]) charts[g.id].destroy();
+        const color = g.value > g.max * 0.8 ? themeColors.procasf.rouge : g.value > g.max * 0.5 ? themeColors.procasf.jaune : themeColors.procasf.vert;
+        charts[g.id] = new Chart(ctx, {
           type: 'doughnut',
           data: {
             datasets: [{
-              data: [g.value, g.maxValue - g.value],
-              backgroundColor: [g.color, '#E5E7EB'],
-              borderWidth: 0,
-              cutout: '80%'
+              data: [g.value, g.max - g.value],
+              backgroundColor: [color, '#e0e0e0'],
+              borderWidth: 0
             }]
           },
           options: {
             responsive: true,
             maintainAspectRatio: false,
-            circumference: 270,
-            rotation: -135,
-            plugins: { tooltip: { enabled: false }, legend: { display: false } }
+            cutout: '70%',
+            plugins: {
+              legend: { display: false },
+              tooltip: { enabled: false },
+              title: {
+                display: true,
+                text: `${Math.round(g.value)}%`,
+                position: 'bottom',
+                color: color,
+                font: { size: 14, weight: 'bold' }
+              }
+            }
           }
         });
       } else {
         console.warn(`Gauge canvas ${g.id} not found`);
       }
     });
-
-    // Set up progress bars
-    document.getElementById('cleaningProgress').style.width = "90.07%";
-    document.getElementById('cleaningValue').textContent = "90.07%";
-    document.getElementById('joiningProgress').style.width = "80.75%";
-    document.getElementById('joiningValue').textContent = "80.75%";
-    document.getElementById('validationProgress').style.width = "93.3%";
-    document.getElementById('validationValue').textContent = "93.3%";
 
     // Animate IA section
     gsap.from('.ia-gauge-card, .ia-insights, .ia-anomaly-list', {
@@ -1585,454 +531,447 @@ function runAdvancedAnalysis() {
   }, 1500);
 }
 
-// Download functions
-function downloadFile(content, filename, contentType) {
-  const blob = new Blob([content], { type: contentType });
+// Populate Commune Table
+function populateCommuneTable() {
+  const tbody = document.getElementById('communeTableBody');
+  if (!tbody || !dashboardData) return;
+
+  tbody.innerHTML = '';
+  dashboardData.communes.forEach(commune => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td><strong>${commune.nom}</strong></td>
+      <td>${formatNumber(commune.brutes)}</td>
+      <td>${formatNumber(commune.individuelles)}</td>
+      <td>${formatNumber(commune.collectives)}</td>
+      <td>${formatNumber(commune.conflits)}</td>
+      <td>${commune.qualite}%</td>
+      <td><span class="status-badge ${commune.statut.toLowerCase()}">${commune.statut}</span></td>
+      <td>
+        <button class="btn-icon" title="Voir détails"><i class="fas fa-eye"></i></button>
+        <button class="btn-icon" title="Modifier"><i class="fas fa-edit"></i></button>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+
+  // Populate commune filter
+  const communeFilter = document.getElementById('communeFilter');
+  if (communeFilter) {
+    communeFilter.innerHTML = '<option value="">Toutes les communes</option>';
+    dashboardData.communes.forEach(commune => {
+      const option = document.createElement('option');
+      option.value = commune.nom;
+      option.textContent = commune.nom;
+      communeFilter.appendChild(option);
+    });
+  }
+}
+
+// Populate Report History
+function populateReportHistory() {
+  const tbody = document.getElementById('reportHistoryBody');
+  if (!tbody) return;
+
+  tbody.innerHTML = '';
+  reportHistory.forEach(report => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${report.date}</td>
+      <td>${report.type}</td>
+      <td>${report.format}</td>
+      <td><span class="status-badge ${report.statut.toLowerCase().replace(' ', '-') }">${report.statut}</span></td>
+      <td>${report.size}</td>
+      <td>
+        <button class="btn-icon" title="Télécharger"><i class="fas fa-download"></i></button>
+        <button class="btn-icon" title="Partager"><i class="fas fa-share"></i></button>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+// Export Reports
+async function generateReport() {
+  const reportType = document.getElementById('reportType')?.value;
+  const reportFormat = document.getElementById('reportFormat')?.value;
+
+  if (!reportType || !reportFormat) {
+    alert('Veuillez sélectionner un type et un format de rapport.');
+    return;
+  }
+
+  const data = await fetchDashboardData();
+  let reportData;
+
+  switch (reportType) {
+    case 'executive':
+      reportData = {
+        'Fichiers traités': data.summary.totalFiles,
+        'Succès': data.summary.success,
+        'Échecs': data.summary.failures,
+        'Parcelles individuelles': data.summary.indivParcels,
+        'Parcelles collectives': data.summary.collParcels,
+        'Jointures Individuelles': data.summary.jointuresIndividuelles,
+        'Jointures Collectives': data.summary.jointuresCollectives,
+        'Même IDUP': data.summary.memeIDUP
+      };
+      break;
+    case 'detailed':
+      reportData = data.summary;
+      break;
+    case 'technical':
+      reportData = {
+        'Conflits globaux': data.summary.globalConflicts,
+        'Parcelles en conflit': data.summary.conflictParcels,
+        'Corrélation collectives-conflits': data.iaAnalysis.correlation.coll_conflits
+      };
+      break;
+    case 'quality':
+      reportData = {
+        'Taux de validation': data.summary.successRate,
+        'Cohérence': data.quality.consistency,
+        'Complétude': data.quality.completude,
+        'Précision': data.quality.precision,
+        'Intégrité': data.quality.integrite,
+        'Erreurs critiques': data.quality.criticalErrors
+      };
+      break;
+    case 'full':
+      reportData = data;
+      break;
+  }
+
+  if (reportFormat === 'csv') {
+    const csvContent = convertToCSV(reportData);
+    downloadFile(csvContent, `report_${reportType}.csv`, 'text/csv');
+  } else if (reportFormat === 'json') {
+    downloadFile(JSON.stringify(reportData, null, 2), `report_${reportType}.json`, 'application/json');
+  } else if (reportFormat === 'pdf') {
+    generatePDFReport(data, reportType);
+    return;
+  } else {
+    alert(`Format ${reportFormat} non supporté pour le moment.`);
+    return;
+  }
+
+  // Update report history for non-PDF formats
+  const reportSize = (JSON.stringify(reportData).length / 1024).toFixed(2) + ' KB';
+  reportHistory.push({
+    date: new Date().toLocaleString(),
+    type: reportType.charAt(0).toUpperCase() + reportType.slice(1),
+    format: reportFormat.toUpperCase(),
+    statut: 'Terminé',
+    size: reportSize
+  });
+  populateReportHistory();
+}
+
+// Generate PDF Report
+async function generatePDFReport(data, reportType) {
+  const { jsPDF } = window.jspdf;
+  if (!jsPDF) {
+    console.error('jsPDF library not loaded');
+    alert('Erreur : la bibliothèque jsPDF n\'est pas chargée.');
+    return;
+  }
+
+  const doc = new jsPDF();
+  const margin = 10;
+  let y = 10;
+
+  // Helper function to add text with word wrapping
+  function addText(text, x, y, fontSize = 12, isBold = false, maxWidth = 190) {
+    doc.setFontSize(fontSize);
+    doc.setFont('helvetica', isBold ? 'bold' : 'normal');
+    const splitText = doc.splitTextToSize(text, maxWidth);
+    doc.text(splitText, x, y);
+    return y + splitText.length * (fontSize * 0.4);
+  }
+
+  // Title
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(16);
+  y = addText(`Rapport ${reportType.charAt(0).toUpperCase() + reportType.slice(1)} - Enquête Foncière`, margin, y, 16, true);
+  y = addText(`Date: ${new Date().toLocaleString('fr-FR')}`, margin, y + 5, 12);
+  y = addText('Par PROCASF & BET-PLUS SA', margin, y + 5, 12);
+  y += 10;
+
+  if (reportType === 'full' || reportType === 'executive') {
+    // Executive Summary
+    y = addText('Résumé Exécutif', margin, y, 14, true);
+    const summary = data.summary;
+    const summaryItems = [
+      `Fichiers Traités: ${formatNumber(summary.totalFiles)}`,
+      `Succès/Échecs: ${summary.success} succès / ${summary.failures} échecs`,
+      `Total Parcelles: ${formatNumber(summary.totalParcels)}`,
+      `Conflits Globaux: ${formatNumber(summary.globalConflicts)}`,
+      `Parcelles Individuelles: ${formatNumber(summary.indivParcels)} (${summary.indivRate}%)`,
+      `Parcelles Collectives: ${formatNumber(summary.collParcels)} (${summary.collRate}%)`,
+      `Parcelles en Conflit: ${formatNumber(summary.conflictParcels)} (${summary.conflictRate}%)`,
+      `Parcelles Sans Jointure: ${formatNumber(summary.noJoinParcels)} (${summary.noJoinRate}%)`,
+      `Jointures Individuelles: ${formatNumber(summary.jointuresIndividuelles)}`,
+      `Jointures Collectives: ${formatNumber(summary.jointuresCollectives)}`,
+      `Même IDUP Indiv/Coll: ${formatNumber(summary.memeIDUP)}`
+    ];
+    summaryItems.forEach(item => {
+      y = addText(`• ${item}`, margin + 5, y + 5, 10);
+    });
+    y += 10;
+  }
+
+  if (reportType === 'full' || reportType === 'communes') {
+    // Commune Analysis
+    y = addText('Analyse par Commune', margin, y, 14, true);
+    const communes = data.communes.slice(0, 5); // Limit to 5 for brevity
+    doc.autoTable({
+      startY: y,
+      head: [['Commune', 'Brutes', 'Individuelles', 'Collectives', 'Conflits', 'Qualité', 'Statut']],
+      body: communes.map(c => [
+        c.nom,
+        formatNumber(c.brutes),
+        formatNumber(c.individuelles),
+        formatNumber(c.collectives),
+        formatNumber(c.conflits),
+        `${c.qualite}%`,
+        c.statut
+      ]),
+      theme: 'grid',
+      styles: { fontSize: 8, cellPadding: 2 },
+      headStyles: { fillColor: themeColors.procasf.bleu }
+    });
+    y = doc.lastAutoTable.finalY + 10;
+  }
+
+  if (reportType === 'full' || reportType === 'quality') {
+    // Quality Metrics
+    y = addText('Métriques de Qualité', margin, y, 14, true);
+    const quality = data.quality;
+    const qualityItems = [
+      `Validation (${quality.validationRate}%): Taux de fichiers traités avec succès.`,
+      `Cohérence (${quality.consistency}%): Mesure de la cohérence des données.`,
+      `Complétude (${quality.completude}%): Proportion des données complètes.`,
+      `Précision (${quality.precision}%): Exactitude des données.`,
+      `Intégrité (${quality.integrite}%): Intégrité structurelle des données.`,
+      `Erreurs critiques (${quality.criticalErrors}): Nombre d'erreurs critiques détectées.`
+    ];
+    qualityItems.forEach(item => {
+      y = addText(`• ${item}`, margin + 5, y + 5, 10);
+    });
+    y += 10;
+  }
+
+  if (reportType === 'full' || reportType === 'analysis') {
+    // IA Analysis
+    y = addText('Analyse IA', margin, y, 14, true);
+    const iaAnalysis = data.iaAnalysis;
+    y = addText('Corrélations', margin + 5, y + 5, 12, true);
+    const correlationItems = [
+      `Brutes-Conflits: ${iaAnalysis.correlation.brutes_conflits.toFixed(3)} (faible impact).`,
+      `Individuelles-Conflits: ${iaAnalysis.correlation.indiv_conflits.toFixed(3)} (corrélation modérée).`,
+      `Collectives-Conflits: ${iaAnalysis.correlation.coll_conflits.toFixed(3)} (forte relation).`
+    ];
+    correlationItems.forEach(item => {
+      y = addText(`• ${item}`, margin + 10, y + 5, 10);
+    });
+    y = addText('Régression', margin + 5, y + 5, 12, true);
+    const regressionItems = [
+      `Slope: ${iaAnalysis.regression.slope.toFixed(6)}`,
+      `R-value: ${iaAnalysis.regression.r_value.toFixed(3)}`,
+      `P-value: ${iaAnalysis.regression.p_value.toFixed(3)}`
+    ];
+    regressionItems.forEach(item => {
+      y = addText(`• ${item}`, margin + 10, y + 5, 10);
+    });
+    y = addText(`Prévision: ${iaAnalysis.forecast.toFixed(2)} conflits estimés pour 10,000 parcelles.`, margin + 5, y + 5, 10);
+    y = addText('Qualité IA', margin + 5, y + 5, 12, true);
+    const iaQualityItems = [
+      `Validation: ${iaAnalysis.quality.validation.toFixed(2)}%`,
+      `Cohérence: ${iaAnalysis.quality.consistency.toFixed(2)}%`,
+      `Erreurs Critiques: ${iaAnalysis.quality.critical}`
+    ];
+    iaQualityItems.forEach(item => {
+      y = addText(`• ${item}`, margin + 10, y + 5, 10);
+    });
+    y += 10;
+  }
+
+  if (reportType === 'full' || reportType === 'reports') {
+    // Report History
+    y = addText('Historique des Rapports', margin, y, 14, true);
+    doc.autoTable({
+      startY: y,
+      head: [['Date', 'Type', 'Format', 'Statut', 'Taille']],
+      body: reportHistory.map(r => [r.date, r.type, r.format, r.statut, r.size]),
+      theme: 'grid',
+      styles: { fontSize: 8, cellPadding: 2 },
+      headStyles: { fillColor: themeColors.procasf.bleu }
+    });
+    y = doc.lastAutoTable.finalY + 10;
+  }
+
+  // Save PDF
+  doc.save(`dashboard_${reportType}_report.pdf`);
+
+  // Update report history
+  reportHistory.push({
+    date: new Date().toLocaleString(),
+    type: reportType.charAt(0).toUpperCase() + reportType.slice(1),
+    format: 'PDF',
+    statut: 'Terminé',
+    size: '~'
+  });
+  populateReportHistory();
+}
+
+// Convert to CSV
+function convertToCSV(obj) {
+  if (Array.isArray(obj)) {
+    const headers = Object.keys(obj[0]);
+    return headers.join(',') + '\n' + obj.map(row => headers.map(h => `"${row[h]?.toString().replace(/"/g, '""')}"`).join(',')).join('\n');
+  }
+  return 'Metric,Value\n' + Object.entries(obj).map(([k, v]) => `"${k.replace(/"/g, '""')}",${v}`).join('\n');
+}
+
+// Download File
+function downloadFile(content, fileName, mimeType) {
+  const blob = new Blob([content], { type: mimeType });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
+  a.download = fileName;
   a.click();
-  document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
 
-// Generate sample report
-function generateReport(reportType, format) {
-  const reportData = {
-    type: reportType,
-    date: new Date().toLocaleDateString('fr-FR'),
-    summary: dashboardData.summary,
-    communes: dashboardData.communes,
-    duplicateRemoval: dashboardData.duplicateRemoval
-  };
-  
-  // Add to report history
-  const newReport = {
-    id: 'R' + new Date().toISOString().slice(0,10).replace(/-/g,'') + Math.floor(Math.random() * 100),
-    name: `Rapport ${reportType === 'summary' ? 'sommaire' : reportType === 'detailed' ? 'détaillé' : 'anomalies'} - Toutes communes`,
-    type: reportType,
-    date: new Date().toLocaleDateString('fr-FR', {day: '2-digit', month: '2-digit', year: 'numeric'}).replace(/\//g, '/'),
-    size: (Math.random() * 3 + 0.5).toFixed(1) + ' MB'
-  };
-  
-  reportHistory.unshift(newReport);
-  
-  // Update UI
-  populateReportHistory();
-  showReportPreview(newReport);
-  
-  // Return generated data
-  if (format === 'json') {
-    downloadFile(JSON.stringify(reportData, null, 2), `report_${reportType}.json`, 'application/json');
-  } else {
-    alert(`Rapport de type "${reportType}" généré au format ${format.toUpperCase()}`);
-  }
-  
-  return reportData;
-}
-
-// Initialize Dashboard with enhancements
-async function initializeDashboardImpl() {
-  try {
-    console.log('Dashboard initialization started');
-    // showLoadingOverlay('Chargement du tableau de bord...');
-    // Show dashboard insights for user guidance
-    showDashboardInsights();
-    // Charger les données principales et mettre à jour le dashboard
-    await updateKPIs();
-    await initCharts();
-    showInsightBanner();
-    // Peupler les tableaux et listes
-    populateCommuneTable();
-    populateReportHistory();
-    populateIssuesTable();
-    populateProblematicParcelsTable();
-    populateActivityTable();
-    // Configurer les interactions
-    setupEventListeners();
-    setupAdvancedInteractions();
-    // hideLoadingOverlay();
-    // Legacy welcome message
-    showWelcomeMessage();
-    console.log('Dashboard initialization completed successfully');
-  } catch (error) {
-    console.error('Erreur lors de l\'initialisation du tableau de bord:', error);
-    // hideLoadingOverlay();
-    // showErrorMessage('Impossible de charger le tableau de bord. Veuillez réessayer.');
-  }
-}
-
-// Store the implementation in our global object (ensure container exists)
-if (!window.dashboardInitFunctions) {
-  window.dashboardInitFunctions = {};
-}
-window.dashboardInitFunctions.initialize = initializeDashboardImpl;
-
-// Define local function that uses the implementation
+// Initialize Dashboard
 async function initializeDashboard() {
-  return await initializeDashboardImpl();
+  await updateKPIs();
+  await initCharts();
+  await runAdvancedAnalysis();
+  populateCommuneTable();
+  populateReportHistory();
+  setupEventListeners();
 }
 
-// Explicitly make the function globally available (double ensure)
-window.initializeDashboard = initializeDashboard;
-
-// Show a random dashboard insight for user guidance
-function showDashboardInsights() {
-  const insights = [
-    "Astuce : Cliquez sur une commune pour voir le détail.",
-    "Recommandation : Analysez les doublons pour améliorer la qualité.",
-    "Info : Les taux de validation supérieurs à 90% sont excellents !",
-    "Conseil : Utilisez les filtres pour explorer les données par statut.",
-    "Saviez-vous ? Vous pouvez exporter les rapports en PDF ou CSV."
-  ];
-  const banner = document.createElement('div');
-  banner.className = 'ia-insights';
-  banner.style.background = 'linear-gradient(90deg, #FBBF24 0%, #3B82F6 100%)';
-  banner.style.color = '#1F2937';
-  banner.style.fontWeight = 'bold';
-  banner.style.textAlign = 'center';
-  banner.style.padding = '12px';
-  banner.style.marginBottom = '18px';
-  banner.style.borderRadius = '12px';
-  banner.innerHTML = '<i class="fas fa-lightbulb"></i> ' + insights[Math.floor(Math.random() * insights.length)];
-  const main = document.querySelector('.main-content');
-  if (main) main.prepend(banner);
-}
-
-// Show insight banner at the top of the dashboard
-function showInsightBanner() {
-  if (document.getElementById('insightBanner')) return;
-  const banner = document.createElement('div');
-  banner.id = 'insightBanner';
-  banner.className = 'insight-banner';
-  banner.innerHTML = `
-    <div class="insight-banner-content">
-      <i class="fas fa-lightbulb"></i>
-      <span><strong>Progression:</strong> 78% des parcelles traitées, <strong>9.93%</strong> de doublons éliminés, <strong>211</strong> parcelles conflictuelles à surveiller. <span class="insight-tip">Survolez les graphiques pour plus de détails.</span></span>
-    <button class="insight-close"><i class="fas fa-times"></i></button>
-  </div>
-  `;
-  document.querySelector('.main-content').prepend(banner);
-  
-  // Add close button functionality
-  banner.querySelector('.insight-close').addEventListener('click', function() {
-    banner.remove();
-  });
-}
-
-// Show welcome message and insights
-function showWelcomeMessage() {
-  if (document.getElementById('welcomeToast')) return;
-  
-  const welcomeEl = document.createElement('div');
-  welcomeEl.id = 'welcomeToast';
-  welcomeEl.className = 'welcome-toast';
-  welcomeEl.innerHTML = `
-    <div class="welcome-toast-header">
-      <i class="fas fa-info-circle"></i>
-      <h3>Tableau de bord actualisé</h3>
-      <button class="toast-close"><i class="fas fa-times"></i></button>
-    </div>
-    <div class="welcome-toast-body">
-      <p><strong>3 insights importants:</strong></p>
-      <ul>
-        <li>Traitement de 78% des parcelles complété</li>
-        <li>Réduction de 9.1% des anomalies ce mois-ci</li>
-        <li>La commune de Ballou maintient le score de qualité le plus élevé</li>
-      </ul>
-    </div>
-  `;
-  
-  document.body.appendChild(welcomeEl);
-  setTimeout(() => welcomeEl.classList.add('show'), 300);
-  
-  welcomeEl.querySelector('.toast-close').addEventListener('click', () => {
-    welcomeEl.classList.remove('show');
-    setTimeout(() => welcomeEl.remove(), 300);
-  });
-  
-  setTimeout(() => {
-    if (document.body.contains(welcomeEl)) {
-      welcomeEl.classList.remove('show');
-      setTimeout(() => welcomeEl.remove(), 300);
-    }
-  }, 8000);
-}
-
-// Event Listeners pour les fonctionnalités de base
+// Event Listeners
 function setupEventListeners() {
-  // Navigation par onglets
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      // Update active classes for buttons
-      document.querySelectorAll('.tab-btn').forEach(b => {
-        b.classList.remove('active');
-        b.setAttribute('aria-selected', 'false');
-      });
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       btn.classList.add('active');
-      btn.setAttribute('aria-selected', 'true');
+      document.getElementById(btn.dataset.tab).classList.add('active');
+      loadTabData(btn.dataset.tab);
+    });
+  });
 
-      // Activate the corresponding tab content. Use the data-tab value as the id.
-      const targetId = btn.dataset.tab;
-      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-      const target = document.getElementById(targetId);
-      if (target) {
-        target.classList.add('active');
-      } else {
-        console.warn('Tab target not found:', targetId);
-      }
-
-      // Trigger a resize event shortly after activation so charts recalculate sizes
-      setTimeout(() => {
-        try { 
-          window.dispatchEvent(new Event('resize'));
-          // Also force Chart.js instances to resize and update
-          if (typeof redrawCharts === 'function') redrawCharts();
-        } catch(e) { console.warn('Resize dispatch failed', e); }
-      }, 120);
-
-      // Analytics tracking
-      if (typeof trackUserAction === 'function') {
-        trackUserAction('tab_change', { tab: btn.dataset.tab });
-      }
-    });
+  document.querySelector('.refresh-btn')?.addEventListener('click', refreshData);
+  document.querySelector('.theme-toggle')?.addEventListener('click', toggleTheme);
+  document.getElementById('communeSearch')?.addEventListener('input', debounce(filterTable, 300));
+  document.getElementById('communeFilter')?.addEventListener('change', applyFilters);
+  document.getElementById('statusFilter')?.addEventListener('change', applyFilters);
+  document.getElementById('dateFilter')?.addEventListener('change', applyFilters);
+  document.getElementById('exportCommuneTableBtn')?.addEventListener('click', () => {
+    const csvContent = convertToCSV(dashboardData.communes);
+    downloadFile(csvContent, 'commune_data.csv', 'text/csv');
   });
-  
-  // Basculer le thème clair/sombre
-  const themeToggle = document.querySelector('.theme-toggle');
-  if (themeToggle) {
-    themeToggle.addEventListener('click', toggleTheme);
-  }
-  
-  // Filtres de période pour les graphiques
-  document.querySelectorAll('.period-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      currentFilters.period = btn.dataset.period;
-      updateChartsForPeriod(currentFilters.period);
-      
-      // Analytics tracking
-      trackUserAction('filter_change', { type: 'period', value: btn.dataset.period });
-    });
-  });
-  
-  // Types de graphiques
-  document.querySelectorAll('.chart-type-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const chartType = btn.dataset.chartType;
-      const parent = btn.closest('.chart-card');
-      const chartId = parent.querySelector('canvas').id;
-      
-      // Mettre à jour l'apparence des boutons
-      parent.querySelectorAll('.chart-type-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      
-      // Mettre à jour le type de graphique
-      updateChartType(chartId, chartType);
-      
-      // Analytics tracking
-      trackUserAction('chart_type_change', { chartId, type: chartType });
-    });
-  });
-  
-  // Filtres de commune pour les métriques de qualité
-  const communeSelect = document.getElementById('qualitySelectCommune');
-  if (communeSelect) {
-    communeSelect.addEventListener('change', () => {
-      updateQualityMetricsForCommune(communeSelect.value);
-      
-      // Analytics tracking
-      trackUserAction('commune_filter_change', { value: communeSelect.value });
-    });
-  }
-  
-  // Recherche
-  const searchInput = document.getElementById('searchInput');
-  if (searchInput) {
-    searchInput.addEventListener('input', debounce(() => {
-      const query = searchInput.value.trim().toLowerCase();
-      if (query.length >= 2) {
-        searchAcrossData(query);
-        trackUserAction('search', { query });
-      }
-    }, 300));
-  }
-  
-  // Boutons d'exportation
-  document.querySelectorAll('.export-btn, button[data-action="exportData"]').forEach(btn => {
-    btn.addEventListener('click', () => exportDashboardData());
-  });
-  
-  // Boutons de génération de rapports
-  document.querySelectorAll('button[data-action="generateReport"]').forEach(btn => {
-    btn.addEventListener('click', () => generateReport());
-  });
+  document.getElementById('generateReportBtn')?.addEventListener('click', generateReport);
 }
 
-// Force all existing Chart.js instances to resize and update
-function redrawCharts() {
-  try {
-    Object.keys(charts || {}).forEach(key => {
-      const c = charts[key];
-      if (!c) return;
-      try {
-        if (typeof c.resize === 'function') c.resize();
-        if (typeof c.update === 'function') c.update();
-      } catch (err) {
-        // ignore individual chart errors
-        console.warn('Chart redraw failed for', key, err);
-      }
-    });
-  } catch (err) {
-    console.warn('redrawCharts failed', err);
+function loadTabData(tabId) {
+  switch (tabId) {
+    case 'dashboard':
+      updateKPIs();
+      initCharts();
+      break;
+    case 'analysis':
+      runAdvancedAnalysis();
+      initCharts();
+      break;
+    case 'communes':
+      populateCommuneTable();
+      break;
+    case 'quality':
+      initCharts();
+      document.getElementById('qualityAnalysis')?.classList.add('active');
+      break;
+    case 'reports':
+      populateReportHistory();
+      break;
   }
 }
 
-// Configuration des interactions avancées
-function setupAdvancedInteractions() {
-  // Toggle pour les séries dans le graphique temporel
-  document.querySelectorAll('.toggle-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const series = btn.dataset.series;
-      btn.classList.toggle('active');
-      toggleChartSeries('timeSeriesChart', series);
-    });
-  });
-  
-  // Boutons d'action pour les anomalies
-  document.querySelectorAll('.btn-action').forEach(btn => {
-    btn.addEventListener('click', function() {
-      const actionItem = this.closest('.anomaly-item, .recommendation-item');
-      const itemTitle = actionItem.querySelector('h4').textContent;
-      
-      showActionModal(itemTitle);
-    });
-  });
-  
-  // Interaction avec les insights
-  document.querySelectorAll('.insight-item').forEach(item => {
-    item.addEventListener('click', function() {
-      const insightText = this.querySelector('p').textContent;
-      showInsightDetail(insightText);
-    });
-  });
-  
-  // Boutons d'expansion des graphiques
-  document.querySelectorAll('.btn-expand').forEach(btn => {
-    btn.addEventListener('click', function() {
-      const chartCard = this.closest('.chart-card');
-      const chartId = chartCard.querySelector('canvas').id;
-      expandChart(chartId, chartCard.querySelector('h3').textContent);
-    });
-  });
-}
-
-// Affiche un modal pour les actions
-function showActionModal(title) {
-  const modal = document.createElement('div');
-  modal.className = 'modal-overlay';
-  modal.innerHTML = `
-    <div class="modal-container">
-      <div class="modal-header">
-        <h3>${title}</h3>
-        <button class="modal-close"><i class="fas fa-times"></i></button>
-      </div>
-      <div class="modal-body">
-        <p>Êtes-vous sûr de vouloir commencer cette action?</p>
-        <p>Cela va créer une nouvelle tâche dans la file de traitement.</p>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-secondary">Annuler</button>
-        <button class="btn-primary">Confirmer</button>
-      </div>
-    </div>
-  `;
-  
-  document.body.appendChild(modal);
-  setTimeout(() => modal.classList.add('show'), 50);
-  
-  modal.querySelector('.modal-close').addEventListener('click', () => closeModal(modal));
-  modal.querySelector('.btn-secondary').addEventListener('click', () => closeModal(modal));
-  modal.querySelector('.btn-primary').addEventListener('click', () => {
-    // Simuler une action
-    showToast('Action ajoutée à la file de traitement', 'success');
-    closeModal(modal);
-  });
-}
-
-// Ferme un modal
-function closeModal(modal) {
-  modal.classList.remove('show');
-  setTimeout(() => modal.remove(), 300);
-}
-
-// Affiche un toast de notification
-function showToast(message, type = 'info') {
-  const toast = document.createElement('div');
-  toast.className = `toast toast-${type}`;
-  toast.innerHTML = `
-    <div class="toast-icon">
-      <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'}"></i>
-    </div>
-    <div class="toast-message">${message}</div>
-    <button class="toast-close"><i class="fas fa-times"></i></button>
-  `;
-  
-  document.body.appendChild(toast);
-  setTimeout(() => toast.classList.add('show'), 50);
-  
-  toast.querySelector('.toast-close').addEventListener('click', () => {
-    toast.classList.remove('show');
-    setTimeout(() => toast.remove(), 300);
-  });
-  
-  setTimeout(() => {
-    if (document.body.contains(toast)) {
-      toast.classList.remove('show');
-      setTimeout(() => toast.remove(), 300);
-    }
-  }, 5000);
-}
-
-// Met à jour le type de graphique
-function updateChartType(chartId, newType) {
-  if (!charts[chartId]) return;
-  
-  const chartInstance = charts[chartId];
-  const chartData = chartInstance.data;
-  
-  // Détruire l'instance existante
-  chartInstance.destroy();
-  
-  // Adapter les options en fonction du type
-  const options = { ...chartDefaults };
-  
-  if (newType === 'bar') {
-    options.plugins.legend.display = false;
-    options.scales = {
-      y: {
-        beginAtZero: true
-      }
-    };
-  } else if (newType === 'treemap') {
-    // Utiliser un graphique de type doughnut comme fallback pour treemap
-    newType = 'doughnut';
-    options.plugins.legend.position = 'right';
+function toggleTheme() {
+  currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+  document.documentElement.dataset.theme = currentTheme;
+  localStorage.setItem('dashboard-theme', currentTheme);
+  const icon = document.getElementById('themeIcon');
+  if (icon) {
+    icon.className = currentTheme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
   }
-  
-  // Créer une nouvelle instance avec le même canvas
-  const ctx = document.getElementById(chartId).getContext('2d');
-  charts[chartId] = new Chart(ctx, {
-    type: newType,
-    data: chartData,
-    options: options
+}
+
+function refreshData() {
+  const refreshBtn = document.querySelector('.refresh-btn i');
+  if (refreshBtn) {
+    refreshBtn.style.animation = 'spin 1s linear infinite';
+    setTimeout(() => {
+      initializeDashboard();
+      refreshBtn.style.animation = '';
+    }, 1000);
+  }
+}
+
+function resetFilters() {
+  const communeFilter = document.getElementById('communeFilter');
+  const statusFilter = document.getElementById('statusFilter');
+  const dateFilter = document.getElementById('dateFilter');
+  if (communeFilter) communeFilter.selectedIndex = 0;
+  if (statusFilter) statusFilter.selectedIndex = 0;
+  if (dateFilter) dateFilter.value = '';
+  currentFilters = { commune: '', status: '', date: '' };
+  populateCommuneTable();
+}
+
+function applyFilters() {
+  currentFilters.commune = document.getElementById('communeFilter')?.value || '';
+  currentFilters.status = document.getElementById('statusFilter')?.value || '';
+  currentFilters.date = document.getElementById('dateFilter')?.value || '';
+  filterTable();
+}
+
+function filterTable() {
+  const searchTerm = document.getElementById('communeSearch')?.value.toLowerCase() || '';
+  const rows = document.querySelectorAll('#communeTableBody tr');
+
+  rows.forEach(row => {
+    const communeName = row.cells[0]?.textContent.toLowerCase() || '';
+    const status = row.cells[6]?.textContent.toLowerCase() || '';
+    const matchesSearch = communeName.includes(searchTerm);
+    const matchesStatus = !currentFilters.status || status.includes(currentFilters.status.toLowerCase());
+    const matchesCommune = !currentFilters.commune || communeName.includes(currentFilters.commune.toLowerCase());
+    row.style.display = matchesSearch && matchesStatus && matchesCommune ? '' : 'none';
   });
 }
 
-// Fonction helper pour debounce
+function getMetricLabel(metric) {
+  const labels = {
+    individuelles: 'Parcelles Individuelles',
+    collectives: 'Parcelles Collectives',
+    conflits: 'Conflits',
+    qualite: 'Indice de Qualité'
+  };
+  return labels[metric] || metric;
+}
+
+function createGradient(ctx, colors) {
+  const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+  gradient.addColorStop(0, colors[0]);
+  gradient.addColorStop(1, colors[1]);
+  return gradient;
+}
+
 function debounce(func, wait) {
   let timeout;
   return function executedFunction(...args) {
@@ -2045,118 +984,6 @@ function debounce(func, wait) {
   };
 }
 
-// Suivi des actions utilisateur (analytics)
-function trackUserAction(action, data = {}) {
-  console.log(`User Action: ${action}`, data);
-  // Implémenter une fonction d'analytics réelle ici
-}
-  
-  // Metric selector
-  const metricSelector = document.getElementById('metricSelector');
-  if (metricSelector) {
-    metricSelector.addEventListener('change', () => initCharts());
-  }
-  
-  // Theme toggle
-  const themeToggle = document.querySelector('.theme-toggle');
-  if (themeToggle) {
-    themeToggle.addEventListener('click', () => {
-      const icon = document.getElementById('themeIcon');
-      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-      document.documentElement.dataset.theme = newTheme;
-      if (icon) icon.className = newTheme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
-      localStorage.setItem('dashboard-theme', newTheme);
-      currentTheme = newTheme;
-    });
-  }
-  
-  // Filter events
-  const filterInputs = document.querySelectorAll('#communeFilter, #statusFilter, #dateFilter');
-  filterInputs.forEach(input => {
-    input.addEventListener('change', applyFilters);
-  });
-  
-  document.getElementById('resetFilters')?.addEventListener('click', resetFilters);
-  
-  // Refresh button
-  document.querySelector('.refresh-btn')?.addEventListener('click', async () => {
-    const refreshIcon = document.querySelector('.refresh-btn i');
-    refreshIcon.classList.add('rotating');
-    await initializeDashboard();
-    setTimeout(() => refreshIcon.classList.remove('rotating'), 1000);
-  });
-  
-  // Report modal
-  document.getElementById('generateReportBtn')?.addEventListener('click', () => {
-    document.getElementById('reportModal').classList.add('active');
-  });
-  
-  document.querySelector('.close-btn')?.addEventListener('click', () => {
-    document.getElementById('reportModal').classList.remove('active');
-  });
-  
-  document.getElementById('cancelReportBtn')?.addEventListener('click', () => {
-    document.getElementById('reportModal').classList.remove('active');
-  });
-  
-  document.getElementById('generateReportConfirmBtn')?.addEventListener('click', () => {
-    const reportType = document.getElementById('reportType').value;
-    const reportFormat = document.getElementById('reportFormat').value;
-    document.getElementById('reportModal').classList.remove('active');
-    generateReport(reportType, reportFormat);
-  });
-  
-  // Run analysis button
-  document.getElementById('runAnalysisBtn')?.addEventListener('click', async () => {
-    const btn = document.getElementById('runAnalysisBtn');
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyse en cours...';
-    btn.disabled = true;
-    
-    await runAdvancedAnalysis();
-    await initCharts();
-    
-    setTimeout(() => {
-      btn.innerHTML = originalText;
-      btn.disabled = false;
-      alert('Analyse complétée !');
-    }, 2000);
-  });
-}
-
-// Filter functions
-function applyFilters() {
-  const communeFilter = document.getElementById('communeFilter').value;
-  const statusFilter = document.getElementById('statusFilter').value;
-  const dateFilter = document.getElementById('dateFilter').value;
-  
-  currentFilters = { commune: communeFilter, status: statusFilter, date: dateFilter };
-  
-  const rows = document.querySelectorAll('#communeTableBody tr');
-  rows.forEach(row => {
-    const communeName = row.querySelector('td:first-child strong').textContent;
-    const status = row.querySelector('.status-badge').textContent;
-    
-    let visible = true;
-    if (communeFilter && communeName !== communeFilter) visible = false;
-    if (statusFilter && status !== statusFilter) visible = false;
-    
-    row.style.display = visible ? '' : 'none';
-  });
-}
-
-function resetFilters() {
-  document.getElementById('communeFilter').value = '';
-  document.getElementById('statusFilter').value = '';
-  document.getElementById('dateFilter').value = '';
-  
-  currentFilters = { commune: '', status: '', date: '' };
-  
-  document.querySelectorAll('#communeTableBody tr').forEach(row => {
-    row.style.display = '';
-  });
-}
-
 // DOM Ready
 document.addEventListener('DOMContentLoaded', () => {
   const savedTheme = localStorage.getItem('dashboard-theme') || 'light';
@@ -2167,157 +994,8 @@ document.addEventListener('DOMContentLoaded', () => {
     icon.className = savedTheme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
   }
   if (document.getElementById('kpiGrid')) {
-    // Make sure we have access to the function
-    if (typeof window.initializeDashboard === 'function') {
-      window.initializeDashboard();
-    } else if (typeof initializeDashboard === 'function') {
-      initializeDashboard();
-    } else {
-      console.error('Dashboard initialization function not found');
-    }
+    initializeDashboard();
   } else {
     console.error('Critical element #kpiGrid not found');
   }
-  
-  // Add final validation check
-  setTimeout(() => {
-    if (typeof dashboardData === 'undefined' || !dashboardData) {
-      console.warn('Dashboard data not loaded after DOMContentLoaded - attempting recovery');
-      if (typeof loadRecoveryScript === 'function') {
-        loadRecoveryScript().then(() => {
-          if (typeof window.fixDashboard === 'function') {
-            window.fixDashboard();
-          }
-        });
-      }
-    }
-  }, 2000);
 });
-
-// Add fallback definitions for critical functions
-if (typeof showInsightBanner !== 'function') {
-  window.showInsightBanner = function() {
-    console.warn('Using fallback showInsightBanner function');
-    if (document.getElementById('insightBanner')) return;
-    const banner = document.createElement('div');
-    banner.id = 'insightBanner';
-    banner.className = 'insight-banner';
-    banner.innerHTML = `
-      <div class="insight-banner-content">
-        <i class="fas fa-lightbulb"></i>
-        <span><strong>Progression:</strong> 78% des parcelles traitées, <strong>9.93%</strong> de doublons éliminés, <strong>211</strong> parcelles conflictuelles à surveiller.</span>
-        <button class="insight-close"><i class="fas fa-times"></i></button>
-      </div>
-    `;
-    const mainContent = document.querySelector('.main-content');
-    if (mainContent) mainContent.prepend(banner);
-    
-    const closeBtn = banner.querySelector('.insight-close');
-    if (closeBtn) {
-      closeBtn.addEventListener('click', function() {
-        banner.remove();
-      });
-    }
-  };
-}
-
-/**
- * Main dashboard initialization function
- * This function will be exposed globally through the EDL_DASHBOARD object
- */
-async function initializeDashboard() {
-  console.log('Dashboard initialization started');
-  try {
-    // Check if already initialized
-    if (dashboardData) {
-      console.log('Dashboard already initialized, skipping');
-      return;
-    }
-
-    showLoadingIndicator('Chargement des données du tableau de bord...');
-    
-    // Load dashboard data
-    try {
-      await loadDashboardData();
-      console.log('Dashboard data loaded successfully');
-    } catch (dataError) {
-      console.error('Error loading dashboard data:', dataError);
-      // Use fallback data
-      dashboardData = realData || {};
-    }
-    
-    // Setup event listeners and UI components
-    setupEventListeners();
-    
-    // Initialize views
-    try {
-      initializeMainDashboard();
-    } catch (viewError) {
-      console.error('Error initializing dashboard views:', viewError);
-    }
-    
-    // Show welcome message
-    showWelcomeMessage();
-    
-    // Hide loading indicator when complete
-    hideLoadingIndicator();
-    
-    console.log('Dashboard initialization complete');
-    
-    // Mark dashboard as ready in global state
-    if (window.EDL_DASHBOARD) {
-      window.EDL_DASHBOARD.ready = true;
-    }
-    
-  } catch (error) {
-    console.error('Error during dashboard initialization:', error);
-    hideLoadingIndicator();
-    showErrorMessage('Une erreur est survenue lors de l\'initialisation du tableau de bord.');
-    
-    // Record error in global state
-    if (window.EDL_DASHBOARD) {
-      window.EDL_DASHBOARD.errors.push({
-        time: new Date(),
-        message: error.message,
-        stack: error.stack
-      });
-    }
-  }
-}
-
-// Expose initialization function globally
-window.addEventListener('load', function() {
-  console.log('Window load event fired, registering global initialization function');
-  
-  // Register the initialization function in the global state
-  if (window.EDL_DASHBOARD) {
-    window.EDL_DASHBOARD.init = initializeDashboard;
-    window.initializeDashboard = initializeDashboard;
-    console.log('Dashboard initialization function registered globally');
-    
-    // Auto-initialize if not already done
-    setTimeout(() => {
-      if (!dashboardData && window.EDL_DASHBOARD && window.EDL_DASHBOARD.ready === false) {
-        console.log('Auto-initializing dashboard');
-        initializeDashboard();
-      }
-    }, 500);
-  } else {
-    console.error('Global state object not found');
-  }
-});
-
-// Provide a global recovery function in case initialization fails
-window.recoverDashboard = function() {
-  try {
-    console.log('Dashboard recovery triggered');
-    if (typeof initializeDashboard === 'function') {
-      initializeDashboard();
-    } else {
-      console.error('Recovery failed: initialization function not available');
-      alert('Dashboard recovery failed. Please refresh the page.');
-    }
-  } catch (error) {
-    console.error('Error during dashboard recovery:', error);
-  }
-};
