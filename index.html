@@ -26,12 +26,31 @@
   <link rel="stylesheet" href="insights_styles.css">
   <link rel="stylesheet" href="temp_css_additions.css">
   
+  <!-- Initialization script (loads first) -->
+  <script>
+    // Pre-define global objects and functions to ensure availability
+    window.dashboardInitFunctions = {};
+    window.initializeDashboard = function() {
+      console.log('Using pre-defined initialization function');
+      if (window.dashboardInitFunctions && typeof window.dashboardInitFunctions.initialize === 'function') {
+        return window.dashboardInitFunctions.initialize();
+      } else {
+        console.warn('Full initialization function not yet available');
+        // Attempt to load app.js again to ensure it's available
+        var script = document.createElement('script');
+        script.src = 'app.js';
+        document.head.appendChild(script);
+        return new Promise(resolve => setTimeout(resolve, 500));
+      }
+    };
+  </script>
+  
   <!-- Scripts -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js" defer></script>
-  <script src="app.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+  <script src="app.js"></script>
   <!-- Recovery script - loads only if needed -->
   <script>
     function loadRecoveryScript() {
@@ -46,19 +65,29 @@
         };
       });
     }
+
+    // Proactively load the recovery script
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(function() {
+        loadRecoveryScript();
+      }, 1000);
+    });
   </script>
+  
   <!-- Error handler -->
   <script>
     window.onerror = function(message, source, lineno, colno, error) {
       console.error('Error caught:', message, 'at', source, ':', lineno);
       // If initialization failed, try to recover
-      if (message.includes('initializeDashboard') || message.includes('not defined')) {
+      if (message.includes('initializeDashboard') || message.includes('not defined') || message.includes('undefined')) {
         console.warn('Attempting to recover from initialization error...');
         loadRecoveryScript().then(() => {
           setTimeout(() => {
             try {
               if (typeof window.fixDashboard === 'function') {
                 window.fixDashboard();
+              } else if (typeof window.dashboardInitFunctions?.initialize === 'function') {
+                window.dashboardInitFunctions.initialize();
               } else if (typeof window.initializeDashboard === 'function') {
                 window.initializeDashboard();
               } else {

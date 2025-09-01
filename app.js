@@ -2,6 +2,9 @@
 /* This file contains template literals with HTML that TypeScript analyzer 
    might misinterpret. Disable TypeScript checking for this file. */
 
+// Global reference for critical initialization function
+window.dashboardInitFunctions = {};
+
 // Ensure we're in a browser environment
 if (typeof window !== 'undefined') {
   // Fix for Favicon 404 error
@@ -9,6 +12,27 @@ if (typeof window !== 'undefined') {
   link.rel = 'shortcut icon';
   link.href = 'data:image/x-icon;,';
   document.head.appendChild(link);
+
+  // Pre-define initialization function to ensure it's globally available
+  window.initializeDashboard = async function() {
+    console.log('Using globally defined initialization function');
+    if (typeof window.dashboardInitFunctions.initialize === 'function') {
+      return window.dashboardInitFunctions.initialize();
+    } else {
+      console.warn('Main initialization not yet available, trying again in 500ms');
+      return new Promise((resolve) => {
+        setTimeout(async () => {
+          if (typeof window.dashboardInitFunctions.initialize === 'function') {
+            await window.dashboardInitFunctions.initialize();
+            resolve();
+          } else {
+            console.error('Dashboard initialization function still not available after delay');
+            resolve();
+          }
+        }, 500);
+      });
+    }
+  };
 }
 
 // Variables globales
@@ -1288,8 +1312,9 @@ function generateReport(reportType, format) {
 }
 
 // Initialize Dashboard with enhancements
-async function initializeDashboard() {
+async function initializeDashboardImpl() {
   try {
+    console.log('Dashboard initialization started');
     // showLoadingOverlay('Chargement du tableau de bord...');
     // Show dashboard insights for user guidance
     showDashboardInsights();
@@ -1309,6 +1334,7 @@ async function initializeDashboard() {
     // hideLoadingOverlay();
     // Legacy welcome message
     showWelcomeMessage();
+    console.log('Dashboard initialization completed successfully');
   } catch (error) {
     console.error('Erreur lors de l\'initialisation du tableau de bord:', error);
     // hideLoadingOverlay();
@@ -1316,7 +1342,15 @@ async function initializeDashboard() {
   }
 }
 
-// Explicitly make the function globally available
+// Store the implementation in our global object
+window.dashboardInitFunctions.initialize = initializeDashboardImpl;
+
+// Define local function that uses the implementation
+async function initializeDashboard() {
+  return await initializeDashboardImpl();
+}
+
+// Explicitly make the function globally available (double ensure)
 window.initializeDashboard = initializeDashboard;
 
 // Show a random dashboard insight for user guidance
@@ -1841,3 +1875,17 @@ window.addEventListener('load', function() {
     }
   }, 500);
 });
+
+// Final global exports to ensure functions are available
+(function() {
+  // Wait for all script parsing to complete
+  setTimeout(() => {
+    // Re-export critical functions to global scope
+    if (typeof initializeDashboardImpl === 'function') {
+      window.initializeDashboardImpl = initializeDashboardImpl;
+      window.initializeDashboard = initializeDashboardImpl;
+      window.dashboardInitFunctions.initialize = initializeDashboardImpl;
+      console.log('Dashboard initialization function globally exposed');
+    }
+  }, 0);
+})();

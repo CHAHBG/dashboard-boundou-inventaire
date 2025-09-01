@@ -13,7 +13,10 @@
     // First, check if key objects/functions exist
     const diagnostics = {
       dashboardDataExists: typeof dashboardData !== 'undefined',
-      initializeDashboardExists: typeof initializeDashboard === 'function',
+      initializeDashboardExists: typeof initializeDashboard === 'function' || 
+                                 typeof window.initializeDashboard === 'function' ||
+                                 (window.dashboardInitFunctions && typeof window.dashboardInitFunctions.initialize === 'function') ||
+                                 typeof window.initializeDashboardImpl === 'function',
       kpiGridExists: document.getElementById('kpiGrid') !== null,
       chartsExists: typeof charts !== 'undefined' && charts !== null,
       chartJsExists: typeof Chart !== 'undefined'
@@ -47,6 +50,14 @@
       } else if (typeof initializeDashboard === 'function') {
         initializeDashboard();
         console.log('Dashboard initialization completed');
+        return true;
+      } else if (window.dashboardInitFunctions && typeof window.dashboardInitFunctions.initialize === 'function') {
+        window.dashboardInitFunctions.initialize();
+        console.log('Dashboard initialization completed using backup reference');
+        return true;
+      } else if (typeof window.initializeDashboardImpl === 'function') {
+        window.initializeDashboardImpl();
+        console.log('Dashboard initialization completed using implementation function');
         return true;
       } else {
         console.error('Could not find initialization function');
