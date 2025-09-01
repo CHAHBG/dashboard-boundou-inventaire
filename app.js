@@ -1739,14 +1739,33 @@ function setupEventListeners() {
   // Navigation par onglets
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      // Update active classes for buttons
+      document.querySelectorAll('.tab-btn').forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-selected', 'false');
+      });
       btn.classList.add('active');
-      
+      btn.setAttribute('aria-selected', 'true');
+
+      // Activate the corresponding tab content. Use the data-tab value as the id.
+      const targetId = btn.dataset.tab;
       document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-      document.getElementById(btn.dataset.tab + 'Tab').classList.add('active');
-      
+      const target = document.getElementById(targetId);
+      if (target) {
+        target.classList.add('active');
+      } else {
+        console.warn('Tab target not found:', targetId);
+      }
+
+      // Trigger a resize event shortly after activation so charts recalculate sizes
+      setTimeout(() => {
+        try { window.dispatchEvent(new Event('resize')); } catch(e) { console.warn('Resize dispatch failed', e); }
+      }, 120);
+
       // Analytics tracking
-      trackUserAction('tab_change', { tab: btn.dataset.tab });
+      if (typeof trackUserAction === 'function') {
+        trackUserAction('tab_change', { tab: btn.dataset.tab });
+      }
     });
   });
   
