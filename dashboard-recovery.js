@@ -192,7 +192,6 @@
       }, 1000);
       
       return false;
-      }
     } catch (error) {
       console.error('Error during initialization fix:', error);
       return false;

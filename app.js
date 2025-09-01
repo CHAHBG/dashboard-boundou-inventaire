@@ -1637,7 +1637,10 @@ async function initializeDashboardImpl() {
   }
 }
 
-// Store the implementation in our global object
+// Store the implementation in our global object (ensure container exists)
+if (!window.dashboardInitFunctions) {
+  window.dashboardInitFunctions = {};
+}
 window.dashboardInitFunctions.initialize = initializeDashboardImpl;
 
 // Define local function that uses the implementation
