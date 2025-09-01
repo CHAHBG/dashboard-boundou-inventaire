@@ -1,0 +1,141 @@
+Created output folder: C:/Users/USER/Documents/Raw_Data/Levés topo-enquetes/Final_Analysis_Results 
+Reading Excel files...
+Individual parcels loaded: 33611 records
+Collective parcels loaded: 8662 records
+
+=== CONFLICT ANALYSIS ===
+Unique individual parcels: 33261 
+Unique collective parcels: 8571 
+Conflicted parcels (both individual and collective): 211 
+Sample conflicted parcels: 0522030300279, 0522030300223, 0522030300266, 0522030300171, 0522030300206, 0522030300254, 0522030300199, 0522030300173, 0522030300182, 0522030300284 
+Only individual parcels: 33050 
+Only collective parcels: 8360 
+
+=== POLYGON FILES PROCESSING ===
+Found 15 polygon files
+
+Processing polygon file: BALA_LineStringZ 
+Polygon features: 1190 
+Individual joins: 959 
+Collective joins: 155 
+Unjoined polygons: 81 
+
+Processing polygon file: BALLOU_LineStringZ 
+Polygon features: 1366 
+Individual joins: 358 
+Collective joins: 275 
+Unjoined polygons: 734 
+
+Processing polygon file: BANDAFASSI_LineStringZ 
+Polygon features: 3506 
+Individual joins: 2735 
+Collective joins: 753 
+Unjoined polygons: 85 
+
+Processing polygon file: BEMBOU_LineStringZ 
+Polygon features: 1992 
+Individual joins: 1552 
+Collective joins: 414 
+Unjoined polygons: 39 
+
+Processing polygon file: DIMBOLI_LineStringZ 
+Polygon features: 2950 
+Individual joins: 2401 
+Collective joins: 412 
+Unjoined polygons: 147 
+
+Processing polygon file: DINDEFELLO_LineStringZ 
+Polygon features: 1766 
+Individual joins: 1496 
+Collective joins: 259 
+Unjoined polygons: 32 
+
+Processing polygon file: FONGOLEMBI_LineStringZ 
+Polygon features: 1429 
+Individual joins: 875 
+Collective joins: 545 
+Unjoined polygons: 22 
+
+Processing polygon file: GABOU_LineStringZ 
+Polygon features: 1581 
+Individual joins: 600 
+Collective joins: 298 
+Unjoined polygons: 683 
+
+Processing polygon file: KOAR_LineStringZ 
+Polygon features: 98 
+Individual joins: 58 
+Collective joins: 30 
+Unjoined polygons: 10 
+
+Processing polygon file: MISSIRAH_LineStringZ 
+Polygon features: 6580 
+Individual joins: 4216 
+Collective joins: 909 
+Unjoined polygons: 1557 
+
+Processing polygon file: MOUDERY_LineStringZ 
+Polygon features: 1049 
+Individual joins: 458 
+Collective joins: 336 
+Unjoined polygons: 259 
+
+Processing polygon file: NDOGA_BABACAR_LineStringZ 
+Polygon features: 1272 
+Individual joins: 60 
+Collective joins: 15 
+Unjoined polygons: 1197 
+
+Processing polygon file: NETTEBOULOU_LineStringZ 
+Polygon features: 3272 
+Individual joins: 1140 
+Collective joins: 677 
+Unjoined polygons: 1576 
+
+Processing polygon file: SINTHIOU_MALEME_LineStringZ 
+Polygon features: 4606 
+Individual joins: 3535 
+Collective joins: 242 
+Unjoined polygons: 855 
+
+Processing polygon file: TOMBORONKOTO_LineStringZ 
+Polygon features: 8933 
+Individual joins: 8235 
+Collective joins: 549 
+Unjoined polygons: 198 
+
+=== CREATING EXCEL REPORTS ===
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+FINAL ANALYSIS REPORT
+= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+Input Files:
+  Individual Excel: Enquete_Foncière-Parcelles_Individuelles_30082025.xlsx 
+  Collective Excel: Enquete_Foncière-Parcelles_Collectives_30082025.xlsx 
+  Polygon Files: 15 files
+
+Output Folder: C:/Users/USER/Documents/Raw_Data/Levés topo-enquetes/Final_Analysis_Results 
+
+Parcel Analysis:
+  Total unique individual parcels: 33261 
+  Total unique collective parcels: 8571 
+  Conflicted parcels (both types): 211 
+  Only individual parcels: 33050 
+  Only collective parcels: 8360 
+
+Join Results:
+  Individual joins: 28678 
+  Collective joins: 5869 
+  Unjoined polygons: 7475 
+
+Output Files Created:
+  Excel report: Parcel_Join_Analysis_Report.xlsx
+  Individual joined: *_individual_joined.gpkg
+  Collective joined: *_collective_joined.gpkg
+  Unjoined polygons: *_unjoined.gpkg
+
+⚠️  WARNING: Found 211 parcels that are BOTH individual and collective!
+   These conflicts are detailed in the Excel report.
+
+Analysis completed successfully!
+

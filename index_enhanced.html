@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tableau de Bord - Enquête Foncière</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="style_enhanced.css">
+  <link rel="stylesheet" href="additional_styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+  <script src="app_enhanced.js"></script>
+</head>
+<body>
+  <div class="dashboard-container">
+    <header class="header">
+      <div class="header-content">
+        <div class="logo-section">
+          <div class="logo-icon"><i class="fas fa-map"></i></div>
+          <div class="logo-text">
+            <h1>Enquête Foncière</h1>
+            <p>PROCASF & BET-PLUS SA</p>
+          </div>
+        </div>
+        <div class="header-stats">
+          <div class="stat-item">
+            <span class="stat-value" id="headerTotalFiles">0</span>
+            <span class="stat-label">Fichiers traités</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value" id="headerTotalParcels">0</span>
+            <span class="stat-label">Total Parcelles</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value" id="headerSuccessRate">0%</span>
+            <span class="stat-label">Taux de succès</span>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="refresh-btn" title="Rafraîchir"><i class="fas fa-sync-alt"></i></button>
+          <button class="theme-toggle" title="Changer le thème"><i id="themeIcon" class="fas fa-moon"></i></button>
+        </div>
+      </div>
+    </header>
+
+    <nav class="nav-container">
+      <div class="nav-tabs">
+        <button class="tab-btn active" data-tab="dashboard">Vue Générale</button>
+        <button class="tab-btn" data-tab="communes">Communes</button>
+        <button class="tab-btn" data-tab="analysis">Analyse Avancée</button>
+        <button class="tab-btn" data-tab="reports">Rapports</button>
+      </div>
+      <div class="nav-actions">
+        <div class="search-container">
+          <input type="text" placeholder="Rechercher une commune..." id="searchInput" class="search-input">
+          <button class="search-btn"><i class="fas fa-search"></i></button>
+        </div>
+        <button class="btn-secondary export-btn"><i class="fas fa-download"></i> Exporter</button>
+      </div>
+    </nav>
+
+    <main class="main-content">
+      <!-- Dashboard Tab -->
+      <section id="dashboardTab" class="tab-content active">
+        <div class="kpi-section">
+          <h2 class="section-title"><i class="fas fa-tachometer-alt"></i> Tableau de bord des performances</h2>
+          <div class="dashboard-header-stats">
+            <div class="summary-stats">
+              <div class="summary-stat-item primary">
+                <div class="stat-header">
+                  <div class="stat-icon"><i class="fas fa-map-marked-alt"></i></div>
+                  <div class="stat-label">Parcelles Totales</div>
+                </div>
+                <div class="stat-value" id="totalParcelsValue">43,119</div>
+                <div class="stat-trend positive">
+                  <i class="fas fa-arrow-up"></i> 2.3% depuis le dernier mois
+                </div>
+              </div>
+              
+              <div class="summary-stat-item">
+                <div class="stat-header">
+                  <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                  <div class="stat-label">Parcelles Validées</div>
+                </div>
+                <div class="stat-value" id="validatedParcelsValue">36,908</div>
+                <div class="stat-trend positive">
+                  <i class="fas fa-arrow-up"></i> 4.1% depuis le dernier mois
+                </div>
+              </div>
+              
+              <div class="summary-stat-item">
+                <div class="stat-header">
+                  <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                  <div class="stat-label">Parcelles Problématiques</div>
+                </div>
+                <div class="stat-value" id="problemParcelsValue">6,211</div>
+                <div class="stat-trend negative">
+                  <i class="fas fa-arrow-up"></i> 0.8% depuis le dernier mois
+                </div>
+              </div>
+              
+              <div class="summary-stat-item">
+                <div class="stat-header">
+                  <div class="stat-icon"><i class="fas fa-percentage"></i></div>
+                  <div class="stat-label">Taux de Réussite</div>
+                </div>
+                <div class="stat-value" id="successRateValue">85.6%</div>
+                <div class="stat-trend positive">
+                  <i class="fas fa-arrow-up"></i> 1.2% depuis le dernier mois
+                </div>
+              </div>
+            </div>
+            
+            <div class="kpi-progress">
+              <div class="progress-header">
+                <h3>Progression du projet</h3>
+                <div class="progress-stats">
+                  <span id="progressPercentage">78%</span>
+                  <span class="progress-dates">15 Nov 2024 - 30 Déc 2025</span>
+                </div>
+              </div>
+              <div class="progress-timeline">
+                <div class="progress-track">
+                  <div class="progress-fill" style="width: 78%"></div>
+                  <div class="milestone" style="left: 25%" title="Phase 1: 25% - Collecte des données">
+                    <div class="milestone-dot completed"></div>
+                    <div class="milestone-label">Phase 1</div>
+                  </div>
+                  <div class="milestone" style="left: 50%" title="Phase 2: 50% - Nettoyage et jointure">
+                    <div class="milestone-dot completed"></div>
+                    <div class="milestone-label">Phase 2</div>
+                  </div>
+                  <div class="milestone" style="left: 75%" title="Phase 3: 75% - Validation et contrôle qualité">
+                    <div class="milestone-dot current"></div>
+                    <div class="milestone-label">Phase 3</div>
+                  </div>
+                  <div class="milestone" style="left: 100%" title="Phase 4: 100% - Finalisation et livraison">
+                    <div class="milestone-dot"></div>
+                    <div class="milestone-label">Phase 4</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="kpi-detail-grid">
+            <div class="kpi-detail-card">
+              <div class="kpi-detail-header">
+                <h4><i class="fas fa-filter"></i> Nettoyage des données</h4>
+                <span class="kpi-badge success">93%</span>
+              </div>
+              <div class="kpi-detail-body">
+                <div class="kpi-metric">
+                  <span class="metric-name">Doublons traités</span>
+                  <span class="metric-value">3,982 / 4,280</span>
+                </div>
+                <div class="kpi-metric">
+                  <span class="metric-name">Géométries corrigées</span>
+                  <span class="metric-value">2,145 / 2,310</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="kpi-detail-card">
+              <div class="kpi-detail-header">
+                <h4><i class="fas fa-link"></i> Jointures</h4>
+                <span class="kpi-badge warning">81%</span>
+              </div>
+              <div class="kpi-detail-body">
+                <div class="kpi-metric">
+                  <span class="metric-name">Parcelles jointes</span>
+                  <span class="metric-value">35,644 / 43,119</span>
+                </div>
+                <div class="kpi-metric">
+                  <span class="metric-name">En attente</span>
+                  <span class="metric-value">7,475</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="kpi-detail-card">
+              <div class="kpi-detail-header">
+                <h4><i class="fas fa-clipboard-check"></i> Validation</h4>
+                <span class="kpi-badge success">89%</span>
+              </div>
+              <div class="kpi-detail-body">
+                <div class="kpi-metric">
+                  <span class="metric-name">Parcelles validées</span>
+                  <span class="metric-value">36,908 / 43,119</span>
+                </div>
+                <div class="kpi-metric">
+                  <span class="metric-name">Taux d'erreur</span>
+                  <span class="metric-value">2.1%</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="kpi-detail-card">
+              <div class="kpi-detail-header">
+                <h4><i class="fas fa-map"></i> Couverture</h4>
+                <span class="kpi-badge success">100%</span>
+              </div>
+              <div class="kpi-detail-body">
+                <div class="kpi-metric">
+                  <span class="metric-name">Communes couvertes</span>
+                  <span class="metric-value">15 / 15</span>
+                </div>
+                <div class="kpi-metric">
+                  <span class="metric-name">Superficie totale</span>
+                  <span class="metric-value">3,215 km²</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="data-visualization-section">
+          <h2 class="section-title"><i class="fas fa-chart-pie"></i> Analyses & Tendances</h2>
+          <div class="viz-controls">
+            <div class="viz-period-selector">
+              <button class="period-btn active" data-period="all">Tous</button>
+              <button class="period-btn" data-period="q1">Q1 2025</button>
+              <button class="period-btn" data-period="q2">Q2 2025</button>
+              <button class="period-btn" data-period="q3">Q3 2025</button>
+            </div>
+            <div class="viz-actions">
+              <button class="btn-secondary btn-sm"><i class="fas fa-download"></i> Exporter</button>
+              <button class="btn-secondary btn-sm"><i class="fas fa-print"></i> Imprimer</button>
+            </div>
+          </div>
+          
+          <div class="charts-grid">
+            <div class="chart-card">
+              <div class="chart-header">
+                <h3><i class="fas fa-chart-pie"></i> Distribution par commune</h3>
+                <div class="chart-controls">
+                  <div class="chart-type-selector">
+                    <button class="chart-type-btn active" data-chart-type="doughnut"><i class="fas fa-chart-pie"></i></button>
+                    <button class="chart-type-btn" data-chart-type="bar"><i class="fas fa-chart-bar"></i></button>
+                    <button class="chart-type-btn" data-chart-type="treemap"><i class="fas fa-th-large"></i></button>
+                  </div>
+                </div>
+              </div>
+              <div class="chart-container">
+                <canvas id="parcelDistributionChart"></canvas>
+              </div>
+              <div class="chart-insights">
+                <div class="insight-badge"><i class="fas fa-bullseye"></i></div>
+                <div class="insight-text">
+                  <p><strong>Tomboronkoto</strong> et <strong>Bandafassi</strong> représentent <strong>31%</strong> du total des parcelles</p>
+                </div>
+              </div>
+              <div class="chart-actions">
+                <button class="btn-text">Voir la répartition détaillée <i class="fas fa-chevron-right"></i></button>
+              </div>
+            </div>
+            
+            <div class="chart-card">
+              <div class="chart-header">
+                <h3><i class="fas fa-star"></i> Performance par commune</h3>
+                <div class="chart-controls">
+                  <select id="metricSelector" class="chart-select">
+                    <option value="qualite">Score global</option>
+                    <option value="individuelles">Parcelles individuelles</option>
+                    <option value="collectives">Parcelles collectives</option>
+                    <option value="conflits">Résolution de conflits</option>
+                  </select>
+                </div>
+              </div>
+              <div class="chart-container">
+                <canvas id="communePerformanceChart"></canvas>
+              </div>
+              <div class="chart-insights">
+                <div class="insight-badge"><i class="fas fa-chart-line"></i></div>
+                <div class="insight-text">
+                  <p><strong>Ballou</strong> maintient le score de qualité le plus élevé à <strong>98.59%</strong></p>
+                </div>
+              </div>
+              <div class="chart-actions">
+                <button class="btn-text">Analyser les performances <i class="fas fa-chevron-right"></i></button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="charts-grid mt-4">
+            <div class="chart-card wide">
+              <div class="chart-header">
+                <h3><i class="fas fa-history"></i> Évolution temporelle</h3>
+                <div class="chart-controls">
+                  <div class="chart-toggle-group">
+                    <button class="toggle-btn active" data-series="parcels">Parcelles</button>
+                    <button class="toggle-btn" data-series="errors">Erreurs</button>
+                    <button class="toggle-btn" data-series="resolutions">Résolutions</button>
+                  </div>
+                </div>
+              </div>
+              <div class="chart-container large">
+                <canvas id="timeSeriesChart"></canvas>
+              </div>
+              <div class="chart-insights wide">
+                <div class="insight-item">
+                  <div class="insight-badge"><i class="fas fa-bolt"></i></div>
+                  <p>Pic de traitement observé en <strong>avril 2025</strong> avec <strong>4,215</strong> parcelles traitées</p>
+                </div>
+                <div class="insight-item">
+                  <div class="insight-badge"><i class="fas fa-arrow-trend-down"></i></div>
+                  <p>Réduction continue des erreurs de <strong>2.1%</strong> en moyenne par mois</p>
+                </div>
+                <div class="insight-item">
+                  <div class="insight-badge"><i class="fas fa-calendar-check"></i></div>
+                  <p>À ce rythme, l'objectif sera atteint <strong>2 semaines</strong> avant la date prévue</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="insights-and-actions-section">
+          <h2 class="section-title"><i class="fas fa-lightbulb"></i> Insights et Actions</h2>
+          <div class="insights-grid">
+            <div class="progress-card">
+              <h3><i class="fas fa-tasks"></i> État d'avancement</h3>
+              <div class="progress-container">
+                <div class="progress-item">
+                  <span class="progress-label">Nettoyage</span>
+                  <div class="progress-bar-container">
+                    <div class="progress-bar" id="cleaningProgress" style="width: 0%"></div>
+                    <div class="progress-marker" style="left: 75%"><span>Objectif</span></div>
+                  </div>
+                  <span class="progress-value" id="cleaningValue">0%</span>
+                </div>
+                <div class="progress-item">
+                  <span class="progress-label">Jointures</span>
+                  <div class="progress-bar-container">
+                    <div class="progress-bar" id="joiningProgress" style="width: 0%"></div>
+                    <div class="progress-marker" style="left: 80%"><span>Objectif</span></div>
+                  </div>
+                  <span class="progress-value" id="joiningValue">0%</span>
+                </div>
+                <div class="progress-item">
+                  <span class="progress-label">Validation</span>
+                  <div class="progress-bar-container">
+                    <div class="progress-bar" id="validationProgress" style="width: 0%"></div>
+                    <div class="progress-marker" style="left: 85%"><span>Objectif</span></div>
+                  </div>
+                  <span class="progress-value" id="validationValue">0%</span>
+                </div>
+              </div>
+              <div class="progress-summary">
+                <p><i class="fas fa-info-circle"></i> <strong>Recommandation:</strong> Prioriser la validation des parcelles de <span class="highlight">Tomboronkoto</span></p>
+              </div>
+            </div>
+
+            <div class="trend-card">
+              <h3><i class="fas fa-chart-line"></i> Évolution du traitement</h3>
+              <div class="chart-container">
+                <canvas id="trendChart"></canvas>
+              </div>
+              <div class="trend-legend">
+                <div class="legend-item">
+                  <span class="color-dot" style="background-color: rgba(54, 162, 235, 0.8)"></span>
+                  <span>Parcelles traitées</span>
+                </div>
+                <div class="legend-item">
+                  <span class="color-dot" style="background-color: rgba(255, 99, 132, 0.8)"></span>
+                  <span>Anomalies détectées</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="anomalies-card">
+              <h3><i class="fas fa-exclamation-triangle"></i> Problèmes critiques</h3>
+              <div class="anomaly-container">
+                <div class="anomaly-item critical">
+                  <div class="anomaly-icon"><i class="fas fa-exclamation-circle"></i></div>
+                  <div class="anomaly-details">
+                    <h4>Doublons d'IDUP</h4>
+                    <p><strong>4280</strong> doublons identifiés (9.93%)</p>
+                    <div class="anomaly-trend positive">
+                      <i class="fas fa-arrow-down"></i> <span>-1.2% depuis le dernier traitement</span>
+                    </div>
+                  </div>
+                  <div class="anomaly-chart-mini" id="duplicatesTrendMini"></div>
+                </div>
+                <div class="anomaly-item warning">
+                  <div class="anomaly-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                  <div class="anomaly-details">
+                    <h4>Conflits de type</h4>
+                    <p><strong>211</strong> parcelles en conflit (0.54%)</p>
+                    <div class="anomaly-trend negative">
+                      <i class="fas fa-arrow-up"></i> <span>+0.1% depuis le dernier traitement</span>
+                    </div>
+                  </div>
+                  <div class="anomaly-chart-mini" id="conflictsTrendMini"></div>
+                </div>
+                <div class="anomaly-item info">
+                  <div class="anomaly-icon"><i class="fas fa-info-circle"></i></div>
+                  <div class="anomaly-details">
+                    <h4>Parcelles sans jointure</h4>
+                    <p><strong>7475</strong> parcelles (19.25%)</p>
+                    <div class="anomaly-trend neutral">
+                      <i class="fas fa-minus"></i> <span>Stable depuis le dernier traitement</span>
+                    </div>
+                  </div>
+                  <div class="anomaly-chart-mini" id="unjoinedTrendMini"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="insights-card">
+              <h3><i class="fas fa-lightbulb"></i> Perspectives clés</h3>
+              <div class="insights-container">
+                <div class="insights-chart-wrapper">
+                  <canvas id="insightsDonutChart"></canvas>
+                  <div class="donut-center-text">
+                    <div class="donut-percentage">85.6%</div>
+                    <div class="donut-label">Taux global</div>
+                  </div>
+                </div>
+                <div class="key-insights">
+                  <div class="key-insight-item">
+                    <div class="insight-indicator success"></div>
+                    <div class="insight-content">
+                      <h4>Distribution des parcelles</h4>
+                      <p>Concentration de <strong>31%</strong> des parcelles dans 2 communes sur 15</p>
+                    </div>
+                  </div>
+                  <div class="key-insight-item">
+                    <div class="insight-indicator warning"></div>
+                    <div class="insight-content">
+                      <h4>Tendance de qualité</h4>
+                      <p>Amélioration constante de <strong>1.2%</strong> par mois au cours du dernier trimestre</p>
+                    </div>
+                  </div>
+                  <div class="key-insight-item">
+                    <div class="insight-indicator info"></div>
+                    <div class="insight-content">
+                      <h4>Prévision d'achèvement</h4>
+                      <p>Le projet est en avance de <strong>14 jours</strong> par rapport au calendrier initial</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="data-intelligence-section">
+          <h2 class="section-title"><i class="fas fa-brain"></i> Intelligence des Données</h2>
+          <div class="data-intel-grid">
+            <div class="quality-card">
+              <div class="card-header">
+                <h3><i class="fas fa-award"></i> Qualité des Données</h3>
+                <select class="commune-select" id="qualitySelectCommune">
+                  <option value="all">Toutes les communes</option>
+                  <option value="TOMBORONKOTO">Tomboronkoto</option>
+                  <option value="BANDAFASSI">Bandafassi</option>
+                  <option value="BALLOU">Ballou</option>
+                  <option value="NDOGA_BABACAR">Ndoga Babacar</option>
+                </select>
+              </div>
+              <div class="quality-grid">
+                <div class="quality-gauge">
+                  <canvas id="qualityGauge"></canvas>
+                  <div class="gauge-overlay">
+                    <div class="gauge-value" id="qualityValue">90.07%</div>
+                    <div class="gauge-change positive">+0.22%</div>
+                  </div>
+                </div>
+                <div class="quality-metrics">
+                  <div class="metric-item">
+                    <div class="metric-name">Complétude</div>
+                    <div class="metric-bar-container">
+                      <div class="metric-bar" style="width: 94%"></div>
+                    </div>
+                    <div class="metric-value">94%</div>
+                  </div>
+                  <div class="metric-item">
+                    <div class="metric-name">Cohérence</div>
+                    <div class="metric-bar-container">
+                      <div class="metric-bar" style="width: 89%"></div>
+                    </div>
+                    <div class="metric-value">89%</div>
+                  </div>
+                  <div class="metric-item">
+                    <div class="metric-name">Unicité</div>
+                    <div class="metric-bar-container">
+                      <div class="metric-bar" style="width: 91%"></div>
+                    </div>
+                    <div class="metric-value">91%</div>
+                  </div>
+                  <div class="metric-item">
+                    <div class="metric-name">Validité</div>
+                    <div class="metric-bar-container">
+                      <div class="metric-bar" style="width: 98%"></div>
+                    </div>
+                    <div class="metric-value">98%</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="predictive-card">
+              <h3><i class="fas fa-chart-line"></i> Prévisions</h3>
+              <div class="prediction-container">
+                <div class="prediction-chart">
+                  <canvas id="predictionChart"></canvas>
+                </div>
+                <div class="prediction-legend">
+                  <div class="legend-item">
+                    <span class="color-dot" style="background-color: rgba(54, 162, 235, 0.8)"></span>
+                    <span>Données historiques</span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="color-dot" style="background-color: rgba(255, 159, 64, 0.8)"></span>
+                    <span>Prévision optimiste</span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="color-dot" style="background-color: rgba(255, 99, 132, 0.8)"></span>
+                    <span>Prévision pessimiste</span>
+                  </div>
+                </div>
+                <div class="prediction-insight">
+                  <i class="fas fa-info-circle"></i>
+                  <p>Au rythme actuel, l'objectif de traitement sera atteint d'ici <strong>14 jours</strong> (±3 jours)</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="pattern-detection-card">
+              <h3><i class="fas fa-puzzle-piece"></i> Modèles et Corrélations</h3>
+              <div class="pattern-container">
+                <div class="pattern-item">
+                  <div class="pattern-badge significant">
+                    <i class="fas fa-star"></i>
+                  </div>
+                  <div class="pattern-content">
+                    <h4>Corrélation Forte (r=0.89)</h4>
+                    <p>Les parcelles avec des doublons d'IDUP sont concentrées à <strong>73%</strong> dans les zones périphériques des communes</p>
+                  </div>
+                </div>
+                <div class="pattern-item">
+                  <div class="pattern-badge notable">
+                    <i class="fas fa-chart-pie"></i>
+                  </div>
+                  <div class="pattern-content">
+                    <h4>Distribution bimodale</h4>
+                    <p>La taille des parcelles suit une distribution à deux pics distincts: parcelles résidentielles (≈150m²) et agricoles (≈5000m²)</p>
+                  </div>
+                </div>
+                <div class="pattern-item">
+                  <div class="pattern-badge emerging">
+                    <i class="fas fa-seedling"></i>
+                  </div>
+                  <div class="pattern-content">
+                    <h4>Tendance émergente</h4>
+                    <p>Augmentation de <strong>12%</strong> des parcelles collectives dans la région sud-est depuis le dernier trimestre</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="anomaly-detection-card">
+              <h3><i class="fas fa-microscope"></i> Détection d'Anomalies</h3>
+              <div class="anomaly-visualization">
+                <div class="visualization-header">
+                  <h4>Distribution des valeurs atypiques</h4>
+                  <div class="visualization-legend">
+                    <span class="legend-dot normal"></span> Valeurs normales
+                    <span class="legend-dot anomaly"></span> Anomalies
+                  </div>
+                </div>
+                <div class="scatter-container">
+                  <canvas id="anomalyScatter"></canvas>
+                </div>
+                <div class="visualization-footer">
+                  <p><strong>215</strong> points de données identifiés comme anomalies potentielles</p>
+                  <button class="btn-secondary">Analyser en détail</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Communes Tab -->
+      <section id="communesTab" class="tab-content">
+        <div class="filters-bar">
+          <div class="filter-group">
+            <label>Commune:</label>
+            <select id="communeFilter" class="filter-select">
+              <option value="">Toutes les communes</option>
+              <!-- Options will be populated by JS -->
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Statut:</label>
+            <select id="statusFilter" class="filter-select">
+              <option value="">Tous les statuts</option>
+              <option value="complété">Complété</option>
+              <option value="en_cours">En cours</option>
+              <option value="en_attente">En attente</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Date:</label>
+            <input type="date" id="dateFilter" class="filter-date">
+          </div>
+          <button id="resetFilters" class="btn-secondary">Réinitialiser</button>
+        </div>
+
+        <div class="table-card">
+          <div class="table-header">
+            <h2>Liste des communes</h2>
+            <div class="table-actions">
+              <button class="btn-icon" title="Exporter en CSV"><i class="fas fa-file-csv"></i></button>
+              <button class="btn-icon" title="Exporter en PDF"><i class="fas fa-file-pdf"></i></button>
+              <button class="btn-icon" title="Imprimer"><i class="fas fa-print"></i></button>
+            </div>
+          </div>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Commune</th>
+                  <th>Parcelles Brutes</th>
+                  <th>Individuelles</th>
+                  <th>Collectives</th>
+                  <th>Conflits</th>
+                  <th>Qualité (%)</th>
+                  <th>Statut</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="communeTableBody">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
+          <div class="table-footer">
+            <div class="pagination">
+              <button class="page-btn" disabled><i class="fas fa-chevron-left"></i></button>
+              <span class="page-info">Page 1 sur 1</span>
+              <button class="page-btn" disabled><i class="fas fa-chevron-right"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="commune-details-section">
+          <h2 class="section-title">Détails de la commune</h2>
+          <div class="commune-grid">
+            <div class="commune-map-card">
+              <h3>Carte de la commune</h3>
+              <div class="map-container">
+                <div id="communeMap" class="map-placeholder">
+                  <i class="fas fa-map-marked-alt"></i>
+                  <p>Sélectionnez une commune pour afficher la carte</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="commune-stats-card">
+              <h3>Statistiques</h3>
+              <div class="commune-stats">
+                <div class="stat-card">
+                  <div class="stat-icon"><i class="fas fa-map-marker-alt"></i></div>
+                  <div class="stat-info">
+                    <span class="stat-value" id="communeParcelsCount">0</span>
+                    <span class="stat-label">Parcelles</span>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-icon"><i class="fas fa-user"></i></div>
+                  <div class="stat-info">
+                    <span class="stat-value" id="communeOwnersCount">0</span>
+                    <span class="stat-label">Propriétaires</span>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                  <div class="stat-info">
+                    <span class="stat-value" id="communeAnomaliesCount">0</span>
+                    <span class="stat-label">Anomalies</span>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+                  <div class="stat-info">
+                    <span class="stat-value" id="communeCompletionDate">--/--/--</span>
+                    <span class="stat-label">Date de traitement</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="commune-history-card">
+              <h3>Historique des traitements</h3>
+              <div class="timeline-container">
+                <div class="timeline" id="communeTimeline">
+                  <!-- Populated by JS -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Analysis Tab -->
+      <section id="analysisTab" class="tab-content">
+        <div class="analysis-header">
+          <h2 class="section-title">Analyse des données</h2>
+          <div class="analysis-controls">
+            <button class="btn-primary" id="refreshVisualizationsBtn"><i class="fas fa-sync-alt"></i> Actualiser les visualisations</button>
+            <div class="date-range-selector">
+              <span>Période:</span>
+              <select class="date-range-select">
+                <option value="all">Toutes les données</option>
+                <option value="1m" selected>Dernier mois</option>
+                <option value="3m">3 derniers mois</option>
+                <option value="6m">6 derniers mois</option>
+                <option value="1y">Dernière année</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        
+        <div class="analysis-grid">
+          <div class="analysis-card">
+            <div class="card-header">
+              <h3>Distribution des doublons d'IDUP</h3>
+              <div class="card-actions">
+                <button class="btn-icon" title="Changer de visualisation"><i class="fas fa-chart-pie"></i></button>
+                <button class="btn-icon" title="Plus d'informations"><i class="fas fa-info-circle"></i></button>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas id="duplicateChart"></canvas>
+            </div>
+            <div class="chart-insights">
+              <div class="insight-badge"><i class="fas fa-bullseye"></i></div>
+              <div class="insight-text">
+                <p><strong>Tomboronkoto</strong> représente <strong>42%</strong> des doublons identifiés</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="analysis-card">
+            <div class="card-header">
+              <h3>Analyse des jointures</h3>
+              <div class="card-actions">
+                <button class="btn-icon" title="Vue détaillée"><i class="fas fa-table"></i></button>
+                <button class="btn-icon" title="Plus d'informations"><i class="fas fa-info-circle"></i></button>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas id="joinChart"></canvas>
+            </div>
+            <div class="chart-insights">
+              <div class="insight-badge"><i class="fas fa-link"></i></div>
+              <div class="insight-text">
+                <p>Taux de jointure global: <strong>80.75%</strong> avec variation de <strong>±4.2%</strong> entre communes</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="analysis-card">
+            <div class="card-header">
+              <h3>Évolution des anomalies</h3>
+              <div class="card-actions">
+                <button class="btn-icon" title="Changer la période"><i class="fas fa-calendar"></i></button>
+                <button class="btn-icon" title="Plus d'informations"><i class="fas fa-info-circle"></i></button>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas id="anomalyTrendsChart"></canvas>
+            </div>
+            <div class="chart-insights">
+              <div class="insight-badge"><i class="fas fa-chart-line"></i></div>
+              <div class="insight-text">
+                <p>Réduction de <strong>1.7%</strong> des anomalies par mois en moyenne depuis mars 2025</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="analysis-card full-width">
+            <div class="card-header">
+              <h3>Distribution des anomalies par commune</h3>
+              <div class="card-actions">
+                <button class="btn-icon" title="Changer de vue"><i class="fas fa-chart-bar"></i></button>
+                <button class="btn-icon" title="Plus d'informations"><i class="fas fa-info-circle"></i></button>
+              </div>
+            </div>
+            <div class="advanced-visualization">
+              <div class="visualization-tabs">
+                <button class="viz-tab active" data-viz="map">Carte</button>
+                <button class="viz-tab" data-viz="heatmap">Heatmap</button>
+                <button class="viz-tab" data-viz="matrix">Matrice</button>
+              </div>
+              <div class="viz-container">
+                <canvas id="anomalyDistributionViz" height="300"></canvas>
+              </div>
+              <div class="viz-legend">
+                <div class="enhanced-legend">
+                  <div class="legend-item">
+                    <div class="legend-color" style="background-color: rgba(239, 68, 68, 0.8)"></div>
+                    <div class="legend-label">Doublons</div>
+                  </div>
+                  <div class="legend-item">
+                    <div class="legend-color" style="background-color: rgba(245, 158, 11, 0.8)"></div>
+                    <div class="legend-label">Conflits</div>
+                  </div>
+                  <div class="legend-item">
+                    <div class="legend-color" style="background-color: rgba(59, 130, 246, 0.8)"></div>
+                    <div class="legend-label">Non-jointures</div>
+                  </div>
+                  <div class="legend-item">
+                    <div class="legend-color" style="background-color: rgba(16, 185, 129, 0.8)"></div>
+                    <div class="legend-label">Géométrie</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Files Tab -->
+      <section id="filesTab" class="tab-content">
+        <div class="files-header">
+          <h2 class="section-title">Gestion des fichiers</h2>
+          <div class="files-actions">
+            <button class="btn-primary" id="uploadFileBtn"><i class="fas fa-upload"></i> Importer</button>
+            <button class="btn-secondary" id="newFolderBtn"><i class="fas fa-folder-plus"></i> Nouveau dossier</button>
+          </div>
+        </div>
+        
+        <div class="files-browser">
+          <div class="files-sidebar">
+            <div class="sidebar-section">
+              <h3>Dossiers</h3>
+              <ul class="folder-tree" id="folderTree">
+                <li class="folder active"><i class="fas fa-folder-open"></i> données brutes</li>
+                <li class="folder"><i class="fas fa-folder"></i> nettoyage</li>
+                <li class="folder"><i class="fas fa-folder"></i> jointures</li>
+                <li class="folder"><i class="fas fa-folder"></i> rapports</li>
+                <li class="folder"><i class="fas fa-folder"></i> exportations</li>
+              </ul>
+            </div>
+            <div class="sidebar-section">
+              <h3>Espace disque</h3>
+              <div class="disk-usage">
+                <div class="progress-bar-container">
+                  <div class="progress-bar" style="width: 45%"></div>
+                </div>
+                <div class="disk-info">
+                  <span>45% utilisé</span>
+                  <span>450MB / 1GB</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="files-content">
+            <div class="files-breadcrumb">
+              <span class="breadcrumb-item"><i class="fas fa-home"></i></span>
+              <span class="breadcrumb-separator">/</span>
+              <span class="breadcrumb-item">données brutes</span>
+            </div>
+            
+            <div class="files-toolbar">
+              <div class="files-search">
+                <input type="text" placeholder="Rechercher des fichiers..." class="files-search-input">
+              </div>
+              <div class="files-view-options">
+                <button class="view-btn active" title="Vue en grille"><i class="fas fa-th"></i></button>
+                <button class="view-btn" title="Vue en liste"><i class="fas fa-list"></i></button>
+              </div>
+            </div>
+            
+            <div class="files-grid" id="filesGrid">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Reports Tab -->
+      <section id="reportsTab" class="tab-content">
+        <div class="reports-header">
+          <h2 class="section-title">Rapports</h2>
+          <div class="reports-actions">
+            <button class="btn-primary" id="generateReportBtn"><i class="fas fa-file-alt"></i> Générer un rapport</button>
+            <button class="btn-secondary" id="scheduleReportBtn"><i class="fas fa-clock"></i> Planifier</button>
+          </div>
+        </div>
+        
+        <div class="reports-grid">
+          <div class="reports-list">
+            <div class="list-header">
+              <h3>Rapports disponibles</h3>
+              <div class="reports-filter">
+                <select class="report-type-select">
+                  <option value="all">Tous les types</option>
+                  <option value="summary">Sommaire</option>
+                  <option value="detailed">Détaillé</option>
+                  <option value="anomaly">Anomalies</option>
+                </select>
+              </div>
+            </div>
+            <div class="list-content" id="reportsList">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+          
+          <div class="report-preview">
+            <div class="preview-header">
+              <h3>Aperçu du rapport</h3>
+              <div class="preview-actions">
+                <button class="btn-icon" title="Télécharger en PDF"><i class="fas fa-file-pdf"></i></button>
+                <button class="btn-icon" title="Télécharger en Excel"><i class="fas fa-file-excel"></i></button>
+                <button class="btn-icon" title="Imprimer"><i class="fas fa-print"></i></button>
+                <button class="btn-icon" title="Partager"><i class="fas fa-share-alt"></i></button>
+              </div>
+            </div>
+            <div class="preview-content" id="reportPreview">
+              <div class="preview-placeholder">
+                <i class="fas fa-file-alt"></i>
+                <p>Sélectionnez un rapport pour l'afficher</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Settings Tab -->
+      <section id="settingsTab" class="tab-content">
+        <div class="settings-header">
+          <h2 class="section-title">Paramètres</h2>
+          <button class="btn-primary" id="saveSettingsBtn">Enregistrer</button>
+        </div>
+        
+        <div class="settings-grid">
+          <div class="settings-card">
+            <h3>Général</h3>
+            <div class="settings-form">
+              <div class="form-group">
+                <label for="appLanguage">Langue</label>
+                <select id="appLanguage" class="form-control">
+                  <option value="fr">Français</option>
+                  <option value="en">English</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="defaultTheme">Thème par défaut</label>
+                <select id="defaultTheme" class="form-control">
+                  <option value="light">Clair</option>
+                  <option value="dark">Sombre</option>
+                  <option value="system">Système</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Notifications</label>
+                <div class="toggle-switch">
+                  <input type="checkbox" id="notificationsToggle" checked>
+                  <label for="notificationsToggle"></label>
+                  <span class="toggle-label">Activées</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="settings-card">
+            <h3>Affichage</h3>
+            <div class="settings-form">
+              <div class="form-group">
+                <label for="elementsPerPage">Éléments par page</label>
+                <input type="number" id="elementsPerPage" class="form-control" value="10" min="5" max="100">
+              </div>
+              <div class="form-group">
+                <label for="chartAnimation">Animation des graphiques</label>
+                <div class="toggle-switch">
+                  <input type="checkbox" id="chartAnimation" checked>
+                  <label for="chartAnimation"></label>
+                  <span class="toggle-label">Activée</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="chartColorScheme">Palette de couleurs</label>
+                <select id="chartColorScheme" class="form-control">
+                  <option value="default">Par défaut</option>
+                  <option value="colorblind">Daltonien</option>
+                  <option value="pastel">Pastel</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <div class="settings-card">
+            <h3>Données</h3>
+            <div class="settings-form">
+              <div class="form-group">
+                <label for="dataRefreshRate">Fréquence d'actualisation</label>
+                <select id="dataRefreshRate" class="form-control">
+                  <option value="0">Manuel uniquement</option>
+                  <option value="60">Chaque minute</option>
+                  <option value="300">Chaque 5 minutes</option>
+                  <option value="3600">Chaque heure</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="dataSourcePath">Chemin de la source de données</label>
+                <div class="path-input-group">
+                  <input type="text" id="dataSourcePath" class="form-control" value="data/">
+                  <button class="btn-icon"><i class="fas fa-folder-open"></i></button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Cache local</label>
+                <div class="action-buttons">
+                  <button class="btn-secondary btn-sm">Vider le cache</button>
+                  <span class="info-text">Dernier vidage: Jamais</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="settings-card">
+            <h3>Avancé</h3>
+            <div class="settings-form">
+              <div class="form-group">
+                <label>Mode développeur</label>
+                <div class="toggle-switch">
+                  <input type="checkbox" id="developerMode">
+                  <label for="developerMode"></label>
+                  <span class="toggle-label">Désactivé</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Journaux détaillés</label>
+                <div class="toggle-switch">
+                  <input type="checkbox" id="verboseLogs">
+                  <label for="verboseLogs"></label>
+                  <span class="toggle-label">Désactivés</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Base de données</label>
+                <div class="action-buttons">
+                  <button class="btn-warning btn-sm">Réinitialiser</button>
+                  <button class="btn-secondary btn-sm">Exporter</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="settings-card full-width">
+            <h3>À propos</h3>
+            <div class="about-content">
+              <div class="app-info">
+                <div class="app-logo"><i class="fas fa-map fa-3x"></i></div>
+                <div class="app-details">
+                  <h4>Tableau de Bord - Enquête Foncière</h4>
+                  <p>Version: 1.2.0</p>
+                  <p>Dernière mise à jour: 31 Août 2025</p>
+                </div>
+              </div>
+              <div class="app-description">
+                <p>Tableau de bord développé pour le suivi des enquêtes foncières dans le cadre du projet PROCASEF.</p>
+                <p>Développé par BET-PLUS SA avec le soutien de l'AGETIP.</p>
+              </div>
+              <div class="app-links">
+                <a href="#" class="link-item"><i class="fas fa-book"></i> Documentation</a>
+                <a href="#" class="link-item"><i class="fas fa-bug"></i> Signaler un problème</a>
+                <a href="#" class="link-item"><i class="fas fa-question-circle"></i> Aide</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-left">
+          <p>&copy; 2025 PROCASEF - BETPLUS SA. Tous droits réservés.</p>
+        </div>
+        <div class="footer-right">
+          <p>Version 1.2.0 | Dernière mise à jour: <span id="lastUpdateDate">31 Août 2025</span></p>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Modals -->
+  <div class="modal" id="reportModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Générer un rapport</h3>
+        <button class="close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="reportType">Type de rapport</label>
+          <select id="reportType" class="form-control">
+            <option value="summary">Rapport sommaire</option>
+            <option value="detailed">Rapport détaillé</option>
+            <option value="anomaly">Rapport d'anomalies</option>
+            <option value="commune">Rapport par commune</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="reportFormat">Format</label>
+          <select id="reportFormat" class="form-control">
+            <option value="pdf">PDF</option>
+            <option value="excel">Excel</option>
+            <option value="json">JSON</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="reportIncludeCharts">Inclure les graphiques</label>
+          <div class="toggle-switch">
+            <input type="checkbox" id="reportIncludeCharts" checked>
+            <label for="reportIncludeCharts"></label>
+            <span class="toggle-label">Oui</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" id="cancelReportBtn">Annuler</button>
+        <button class="btn-primary" id="generateReportConfirmBtn">Générer</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

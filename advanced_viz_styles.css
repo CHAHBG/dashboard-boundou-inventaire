@@ -1,0 +1,147 @@
+/* Advanced Visualization Styles */
+.advanced-visualization {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.visualization-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 1rem;
+}
+
+.viz-tab {
+  padding: 0.5rem 1rem;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.viz-tab:hover {
+  color: var(--text-primary);
+}
+
+.viz-tab.active {
+  border-bottom-color: var(--primary);
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.viz-container {
+  position: relative;
+  height: 300px;
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.viz-legend {
+  margin-top: 1rem;
+}
+
+/* Enhanced Chart Styling */
+.anomaly-chart-mini {
+  background: linear-gradient(to right, 
+    rgba(59, 130, 246, 0.1) 0%, 
+    rgba(59, 130, 246, 0.2) 50%, 
+    rgba(59, 130, 246, 0.1) 100%
+  );
+  position: relative;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.anomaly-chart-mini::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(to right,
+    transparent 0%,
+    rgba(59, 130, 246, 0.5) 50%,
+    transparent 100%
+  );
+}
+
+/* Chart tooltip enhancements */
+.chart-custom-tooltip {
+  opacity: 0;
+  position: absolute;
+  background-color: var(--background-card);
+  border-radius: var(--border-radius-sm);
+  padding: 0.75rem 1rem;
+  box-shadow: var(--shadow-medium);
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 10;
+  max-width: 220px;
+  border-left: 3px solid var(--primary);
+}
+
+.tooltip-header {
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.tooltip-body {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.tooltip-data-point {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.3rem;
+}
+
+.tooltip-color {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+}
+
+.tooltip-label {
+  margin-right: 0.5rem;
+}
+
+.tooltip-value {
+  font-weight: 500;
+  margin-left: auto;
+  color: var(--text-primary);
+}
+
+/* Mobile responsiveness for visualizations */
+@media (max-width: 768px) {
+  .viz-container {
+    height: 250px;
+  }
+  
+  .visualization-tabs {
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .viz-tab {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+  }
+  
+  .enhanced-legend {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+  
+  .legend-item {
+    margin-bottom: 0.5rem;
+  }
+}

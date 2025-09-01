@@ -1,0 +1,1659 @@
+Created output folder: C:/Users/USER/Documents/Raw_Data/Levés topo-enquetes/Données LineStringZ Amélioré/Geopackages_Final_Clean 
+[1] "Found 15 files to process"
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+Processing file 1 of 15 : BALA_LineStringZ 
+= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+Original feature count: 1212 
+Available columns: id, source_file, length_2d, start_x, start_y, start_z, end_x, end_y, end_z, min_z, max_z, z_range, point_count, length_3d, dxf_type, layer, color, linetype, lineweight, handle, thickness, elevation, extrusion_x, extrusion_y, extrusion_z, closed, start_width, end_width, geom 
+Created Num_parcel field from 'layer' column
+Kept columns: source_file, layer, Num_parcel 
+
+--- Num_parcel ANALYSIS ---
+Unique Num_parcel values: 1188 
+Sample Num_parcel values: 0532010101605, 0532010101937, 0532010101652, 0532010101839, 0532010101945, 0532010100016, 0532010101977, 0532010101929, 0532010101953, 0532010100584 
+Numeric parcels (excluding 0): 1187 
+Zero parcels: 1 
+Text/character parcels: 1 
+Removing 1 duplicates for numeric Num_parcel: 0532010101123 
+Removing 2 duplicates for numeric Num_parcel: 0532010101926 
+Removing 1 duplicates for numeric Num_parcel: 0532010101151 
+Removing 1 duplicates for numeric Num_parcel: 0532010101636 
+Removing 1 duplicates for numeric Num_parcel: 0532010100011 
+Removing 1 duplicates for numeric Num_parcel: 0532010101291 
+Removing 1 duplicates for numeric Num_parcel: 0532010101811 
+Removing 1 duplicates for numeric Num_parcel: 0532010100647 
+Removing 1 duplicates for numeric Num_parcel: 0532010100249 
+Removing 1 duplicates for numeric Num_parcel: 0532010101390 
+Removing 1 duplicates for numeric Num_parcel: 0532010101506 
+Removing 1 duplicates for numeric Num_parcel: 0532010101557 
+Removing 1 duplicates for numeric Num_parcel: 0532010100712 
+Removing 1 duplicates for numeric Num_parcel: 0532010101670 
+Removing 1 duplicates for numeric Num_parcel: 0532010100419 
+Removing 1 duplicates for numeric Num_parcel: 0532010101269 
+Removing 1 duplicates for numeric Num_parcel: 0532010101966 
+Removing 1 duplicates for numeric Num_parcel: 0532010100782 
+Removing 1 duplicates for numeric Num_parcel: 0532010101974 
+Removing 1 duplicates for numeric Num_parcel: 0532010100460 
+Removing 1 duplicates for numeric Num_parcel: 0532010101039 
+
+--- CLEANING RESULTS ---
+Features after cleaning: 1190 
+Features removed: 22 
+Reduction: 1.8 %
+Final unique Num_parcel values: 1188 
+Final numeric parcels (no duplicates): 1187 
+Final zero parcels (kept all): 1 
+Final text parcels (kept all): 1 
+✓ Successfully processed and saved: BALA_LineStringZ_final.gpkg 
+Final columns: source_file, layer, Num_parcel, geom 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+Processing file 2 of 15 : BALLOU_LineStringZ 
+= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+Original feature count: 1371 
+Available columns: id, source_file, length_2d, start_x, start_y, start_z, end_x, end_y, end_z, min_z, max_z, z_range, point_count, length_3d, dxf_type, layer, color, linetype, lineweight, handle, thickness, elevation, extrusion_x, extrusion_y, extrusion_z, closed, start_width, end_width, geom 
+Created Num_parcel field from 'layer' column
+Kept columns: source_file, layer, Num_parcel 
+
+--- Num_parcel ANALYSIS ---
+Unique Num_parcel values: 637 
+Sample Num_parcel values: 0, 0512030102682, 0512030102674, 0512030102666, 0512030102658, 0512030102677, 0512030102336, 0512030102685, 0512030103088, 0512030100043 
+Numeric parcels (excluding 0): 635 
+Zero parcels: 1 
+Text/character parcels: 2 
+Removing 1 duplicates for numeric Num_parcel: 0512030102877 
+Removing 1 duplicates for numeric Num_parcel: 0512030103612 
+Removing 1 duplicates for numeric Num_parcel: 0512030103231 
+Removing 1 duplicates for numeric Num_parcel: 0512030103212 
+Removing 1 duplicates for numeric Num_parcel: 0512030103549 
+
+--- CLEANING RESULTS ---
+Features after cleaning: 1366 
+Features removed: 5 
+Reduction: 0.4 %
+Final unique Num_parcel values: 637 
+Final numeric parcels (no duplicates): 635 
+Final zero parcels (kept all): 1 
+Final text parcels (kept all): 2 
+✓ Successfully processed and saved: BALLOU_LineStringZ_final.gpkg 
+Final columns: source_file, layer, Num_parcel, geom 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+Processing file 3 of 15 : BANDAFASSI_LineStringZ 
+= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+Original feature count: 3691 
+Available columns: id, source_file, length_2d, start_x, start_y, start_z, end_x, end_y, end_z, min_z, max_z, z_range, point_count, length_3d, dxf_type, layer, color, linetype, lineweight, handle, thickness, elevation, extrusion_x, extrusion_y, extrusion_z, closed, start_width, end_width, geom 
+Created Num_parcel field from 'layer' column
+Kept columns: source_file, layer, Num_parcel 
+
+--- Num_parcel ANALYSIS ---
+Unique Num_parcel values: 3457 
+Sample Num_parcel values: 1312010102240, 1312010102080, 1312010102232, 1312010102224, 1312010102151, 1312010102159, 1312010102039, 1312010102047, 1312010102671, 1312010102343 
+Numeric parcels (excluding 0): 3443 
+Zero parcels: 1 
+Text/character parcels: 14 
+Removing 1 duplicates for numeric Num_parcel: 1312010102176 
+Removing 1 duplicates for numeric Num_parcel: 1312010100259 
+Removing 1 duplicates for numeric Num_parcel: 1312010102832 
+Removing 1 duplicates for numeric Num_parcel: 1312010100581 
+Removing 1 duplicates for numeric Num_parcel: 1312010104494 
+Removing 1 duplicates for numeric Num_parcel: 1312010104514 
+Removing 1 duplicates for numeric Num_parcel: 1312010104591 
+Removing 1 duplicates for numeric Num_parcel: 1312010101247 
+Removing 1 duplicates for numeric Num_parcel: 1312010101704 
+Removing 1 duplicates for numeric Num_parcel: 1312010101176 
+Removing 1 duplicates for numeric Num_parcel: 1312010100531 
+Removing 1 duplicates for numeric Num_parcel: 1312010100747 
+Removing 1 duplicates for numeric Num_parcel: 1312010100755 
+Removing 1 duplicates for numeric Num_parcel: 1312010100085 
+Removing 1 duplicates for numeric Num_parcel: 1312010100070 
+Removing 1 duplicates for numeric Num_parcel: 1312010103297 
+Removing 1 duplicates for numeric Num_parcel: 1312010103989 
+Removing 1 duplicates for numeric Num_parcel: 1312010104548 
+Removing 1 duplicates for numeric Num_parcel: 1312010102174 
+Removing 1 duplicates for numeric Num_parcel: 1312010101458 
+Removing 1 duplicates for numeric Num_parcel: 1312010101537 
+Removing 1 duplicates for numeric Num_parcel: 1312010101442 
+Removing 1 duplicates for numeric Num_parcel: 1312010101657 
+Removing 1 duplicates for numeric Num_parcel: 1312010101655 
+Removing 2 duplicates for numeric Num_parcel: 1312010101953 
+Removing 1 duplicates for numeric Num_parcel: 1312010101937 
+Removing 1 duplicates for numeric Num_parcel: 1312010102079 
+Removing 1 duplicates for numeric Num_parcel: 1312010102170 
+Removing 1 duplicates for numeric Num_parcel: 1312010100153 
+Removing 1 duplicates for numeric Num_parcel: 1312010100488 
+Removing 1 duplicates for numeric Num_parcel: 1312010101919 
+Removing 1 duplicates for numeric Num_parcel: 1312010104543 
+Removing 1 duplicates for numeric Num_parcel: 1312010104446 
+Removing 1 duplicates for numeric Num_parcel: 1312010102567 
+Removing 1 duplicates for numeric Num_parcel: 1312010101470 
+Removing 1 duplicates for numeric Num_parcel: 1312010101476 
+Removing 1 duplicates for numeric Num_parcel: 1312010100678 
+Removing 1 duplicates for numeric Num_parcel: 1312010104372 
+Removing 2 duplicates for numeric Num_parcel: 1312010102421 
+Removing 2 duplicates for numeric Num_parcel: 1312010104041 
+Removing 1 duplicates for numeric Num_parcel: 1312010104033 
+Removing 1 duplicates for numeric Num_parcel: 1312010104170 
+Removing 1 duplicates for numeric Num_parcel: 1312010102046 
+Removing 1 duplicates for numeric Num_parcel: 1312010100305 
+Removing 1 duplicates for numeric Num_parcel: 1312010100553 
+Removing 1 duplicates for numeric Num_parcel: 1312010101810 
+Removing 1 duplicates for numeric Num_parcel: 1312010100668 
+Removing 1 duplicates for numeric Num_parcel: 1312010101800 
+Removing 1 duplicates for numeric Num_parcel: 1312010100855 
+Removing 1 duplicates for numeric Num_parcel: 1312010100627 
+Removing 1 duplicates for numeric Num_parcel: 1312010101216 
+Removing 1 duplicates for numeric Num_parcel: 1312010100967 
+Removing 1 duplicates for numeric Num_parcel: 1312010104528 
+Removing 1 duplicates for numeric Num_parcel: 1312010102887 
+Removing 1 duplicates for numeric Num_parcel: 1312010104529 
+Removing 1 duplicates for numeric Num_parcel: 1312010102632 
+Removing 1 duplicates for numeric Num_parcel: 1312010102624 
+Removing 2 duplicates for numeric Num_parcel: 1312010102647 
+Removing 1 duplicates for numeric Num_parcel: 1312010102287 
+Removing 3 duplicates for numeric Num_parcel: 1312010102208 
+Removing 1 duplicates for numeric Num_parcel: 1312010102725 
+Removing 1 duplicates for numeric Num_parcel: 1312010102877 
+Removing 1 duplicates for numeric Num_parcel: 1312010102447 
+Removing 1 duplicates for numeric Num_parcel: 1312010100237 
+Removing 1 duplicates for numeric Num_parcel: 1312010102439 
+Removing 1 duplicates for numeric Num_parcel: 1312010100343 
+Removing 1 duplicates for numeric Num_parcel: 1312010102368 
+Removing 1 duplicates for numeric Num_parcel: 1312010102830 
+Removing 1 duplicates for numeric Num_parcel: 1312010102792 
+Removing 1 duplicates for numeric Num_parcel: 1312010102800 
+Removing 1 duplicates for numeric Num_parcel: 1312010100194 
+Removing 1 duplicates for numeric Num_parcel: 1312010101117 
+Removing 2 duplicates for numeric Num_parcel: 1312010100813 
+Removing 1 duplicates for numeric Num_parcel: 1312010101013 
+Removing 1 duplicates for numeric Num_parcel: 1312010100805 
+Removing 1 duplicates for numeric Num_parcel: 1312010104438 
+Removing 1 duplicates for numeric Num_parcel: 1312010100758 
+Removing 1 duplicates for numeric Num_parcel: 1312010100381 
+Removing 1 duplicates for numeric Num_parcel: 1312010101787 
+Removing 2 duplicates for numeric Num_parcel: 1312010101040 
+Removing 1 duplicates for numeric Num_parcel: 1312010102532 
+Removing 1 duplicates for numeric Num_parcel: 1312010104540 
+Removing 1 duplicates for numeric Num_parcel: 1312010102502 
+Removing 1 duplicates for numeric Num_parcel: 1312010102432 
+Removing 1 duplicates for numeric Num_parcel: 1312010102648 
+Removing 1 duplicates for numeric Num_parcel: 1312010100188 
+Removing 2 duplicates for numeric Num_parcel: 1312010102489 
+Removing 1 duplicates for numeric Num_parcel: 1312010100400 
+Removing 1 duplicates for numeric Num_parcel: 1312010102906 
+Removing 1 duplicates for numeric Num_parcel: 1312010102569 
+Removing 1 duplicates for numeric Num_parcel: 1312010101106 
+Removing 1 duplicates for numeric Num_parcel: 1312010100494 
+Removing 1 duplicates for numeric Num_parcel: 1312010104470 
+Removing 1 duplicates for numeric Num_parcel: 1312010104478 
+Removing 1 duplicates for numeric Num_parcel: 1312010104462 
+Removing 1 duplicates for numeric Num_parcel: 1312010104454 
+Removing 1 duplicates for numeric Num_parcel: 1312010104518 
+Removing 1 duplicates for numeric Num_parcel: 1312010104510 
+Removing 1 duplicates for numeric Num_parcel: 1312010104486 
+Removing 1 duplicates for numeric Num_parcel: 1312010104502 
+Removing 1 duplicates for numeric Num_parcel: 1312010104551 
+Removing 1 duplicates for numeric Num_parcel: 1312010104535 
+Removing 2 duplicates for numeric Num_parcel: 1312010101980 
+Removing 2 duplicates for numeric Num_parcel: 1312010101563 
+Removing 1 duplicates for numeric Num_parcel: 1312010100873 
+Removing 1 duplicates for numeric Num_parcel: 1312010101781 
+Removing 1 duplicates for numeric Num_parcel: 1312010100689 
+Removing 1 duplicates for numeric Num_parcel: 1312010102452 
+Removing 1 duplicates for numeric Num_parcel: 1312010103784 
+Removing 1 duplicates for numeric Num_parcel: 1312010104544 
+Removing 1 duplicates for numeric Num_parcel: 1312010104536 
+Removing 1 duplicates for numeric Num_parcel: 1312010104547 
+Removing 2 duplicates for numeric Num_parcel: 1312010101270 
+Removing 1 duplicates for numeric Num_parcel: 1312010104586 
+Removing 1 duplicates for numeric Num_parcel: 1312010104532 
+Removing 1 duplicates for numeric Num_parcel: 1312010104556 
+Removing 1 duplicates for numeric Num_parcel: 1312010100339 
+Removing 1 duplicates for numeric Num_parcel: 1312010102480 
+Removing 1 duplicates for numeric Num_parcel: 1312010102245 
+Removing 1 duplicates for numeric Num_parcel: 1312010101974 
+Removing 1 duplicates for numeric Num_parcel: 1312010102213 
+Removing 1 duplicates for numeric Num_parcel: 1312010102357 
+Removing 1 duplicates for numeric Num_parcel: 1312010104588 
+Removing 1 duplicates for numeric Num_parcel: 1312010104580 
+Removing 1 duplicates for numeric Num_parcel: 1312010104572 
+Removing 1 duplicates for numeric Num_parcel: 1312010104564 
+Removing 2 duplicates for numeric Num_parcel: 1312010100574 
+Removing 1 duplicates for numeric Num_parcel: 1312010101293 
+Removing 1 duplicates for numeric Num_parcel: 1312010100566 
+Removing 1 duplicates for numeric Num_parcel: 1312010100719 
+Removing 1 duplicates for numeric Num_parcel: 1312010104555 
+Removing 2 duplicates for numeric Num_parcel: 1312010104554 
+Removing 1 duplicates for numeric Num_parcel: 1312010104579 
+Removing 1 duplicates for numeric Num_parcel: 1312010104563 
+Removing 1 duplicates for numeric Num_parcel: 1312010102364 
+Removing 1 duplicates for numeric Num_parcel: 1312010104359 
+Removing 1 duplicates for numeric Num_parcel: 1312010103720 
+Removing 1 duplicates for numeric Num_parcel: 1312010102479 
+Removing 1 duplicates for numeric Num_parcel: 1312010104584 
+Removing 1 duplicates for numeric Num_parcel: 1312010104592 
+Removing 1 duplicates for numeric Num_parcel: 1312010102530 
+Removing 1 duplicates for numeric Num_parcel: 1312010100588 
+Removing 1 duplicates for numeric Num_parcel: 1312010100703 
+Removing 1 duplicates for numeric Num_parcel: 1312010104571 
+Removing 1 duplicates for numeric Num_parcel: 1312010104587 
+Removing 1 duplicates for numeric Num_parcel: 1312010104565 
+Removing 1 duplicates for numeric Num_parcel: 1312010101904 
+Removing 1 duplicates for numeric Num_parcel: 1312010101896 
+Removing 1 duplicates for numeric Num_parcel: 1312010104559 
+Removing 1 duplicates for numeric Num_parcel: 1312010104527 
+Removing 1 duplicates for numeric Num_parcel: 1312010104524 
+Removing 1 duplicates for numeric Num_parcel: 1312010104539 
+Removing 1 duplicates for numeric Num_parcel: 1312010104567 
+Removing 2 duplicates for numeric Num_parcel: 1312010104583 
+Removing 1 duplicates for numeric Num_parcel: 1312010102619 
+Removing 1 duplicates for numeric Num_parcel: 1312010102964 
+Removing 2 duplicates for numeric Num_parcel: 1312010102931 
+Removing 1 duplicates for numeric Num_parcel: 1312010104531 
+Removing 1 duplicates for numeric Num_parcel: 1312010104575 
+Removing 2 duplicates for numeric Num_parcel: 1312010100568 
+Removing 1 duplicates for numeric Num_parcel: 1312010102122 
+Removing 1 duplicates for numeric Num_parcel: 1312010101258 
+Removing 1 duplicates for numeric Num_parcel: 1312010101198 
+Removing 1 duplicates for numeric Num_parcel: 1312010100536 
+Removing 1 duplicates for numeric Num_parcel: 1312010101004 
+Removing 1 duplicates for numeric Num_parcel: 1312010104466 
+Removing 1 duplicates for numeric Num_parcel: 1312010100291 
+Removing 1 duplicates for numeric Num_parcel: 1312010100812 
+
+--- CLEANING RESULTS ---
+Features after cleaning: 3506 
+Features removed: 185 
+Reduction: 5 %
+Final unique Num_parcel values: 3457 
+Final numeric parcels (no duplicates): 3443 
+Final zero parcels (kept all): 1 
+Final text parcels (kept all): 14 
+✓ Successfully processed and saved: BANDAFASSI_LineStringZ_final.gpkg 
+Final columns: source_file, layer, Num_parcel, geom 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+Processing file 4 of 15 : BEMBOU_LineStringZ 
+= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+Original feature count: 2056 
+Available columns: id, source_file, length_2d, start_x, start_y, start_z, end_x, end_y, end_z, min_z, max_z, z_range, point_count, length_3d, dxf_type, layer, color, linetype, lineweight, handle, thickness, elevation, extrusion_x, extrusion_y, extrusion_z, closed, start_width, end_width, geom 
+Created Num_parcel field from 'layer' column
+Kept columns: source_file, layer, Num_parcel 
+
+--- Num_parcel ANALYSIS ---
+Unique Num_parcel values: 1991 
+Sample Num_parcel values: 1332010202077, 1332010202053, 1332010202037, 1332010202085, 1332010202045, 1332010202040, 1332010201832, 1332010202048, 1332010202056, 1332010200861 
+Numeric parcels (excluding 0): 1986 
+Zero parcels: 0 
+Text/character parcels: 5 
+Removing 1 duplicates for numeric Num_parcel: 1332010203461 
+Removing 1 duplicates for numeric Num_parcel: 1332010201060 
+Removing 1 duplicates for numeric Num_parcel: 1332010203854 
+Removing 1 duplicates for numeric Num_parcel: 1332010203979 
+Removing 1 duplicates for numeric Num_parcel: 1332010201113 
+Removing 1 duplicates for numeric Num_parcel: 1332010202333 
+Removing 1 duplicates for numeric Num_parcel: 1332010201916 
+Removing 1 duplicates for numeric Num_parcel: 1332010202058 
+Removing 1 duplicates for numeric Num_parcel: 1332010203049 
+Removing 1 duplicates for numeric Num_parcel: 1332010203110 
+Removing 1 duplicates for numeric Num_parcel: 1332010203102 
+Removing 1 duplicates for numeric Num_parcel: 1332010203094 
+Removing 1 duplicates for numeric Num_parcel: 1332010201464 
+Removing 1 duplicates for numeric Num_parcel: 1332010201137 
+Removing 1 duplicates for numeric Num_parcel: 1332010201169 
+Removing 1 duplicates for numeric Num_parcel: 1332010201183 
+Removing 1 duplicates for numeric Num_parcel: 1332010203574 
+Removing 1 duplicates for numeric Num_parcel: 1332010202018 
+Removing 1 duplicates for numeric Num_parcel: 1332010201194 
+Removing 1 duplicates for numeric Num_parcel: 1332010201936 
+Removing 1 duplicates for numeric Num_parcel: 1332010201461 
+Removing 1 duplicates for numeric Num_parcel: 1332010203492 
+Removing 1 duplicates for numeric Num_parcel: 1332010203443 
+Removing 1 duplicates for numeric Num_parcel: 1332010203656 
+Removing 1 duplicates for numeric Num_parcel: 1332010204041 
+Removing 1 duplicates for numeric Num_parcel: 1332010203848 
+Removing 1 duplicates for numeric Num_parcel: 1332010202432 
+Removing 1 duplicates for numeric Num_parcel: 1332010203361 
+Removing 1 duplicates for numeric Num_parcel: 1332010201323 
+Removing 1 duplicates for numeric Num_parcel: 1332010201307 
+Removing 1 duplicates for numeric Num_parcel: 1332010201291 
+Removing 1 duplicates for numeric Num_parcel: 1332010201275 
+Removing 1 duplicates for numeric Num_parcel: 1332010201315 
+Removing 1 duplicates for numeric Num_parcel: 1332010201482 
+Removing 1 duplicates for numeric Num_parcel: 1332010201479 
+Removing 1 duplicates for numeric Num_parcel: 1332010201983 
+Removing 1 duplicates for numeric Num_parcel: 1332010202580 
+Removing 1 duplicates for numeric Num_parcel: 1332010201147 
+Removing 2 duplicates for numeric Num_parcel: 1332010200876 
+Removing 2 duplicates for numeric Num_parcel: 1332010200900 
+Removing 3 duplicates for numeric Num_parcel: 1332010202727 
+Removing 1 duplicates for numeric Num_parcel: 1332010202719 
+Removing 1 duplicates for numeric Num_parcel: 1332010202901 
+Removing 1 duplicates for numeric Num_parcel: 1332010202673 
+Removing 1 duplicates for numeric Num_parcel: 1332010202655 
+Removing 1 duplicates for numeric Num_parcel: 1332010202657 
+Removing 1 duplicates for numeric Num_parcel: 1332010203552 
+Removing 1 duplicates for numeric Num_parcel: 1332010203515 
+Removing 1 duplicates for numeric Num_parcel: 1332010201020 
+Removing 1 duplicates for numeric Num_parcel: 1332010203108 
+Removing 1 duplicates for numeric Num_parcel: 1332010203904 
+Removing 1 duplicates for numeric Num_parcel: 1332010203947 
+Removing 1 duplicates for numeric Num_parcel: 1332010202651 
+Removing 1 duplicates for numeric Num_parcel: 1332010203978 
+Removing 1 duplicates for numeric Num_parcel: 1332010202421 
+Removing 1 duplicates for numeric Num_parcel: 1332010202429 
+Removing 1 duplicates for numeric Num_parcel: 1332010204078 
+Removing 2 duplicates for numeric Num_parcel: 1332010204012 
+Removing 1 duplicates for numeric Num_parcel: 1332010203716 
+
+--- CLEANING RESULTS ---
+Features after cleaning: 1992 
+Features removed: 64 
+Reduction: 3.1 %
+Final unique Num_parcel values: 1991 
+Final numeric parcels (no duplicates): 1986 
+Final zero parcels (kept all): 0 
+Final text parcels (kept all): 5 
+✓ Successfully processed and saved: BEMBOU_LineStringZ_final.gpkg 
+Final columns: source_file, layer, Num_parcel, geom 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+Processing file 5 of 15 : DIMBOLI_LineStringZ 
+= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+Original feature count: 3021 
+Available columns: id, source_file, length_2d, start_x, start_y, start_z, end_x, end_y, end_z, min_z, max_z, z_range, point_count, length_3d, dxf_type, layer, color, linetype, lineweight, handle, thickness, elevation, extrusion_x, extrusion_y, extrusion_z, closed, start_width, end_width, geom 
+Created Num_parcel field from 'layer' column
+Kept columns: source_file, layer, Num_parcel 
+
+--- Num_parcel ANALYSIS ---
+Unique Num_parcel values: 2850 
+Sample Num_parcel values: 1312020101823, 1312020101815, 1312020101807, 1312020101791, 1312020101744, 1312020101799, 1312020101760, 1312020101560, 1312020102500, 1312020101768 
+Numeric parcels (excluding 0): 2848 
+Zero parcels: 0 
+Text/character parcels: 2 
+Removing 1 duplicates for numeric Num_parcel: 1312020100056 
+Removing 1 duplicates for numeric Num_parcel: 1312020103112 
+Removing 1 duplicates for numeric Num_parcel: 1312020103389 
+Removing 1 duplicates for numeric Num_parcel: 1312020103528 
+Removing 2 duplicates for numeric Num_parcel: 1312020103520 
+Removing 1 duplicates for numeric Num_parcel: 1312020103407 
+Removing 1 duplicates for numeric Num_parcel: 1312020103434 
+Removing 1 duplicates for numeric Num_parcel: 1312020103458 
+Removing 1 duplicates for numeric Num_parcel: 1312020100014 
+Removing 1 duplicates for numeric Num_parcel: 1312020100055 
+Removing 1 duplicates for numeric Num_parcel: 1312020103525 
+Removing 1 duplicates for numeric Num_parcel: 1312020100270 
+Removing 1 duplicates for numeric Num_parcel: 1312020102036 
+Removing 1 duplicates for numeric Num_parcel: 1312020101701 
+Removing 1 duplicates for numeric Num_parcel: 1312020101814 
+Removing 1 duplicates for numeric Num_parcel: 1312020100784 
+Removing 1 duplicates for numeric Num_parcel: 1312020103038 
+Removing 1 duplicates for numeric Num_parcel: 1312020102207 
+Removing 1 duplicates for numeric Num_parcel: 1312020101561 
+Removing 1 duplicates for numeric Num_parcel: 1312020101658 
+Removing 1 duplicates for numeric Num_parcel: 1312020101970 
+Removing 1 duplicates for numeric Num_parcel: 1312020101929 
+Removing 1 duplicates for numeric Num_parcel: 1312020101663 
+Removing 1 duplicates for numeric Num_parcel: 1312020103334 
+Removing 1 duplicates for numeric Num_parcel: 1312020101940 
+Removing 1 duplicates for numeric Num_parcel: 1312020102296 
+Removing 1 duplicates for numeric Num_parcel: 1312020100146 
+Removing 1 duplicates for numeric Num_parcel: 1312020102100 
+Removing 1 duplicates for numeric Num_parcel: 1312020101326 
+Removing 1 duplicates for numeric Num_parcel: 1312020102078 
+Removing 1 duplicates for numeric Num_parcel: 1312020102045 
+Removing 1 duplicates for numeric Num_parcel: 1312020102863 
+Removing 1 duplicates for numeric Num_parcel: 1312020101003 
+Removing 1 duplicates for numeric Num_parcel: 1312020100334 
+Removing 1 duplicates for numeric Num_parcel: 1312020101742 
+Removing 1 duplicates for numeric Num_parcel: 1312020102025 
+Removing 1 duplicates for numeric Num_parcel: 1312020101372 
+Removing 1 duplicates for numeric Num_parcel: 1312020102219 
+Removing 1 duplicates for numeric Num_parcel: 1312020101115 
+Removing 1 duplicates for numeric Num_parcel: 1312020102234 
+Removing 1 duplicates for numeric Num_parcel: 1312020102318 
+Removing 1 duplicates for numeric Num_parcel: 1312020101272 
+Removing 1 duplicates for numeric Num_parcel: 1312020101235 
+Removing 1 duplicates for numeric Num_parcel: 1312020101176 
+Removing 1 duplicates for numeric Num_parcel: 1312020101783 
+Removing 1 duplicates for numeric Num_parcel: 1312020101767 
+Removing 1 duplicates for numeric Num_parcel: 1312020101035 
+Removing 1 duplicates for numeric Num_parcel: 1312020102321 
+Removing 1 duplicates for numeric Num_parcel: 1312020102361 
+Removing 1 duplicates for numeric Num_parcel: 1312020102358 
+Removing 1 duplicates for numeric Num_parcel: 1312020101054 
+Removing 1 duplicates for numeric Num_parcel: 1312020101109 
+Removing 1 duplicates for numeric Num_parcel: 1312020101172 
+Removing 1 duplicates for numeric Num_parcel: 1312020100938 
+Removing 1 duplicates for numeric Num_parcel: 1312020100399 
+Removing 1 duplicates for numeric Num_parcel: 1312020101320 
+Removing 2 duplicates for numeric Num_parcel: 1312020100301 
+Removing 1 duplicates for numeric Num_parcel: 1312020101270 
+Removing 1 duplicates for numeric Num_parcel: 1312020100321 
+Removing 1 duplicates for numeric Num_parcel: 1312020100337 
+Removing 1 duplicates for numeric Num_parcel: 1312020102174 
+Removing 1 duplicates for numeric Num_parcel: 1312020102205 
+Removing 1 duplicates for numeric Num_parcel: 1312020102283 
+Removing 1 duplicates for numeric Num_parcel: 1312020102394 
+Removing 1 duplicates for numeric Num_parcel: 1312020102434 
+Removing 1 duplicates for numeric Num_parcel: 1312020102415 
+Removing 1 duplicates for numeric Num_parcel: 1312020101981 
+Removing 1 duplicates for numeric Num_parcel: 1312020100474 
+Removing 1 duplicates for numeric Num_parcel: 1312020101102 
+
+--- CLEANING RESULTS ---
+Features after cleaning: 2950 
+Features removed: 71 
+Reduction: 2.4 %
+Final unique Num_parcel values: 2850 
+Final numeric parcels (no duplicates): 2848 
+Final zero parcels (kept all): 0 
+Final text parcels (kept all): 2 
+✓ Successfully processed and saved: DIMBOLI_LineStringZ_final.gpkg 
+Final columns: source_file, layer, Num_parcel, geom 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+Processing file 6 of 15 : DINDEFELLO_LineStringZ 
+= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+Original feature count: 1820 
+Available columns: id, source_file, length_2d, start_x, start_y, start_z, end_x, end_y, end_z, min_z, max_z, z_range, point_count, length_3d, dxf_type, layer, color, linetype, lineweight, handle, thickness, elevation, extrusion_x, extrusion_y, extrusion_z, closed, start_width, end_width, geom 
+Created Num_parcel field from 'layer' column
+Kept columns: source_file, layer, Num_parcel 
+
+--- Num_parcel ANALYSIS ---
+Unique Num_parcel values: 1765 
+Sample Num_parcel values: 1312010302183, 1312010300343, 1312010302191, 1312010300351, 1312010300359, 1312010302198, 1312010302206, 1312010302222, 1312010302230, 1312010302143 
+Numeric parcels (excluding 0): 1763 
+Zero parcels: 0 
+Text/character parcels: 2 
+Removing 1 duplicates for numeric Num_parcel: 1312010300364 
+Removing 1 duplicates for numeric Num_parcel: 1312010300023 
+Removing 1 duplicates for numeric Num_parcel: 1312010300060 
+Removing 1 duplicates for numeric Num_parcel: 1312010300720 
+Removing 1 duplicates for numeric Num_parcel: 1312010300166 
+Removing 1 duplicates for numeric Num_parcel: 1312010301814 
+Removing 1 duplicates for numeric Num_parcel: 1312010301772 
+Removing 1 duplicates for numeric Num_parcel: 1312010302612 
+Removing 1 duplicates for numeric Num_parcel: 1312010302596 
+Removing 1 duplicates for numeric Num_parcel: 1312010301242 
+Removing 1 duplicates for numeric Num_parcel: 1312010300354 
+Removing 1 duplicates for numeric Num_parcel: 1312010301093 
+Removing 1 duplicates for numeric Num_parcel: 1312010302879 
+Removing 1 duplicates for numeric Num_parcel: 1312010300024 
+Removing 1 duplicates for numeric Num_parcel: 1312010301327 
+Removing 1 duplicates for numeric Num_parcel: 1312010301112 
+Removing 1 duplicates for numeric Num_parcel: 1312010301340 
+Removing 1 duplicates for numeric Num_parcel: 1312010300109 
+Removing 1 duplicates for numeric Num_parcel: 1312010300056 
+Removing 1 duplicates for numeric Num_parcel: 1312010300462 
+Removing 1 duplicates for numeric Num_parcel: 1312010300461 
+Removing 1 duplicates for numeric Num_parcel: 1312010300470 
+Removing 2 duplicates for numeric Num_parcel: 1312010300910 
+Removing 1 duplicates for numeric Num_parcel: 1312010300883 
+Removing 1 duplicates for numeric Num_parcel: 1312010300142 
+Removing 1 duplicates for numeric Num_parcel: 1312010300900 
+Removing 1 duplicates for numeric Num_parcel: 1312010300932 
+Removing 1 duplicates for numeric Num_parcel: 1312010302252 
+Removing 1 duplicates for numeric Num_parcel: 1312010302269 
+Removing 1 duplicates for numeric Num_parcel: 1312010300754 
+Removing 1 duplicates for numeric Num_parcel: 1312010300640 
+Removing 2 duplicates for numeric Num_parcel: 1312010300484 
+Removing 1 duplicates for numeric Num_parcel: 1312010302497 
+Removing 1 duplicates for numeric Num_parcel: 1312010300256 
+Removing 1 duplicates for numeric Num_parcel: 1312010300180 
+Removing 1 duplicates for numeric Num_parcel: 1312010301970 
+Removing 1 duplicates for numeric Num_parcel: 1312010301978 
+Removing 1 duplicates for numeric Num_parcel: 1312010300726 
+Removing 1 duplicates for numeric Num_parcel: 1312010300736 
+Removing 1 duplicates for numeric Num_parcel: 1312010301958 
+Removing 1 duplicates for numeric Num_parcel: 1312010301960 
+Removing 1 duplicates for numeric Num_parcel: 1312010301712 
+Removing 1 duplicates for numeric Num_parcel: 1312010301934 
+Removing 1 duplicates for numeric Num_parcel: 1312010302350 
+Removing 1 duplicates for numeric Num_parcel: 1312010300213 
+Removing 1 duplicates for numeric Num_parcel: 1312010301229 
+Removing 1 duplicates for numeric Num_parcel: 1312010301349 
+Removing 1 duplicates for numeric Num_parcel: 1312010301321 
+Removing 1 duplicates for numeric Num_parcel: 1312010301818 
+Removing 1 duplicates for numeric Num_parcel: 1312010301812 
+Removing 1 duplicates for numeric Num_parcel: 1312010301243 
+Removing 1 duplicates for numeric Num_parcel: 1312010302074 
+
+--- CLEANING RESULTS ---
+Features after cleaning: 1766 
+Features removed: 54 
+Reduction: 3 %
+Final unique Num_parcel values: 1765 
+Final numeric parcels (no duplicates): 1763 
+Final zero parcels (kept all): 0 
+Final text parcels (kept all): 2 
+✓ Successfully processed and saved: DINDEFELLO_LineStringZ_final.gpkg 
+Final columns: source_file, layer, Num_parcel, geom 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+Processing file 7 of 15 : FONGOLEMBI_LineStringZ 
+= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+Original feature count: 1476 
+Available columns: id, source_file, length_2d, start_x, start_y, start_z, end_x, end_y, end_z, min_z, max_z, z_range, point_count, length_3d, dxf_type, layer, color, linetype, lineweight, handle, thickness, elevation, extrusion_x, extrusion_y, extrusion_z, closed, start_width, end_width, geom 
+Created Num_parcel field from 'layer' column
+Kept columns: source_file, layer, Num_parcel 
+
+--- Num_parcel ANALYSIS ---
+Unique Num_parcel values: 1429 
+Sample Num_parcel values: 1312020203586, 1312020203594, 1312020201142, 1312020203602, 1312020203618, 1312020203610, 1312020203125, 1312020203626, 1312020203634, 1312020203054 
+Numeric parcels (excluding 0): 1426 
+Zero parcels: 1 
+Text/character parcels: 3 
+Removing 1 duplicates for numeric Num_parcel: 1312020203958 
+Removing 1 duplicates for numeric Num_parcel: 1312020203503 
+Removing 1 duplicates for numeric Num_parcel: 1312020201998 
+Removing 1 duplicates for numeric Num_parcel: 1312020202216 
+Removing 1 duplicates for numeric Num_parcel: 1312020203640 
+Removing 1 duplicates for numeric Num_parcel: 1312020203997 
+Removing 1 duplicates for numeric Num_parcel: 1312020203945 
+Removing 1 duplicates for numeric Num_parcel: 1312020203643 
+Removing 1 duplicates for numeric Num_parcel: 1312020202121 
+Removing 1 duplicates for numeric Num_parcel: 1312020203315 
+Removing 1 duplicates for numeric Num_parcel: 1312020203364 
+Removing 2 duplicates for numeric Num_parcel: 1312020203482 
+Removing 1 duplicates for numeric Num_parcel: 1312020203350 
+Removing 3 duplicates for numeric Num_parcel: 1312020203301 
+Removing 2 duplicates for numeric Num_parcel: 1312020203570 
+Removing 2 duplicates for numeric Num_parcel: 1312020203669 
+Removing 1 duplicates for numeric Num_parcel: 1312020201226 
+Removing 1 duplicates for numeric Num_parcel: 1312020203755 
+Removing 1 duplicates for numeric Num_parcel: 1312020203358 
+Removing 1 duplicates for numeric Num_parcel: 1312020203762 
+Removing 1 duplicates for numeric Num_parcel: 1312020202175 
+Removing 1 duplicates for numeric Num_parcel: 1312020202086 
+Removing 1 duplicates for numeric Num_parcel: 1312020202092 
+Removing 1 duplicates for numeric Num_parcel: 1312020201809 
+Removing 1 duplicates for numeric Num_parcel: 1312020201563 
+Removing 1 duplicates for numeric Num_parcel: 1312020201555 
+Removing 1 duplicates for numeric Num_parcel: 1312020201793 
+Removing 1 duplicates for numeric Num_parcel: 1312020201909 
+Removing 1 duplicates for numeric Num_parcel: 1312020202146 
+Removing 1 duplicates for numeric Num_parcel: 1312020201745 
+Removing 1 duplicates for numeric Num_parcel: 1312020203706 
+Removing 1 duplicates for numeric Num_parcel: 1312020203076 
+Removing 2 duplicates for numeric Num_parcel: 1312020201370 
+Removing 1 duplicates for numeric Num_parcel: 1312020203811 
+Removing 1 duplicates for numeric Num_parcel: 1312020200830 
+Removing 1 duplicates for numeric Num_parcel: 1312020201921 
+Removing 1 duplicates for numeric Num_parcel: 1312020203845 
+Removing 1 duplicates for numeric Num_parcel: 1312020203813 
+Removing 1 duplicates for numeric Num_parcel: 1312020203615 
+Removing 1 duplicates for numeric Num_parcel: 1312020201489 
+Removing 1 duplicates for numeric Num_parcel: 1312020203826 
+
+--- CLEANING RESULTS ---
+Features after cleaning: 1429 
+Features removed: 47 
+Reduction: 3.2 %
+Final unique Num_parcel values: 1429 
+Final numeric parcels (no duplicates): 1426 
+Final zero parcels (kept all): 1 
+Final text parcels (kept all): 3 
+✓ Successfully processed and saved: FONGOLEMBI_LineStringZ_final.gpkg 
+Final columns: source_file, layer, Num_parcel, geom 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+Processing file 8 of 15 : GABOU_LineStringZ 
+= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+Original feature count: 1599 
+Available columns: id, source_file, length_2d, start_x, start_y, start_z, end_x, end_y, end_z, min_z, max_z, z_range, point_count, length_3d, dxf_type, layer, color, linetype, lineweight, handle, thickness, elevation, extrusion_x, extrusion_y, extrusion_z, closed, start_width, end_width, geom 
+Created Num_parcel field from 'layer' column
+Kept columns: source_file, layer, Num_parcel 
+
+--- Num_parcel ANALYSIS ---
+Unique Num_parcel values: 908 
+Sample Num_parcel values: 0512030200781, 0512030200789, 0512030200929, 0512030200889, 0512030200873, 0512030200905, 0512030200913, 0512030200773, 0512030200801, 0512030200538 
+Numeric parcels (excluding 0): 903 
+Zero parcels: 1 
+Text/character parcels: 5 
+Removing 2 duplicates for numeric Num_parcel: 0512030200458 
+Removing 1 duplicates for numeric Num_parcel: 0512030200828 
+Removing 2 duplicates for numeric Num_parcel: 0512030200563 
+Removing 1 duplicates for numeric Num_parcel: 0512030200487 
+Removing 1 duplicates for numeric Num_parcel: 0512030201238 
+Removing 1 duplicates for numeric Num_parcel: 0512030201281 
+Removing 1 duplicates for numeric Num_parcel: 0512030201273 
+Removing 1 duplicates for numeric Num_parcel: 0512030201120 
+Removing 1 duplicates for numeric Num_parcel: 0512030201776 
+Removing 1 duplicates for numeric Num_parcel: 0512030201406 
+Removing 1 duplicates for numeric Num_parcel: 0512030201420 
+Removing 1 duplicates for numeric Num_parcel: 0512030201356 
+Removing 1 duplicates for numeric Num_parcel: 0512030200620 
+Removing 1 duplicates for numeric Num_parcel: 0512030200178 
+Removing 1 duplicates for numeric Num_parcel: 0512030202115 
+Removing 1 duplicates for numeric Num_parcel: 0512030201324 
+
+--- CLEANING RESULTS ---
+Features after cleaning: 1581 
+Features removed: 18 
+Reduction: 1.1 %
+Final unique Num_parcel values: 908 
+Final numeric parcels (no duplicates): 903 
+Final zero parcels (kept all): 1 
+Final text parcels (kept all): 5 
+✓ Successfully processed and saved: GABOU_LineStringZ_final.gpkg 
+Final columns: source_file, layer, Num_parcel, geom 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+Processing file 9 of 15 : KOAR_LineStringZ 
+= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+Original feature count: 101 
+Available columns: id, source_file, length_2d, start_x, start_y, start_z, end_x, end_y, end_z, min_z, max_z, z_range, point_count, length_3d, dxf_type, layer, color, linetype, lineweight, handle, thickness, elevation, extrusion_x, extrusion_y, extrusion_z, closed, start_width, end_width, geom 
+Created Num_parcel field from 'layer' column
+Kept columns: source_file, layer, Num_parcel 
+
+--- Num_parcel ANALYSIS ---
+Unique Num_parcel values: 91 
+Sample Num_parcel values: 0, 0532010301615, 0532010301687, 0532010301607, 0532010301599, 0532010301580, 0532010301591, 0532010301564, 0532010301572, 0532010301583 
+Numeric parcels (excluding 0): 90 
+Zero parcels: 1 
+Text/character parcels: 1 
+Removing 2 duplicates for numeric Num_parcel: 0532010301321 
+Removing 1 duplicates for numeric Num_parcel: 0532010301467 
+
+--- CLEANING RESULTS ---
+Features after cleaning: 98 
+Features removed: 3 
+Reduction: 3 %
+Final unique Num_parcel values: 91 
+Final numeric parcels (no duplicates): 90 
+Final zero parcels (kept all): 1 
+Final text parcels (kept all): 1 
+✓ Successfully processed and saved: KOAR_LineStringZ_final.gpkg 
+Final columns: source_file, layer, Num_parcel, geom 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+Processing file 10 of 15 : MISSIRAH_LineStringZ 
+= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+Original feature count: 6701 
+Available columns: id, source_file, length_2d, start_x, start_y, start_z, end_x, end_y, end_z, min_z, max_z, z_range, point_count, length_3d, dxf_type, layer, color, linetype, lineweight, handle, thickness, elevation, extrusion_x, extrusion_y, extrusion_z, closed, start_width, end_width, geom 
+Created Num_parcel field from 'layer' column
+Kept columns: source_file, layer, Num_parcel 
+
+--- Num_parcel ANALYSIS ---
+Unique Num_parcel values: 5087 
+Sample Num_parcel values: 0, 0522030301596, 0522030301572, 0522030301548, 0522030200846, 0522030301595, 0522030301580, 0522030301579, 0522030301564, 0522030301556 
+Numeric parcels (excluding 0): 5078 
+Zero parcels: 1 
+Text/character parcels: 9 
+Removing 1 duplicates for numeric Num_parcel: 0522030200846 
+Removing 3 duplicates for numeric Num_parcel: 0522030200144 
+Removing 1 duplicates for numeric Num_parcel: 0522030200060 
+Removing 2 duplicates for numeric Num_parcel: 0522030200150 
+Removing 1 duplicates for numeric Num_parcel: 0522030200102 
+Removing 1 duplicates for numeric Num_parcel: 0522030200002 
+Removing 1 duplicates for numeric Num_parcel: 0522030200141 
+Removing 1 duplicates for numeric Num_parcel: 0522030200338 
+Removing 1 duplicates for numeric Num_parcel: 0522030200361 
+Removing 1 duplicates for numeric Num_parcel: 0522030200329 
+Removing 1 duplicates for numeric Num_parcel: 0522030200346 
+Removing 2 duplicates for numeric Num_parcel: 0522030200454 
+Removing 1 duplicates for numeric Num_parcel: 0522030200508 
+Removing 1 duplicates for numeric Num_parcel: 0522030200350 
+Removing 1 duplicates for numeric Num_parcel: 0522030200335 
+Removing 1 duplicates for numeric Num_parcel: 0522030200343 
+Removing 1 duplicates for numeric Num_parcel: 0522030200366 
+Removing 1 duplicates for numeric Num_parcel: 0522030200339 
+Removing 1 duplicates for numeric Num_parcel: 0522030200272 
+Removing 1 duplicates for numeric Num_parcel: 0522030200359 
+Removing 1 duplicates for numeric Num_parcel: 0522030200340 
+Removing 3 duplicates for numeric Num_parcel: 0522030200429 
+Removing 1 duplicates for numeric Num_parcel: 0522030200341 
+Removing 1 duplicates for numeric Num_parcel: 0522030200342 
+Removing 1 duplicates for numeric Num_parcel: 0522030200543 
+Removing 1 duplicates for numeric Num_parcel: 0522030200356 
+Removing 1 duplicates for numeric Num_parcel: 0522030201916 
+Removing 1 duplicates for numeric Num_parcel: 0522030201839 
+Removing 9 duplicates for numeric Num_parcel: 0522030207847 
+Removing 1 duplicates for numeric Num_parcel: 0522030208858 
+Removing 1 duplicates for numeric Num_parcel: 0522030200513 
+Removing 1 duplicates for numeric Num_parcel: 0522030200669 
+Removing 1 duplicates for numeric Num_parcel: 0522030301438 
+Removing 1 duplicates for numeric Num_parcel: 0522030207485 
+Removing 1 duplicates for numeric Num_parcel: 0522030208185 
+Removing 1 duplicates for numeric Num_parcel: 0522030210555 
+Removing 1 duplicates for numeric Num_parcel: 0522030209096 
+Removing 1 duplicates for numeric Num_parcel: 0522030210993 
+Removing 1 duplicates for numeric Num_parcel: 0522030208359 
+Removing 1 duplicates for numeric Num_parcel: 0522030210408 
+Removing 1 duplicates for numeric Num_parcel: 0522030209614 
+Removing 1 duplicates for numeric Num_parcel: 0522030210888 
+Removing 1 duplicates for numeric Num_parcel: 0522030209809 
+Removing 1 duplicates for numeric Num_parcel: 0522030210890 
+Removing 1 duplicates for numeric Num_parcel: 0522030209552 
+Removing 1 duplicates for numeric Num_parcel: 0522030208447 
+Removing 1 duplicates for numeric Num_parcel: 0522030207418 
+Removing 1 duplicates for numeric Num_parcel: 0522030205669 
+Removing 1 duplicates for numeric Num_parcel: 0522030205623 
+Removing 1 duplicates for numeric Num_parcel: 0522030209654 
+Removing 1 duplicates for numeric Num_parcel: 0522030211693 
+Removing 1 duplicates for numeric Num_parcel: 0522030210236 
+Removing 1 duplicates for numeric Num_parcel: 0522030210640 
+Removing 2 duplicates for numeric Num_parcel: 0522030208345 
+Removing 1 duplicates for numeric Num_parcel: 0522030208335 
+Removing 1 duplicates for numeric Num_parcel: 0522030209383 
+Removing 1 duplicates for numeric Num_parcel: 0522030207017 
+Removing 1 duplicates for numeric Num_parcel: 0522030208118 
+Removing 2 duplicates for numeric Num_parcel: 0522030208126 
+Removing 1 duplicates for numeric Num_parcel: 0522030208660 
+Removing 1 duplicates for numeric Num_parcel: 0522030207787 
+Removing 1 duplicates for numeric Num_parcel: 0522030208406 
+Removing 1 duplicates for numeric Num_parcel: 0522030210190 
+Removing 1 duplicates for numeric Num_parcel: 0522030211797 
+Removing 1 duplicates for numeric Num_parcel: 0522030208467 
+Removing 1 duplicates for numeric Num_parcel: 0522030206344 
+Removing 1 duplicates for numeric Num_parcel: 0522030208343 
+Removing 1 duplicates for numeric Num_parcel: 0522030205930 
+Removing 1 duplicates for numeric Num_parcel: 0522030205838 
+Removing 1 duplicates for numeric Num_parcel: 0522030206316 
+Removing 1 duplicates for numeric Num_parcel: 0522030205766 
+Removing 1 duplicates for numeric Num_parcel: 0522030207320 
+Removing 1 duplicates for numeric Num_parcel: 0522030208459 
+Removing 1 duplicates for numeric Num_parcel: 0522030207284 
+Removing 1 duplicates for numeric Num_parcel: 0522030207275 
+Removing 1 duplicates for numeric Num_parcel: 0522030209017 
+Removing 1 duplicates for numeric Num_parcel: 0522030210986 
+Removing 1 duplicates for numeric Num_parcel: 0522030207451 
+Removing 1 duplicates for numeric Num_parcel: 0522030208003 
+Removing 1 duplicates for numeric Num_parcel: 0522030207397 
+Removing 1 duplicates for numeric Num_parcel: 0522030207924 
+Removing 1 duplicates for numeric Num_parcel: 0522030206968 
+Removing 1 duplicates for numeric Num_parcel: 0522030207179 
+Removing 2 duplicates for numeric Num_parcel: 0522030207259 
+Removing 1 duplicates for numeric Num_parcel: 0522030207480 
+Removing 1 duplicates for numeric Num_parcel: 0522030207600 
+Removing 4 duplicates for numeric Num_parcel: 0522030207290 
+Removing 7 duplicates for numeric Num_parcel: 0522030210332 
+Removing 1 duplicates for numeric Num_parcel: 0522030210748 
+Removing 1 duplicates for numeric Num_parcel: 0522030209345 
+Removing 1 duplicates for numeric Num_parcel: 0522030208529 
+Removing 1 duplicates for numeric Num_parcel: 0522030210780 
+Removing 1 duplicates for numeric Num_parcel: 0522030207729 
+Removing 1 duplicates for numeric Num_parcel: 0522030209978 
+Removing 1 duplicates for numeric Num_parcel: 0522030208889 
+
+--- CLEANING RESULTS ---
+Features after cleaning: 6580 
+Features removed: 121 
+Reduction: 1.8 %
+Final unique Num_parcel values: 5087 
+Final numeric parcels (no duplicates): 5078 
+Final zero parcels (kept all): 1 
+Final text parcels (kept all): 9 
+✓ Successfully processed and saved: MISSIRAH_LineStringZ_final.gpkg 
+Final columns: source_file, layer, Num_parcel, geom 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+Processing file 11 of 15 : MOUDERY_LineStringZ 
+= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+Original feature count: 1054 
+Available columns: id, source_file, length_2d, start_x, start_y, start_z, end_x, end_y, end_z, min_z, max_z, z_range, point_count, length_3d, dxf_type, layer, color, linetype, lineweight, handle, thickness, elevation, extrusion_x, extrusion_y, extrusion_z, closed, start_width, end_width, geom 
+Created Num_parcel field from 'layer' column
+Kept columns: source_file, layer, Num_parcel 
+
+--- Num_parcel ANALYSIS ---
+Unique Num_parcel values: 895 
+Sample Num_parcel values: 0, 0512030301926, 0512030301989, y, 0512030301942, 0512030301950, 0512030301966, 0512030301958, 0512030301974, 0512030301927 
+Numeric parcels (excluding 0): 797 
+Zero parcels: 1 
+Text/character parcels: 98 
+Removing 1 duplicates for numeric Num_parcel: 0512030301983 
+Removing 1 duplicates for numeric Num_parcel: 0512030301902 
+Removing 1 duplicates for numeric Num_parcel: 0512030300512 
+Removing 1 duplicates for numeric Num_parcel: 0512030301843 
+Removing 1 duplicates for numeric Num_parcel: 0512030300027 
+
+--- CLEANING RESULTS ---
+Features after cleaning: 1049 
+Features removed: 5 
+Reduction: 0.5 %
+Final unique Num_parcel values: 895 
+Final numeric parcels (no duplicates): 797 
+Final zero parcels (kept all): 1 
+Final text parcels (kept all): 98 
+✓ Successfully processed and saved: MOUDERY_LineStringZ_final.gpkg 
+Final columns: source_file, layer, Num_parcel, geom 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+Processing file 12 of 15 : NDOGA_BABACAR_LineStringZ 
+= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+Original feature count: 1291 
+Available columns: id, source_file, length_2d, start_x, start_y, start_z, end_x, end_y, end_z, min_z, max_z, z_range, point_count, length_3d, dxf_type, layer, color, linetype, lineweight, handle, thickness, elevation, extrusion_x, extrusion_y, extrusion_z, closed, start_width, end_width, geom 
+Created Num_parcel field from 'layer' column
+Kept columns: source_file, layer, Num_parcel 
+
+--- Num_parcel ANALYSIS ---
+Unique Num_parcel values: 816 
+Sample Num_parcel values: 01101091, 01101092, 01101094, 01101093, 01101095, 01101096, 01101097, 01101098, 01101099, 011010100 
+Numeric parcels (excluding 0): 486 
+Zero parcels: 1 
+Text/character parcels: 330 
+Removing 1 duplicates for numeric Num_parcel: 011010104 
+Removing 1 duplicates for numeric Num_parcel: 03232327 
+Removing 1 duplicates for numeric Num_parcel: 03232339 
+Removing 1 duplicates for numeric Num_parcel: 01151541 
+Removing 1 duplicates for numeric Num_parcel: 02141416 
+Removing 1 duplicates for numeric Num_parcel: 03191940 
+Removing 3 duplicates for numeric Num_parcel: 03191943 
+Removing 1 duplicates for numeric Num_parcel: 03191944 
+Removing 1 duplicates for numeric Num_parcel: 03191941 
+Removing 1 duplicates for numeric Num_parcel: 03191942 
+Removing 1 duplicates for numeric Num_parcel: 0304422 
+Removing 1 duplicates for numeric Num_parcel: 03252543 
+Removing 1 duplicates for numeric Num_parcel: 03191954 
+Removing 1 duplicates for numeric Num_parcel: 0215151001 
+Removing 1 duplicates for numeric Num_parcel: 0407760 
+Removing 1 duplicates for numeric Num_parcel: 0522020210747 
+Removing 1 duplicates for numeric Num_parcel: 0522020210091 
+
+--- CLEANING RESULTS ---
+Features after cleaning: 1272 
+Features removed: 19 
+Reduction: 1.5 %
+Final unique Num_parcel values: 816 
+Final numeric parcels (no duplicates): 486 
+Final zero parcels (kept all): 1 
+Final text parcels (kept all): 330 
+✓ Successfully processed and saved: NDOGA_BABACAR_LineStringZ_final.gpkg 
+Final columns: source_file, layer, Num_parcel, geom 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+Processing file 13 of 15 : NETTEBOULOU_LineStringZ 
+= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+Original feature count: 3310 
+Available columns: id, source_file, length_2d, start_x, start_y, start_z, end_x, end_y, end_z, min_z, max_z, z_range, point_count, length_3d, dxf_type, layer, color, linetype, lineweight, handle, thickness, elevation, extrusion_x, extrusion_y, extrusion_z, closed, start_width, end_width, geom 
+Created Num_parcel field from 'layer' column
+Kept columns: source_file, layer, Num_parcel 
+
+--- Num_parcel ANALYSIS ---
+Unique Num_parcel values: 1804 
+Sample Num_parcel values: 0, 0522030300046, 0522030300054, 0522030300038, 0522030300056, 0522030300048, 0522030300052, 0522030300076, 0522030300044, 0522030300096 
+Numeric parcels (excluding 0): 1775 
+Zero parcels: 1 
+Text/character parcels: 29 
+Removing 1 duplicates for numeric Num_parcel: 0522030300236 
+Removing 1 duplicates for numeric Num_parcel: 0522030300284 
+Removing 1 duplicates for numeric Num_parcel: 0522030300276 
+Removing 1 duplicates for numeric Num_parcel: 0522030300268 
+Removing 1 duplicates for numeric Num_parcel: 0522030301914 
+Removing 1 duplicates for numeric Num_parcel: 0522030302029 
+Removing 1 duplicates for numeric Num_parcel: 0522030300292 
+Removing 1 duplicates for numeric Num_parcel: 0522030301585 
+Removing 1 duplicates for numeric Num_parcel: 0522030301211 
+Removing 1 duplicates for numeric Num_parcel: 0522030302411 
+Removing 1 duplicates for numeric Num_parcel: 0522030303711 
+Removing 1 duplicates for numeric Num_parcel: 0522030301912 
+Removing 1 duplicates for numeric Num_parcel: 0522030304600 
+Removing 1 duplicates for numeric Num_parcel: 0522030304012 
+Removing 1 duplicates for numeric Num_parcel: 0522030303181 
+Removing 1 duplicates for numeric Num_parcel: 0512030103683 
+Removing 1 duplicates for numeric Num_parcel: 0522030303151 
+Removing 1 duplicates for numeric Num_parcel: 0522030303159 
+Removing 2 duplicates for numeric Num_parcel: 0522030303204 
+Removing 1 duplicates for numeric Num_parcel: 0522030301907 
+Removing 1 duplicates for numeric Num_parcel: 0522030300304 
+Removing 1 duplicates for numeric Num_parcel: 0522030300309 
+Removing 1 duplicates for numeric Num_parcel: 0522030300277 
+Removing 1 duplicates for numeric Num_parcel: 0522030300269 
+Removing 1 duplicates for numeric Num_parcel: 0522030300312 
+Removing 1 duplicates for numeric Num_parcel: 0522030300244 
+Removing 1 duplicates for numeric Num_parcel: 0522030300266 
+Removing 1 duplicates for numeric Num_parcel: 0522030300134 
+Removing 1 duplicates for numeric Num_parcel: 0522030300005 
+Removing 1 duplicates for numeric Num_parcel: 0522030300172 
+Removing 1 duplicates for numeric Num_parcel: 0522030300295 
+Removing 1 duplicates for numeric Num_parcel: 0522030300298 
+Removing 1 duplicates for numeric Num_parcel: 0522030300314 
+Removing 1 duplicates for numeric Num_parcel: 0522030300306 
+Removing 1 duplicates for numeric Num_parcel: 0522030300710 
+Removing 1 duplicates for numeric Num_parcel: 0522030300999 
+Removing 1 duplicates for numeric Num_parcel: 0522030301334 
+
+--- CLEANING RESULTS ---
+Features after cleaning: 3272 
+Features removed: 38 
+Reduction: 1.1 %
+Final unique Num_parcel values: 1804 
+Final numeric parcels (no duplicates): 1775 
+Final zero parcels (kept all): 1 
+Final text parcels (kept all): 29 
+✓ Successfully processed and saved: NETTEBOULOU_LineStringZ_final.gpkg 
+Final columns: source_file, layer, Num_parcel, geom 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+Processing file 14 of 15 : SINTHIOU_MALEME_LineStringZ 
+= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+Original feature count: 4739 
+Available columns: id, source_file, length_2d, start_x, start_y, start_z, end_x, end_y, end_z, min_z, max_z, z_range, point_count, length_3d, dxf_type, layer, color, linetype, lineweight, handle, thickness, elevation, extrusion_x, extrusion_y, extrusion_z, closed, start_width, end_width, geom 
+Created Num_parcel field from 'layer' column
+Kept columns: source_file, layer, Num_parcel 
+
+--- Num_parcel ANALYSIS ---
+Unique Num_parcel values: 4508 
+Sample Num_parcel values: 0, 0522010205828, 0522010205836, 0522010205929, 0522010205955, 0522010205233, 0522010205844, 0522010205921, 0522010205804, 0522010205913 
+Numeric parcels (excluding 0): 4506 
+Zero parcels: 1 
+Text/character parcels: 2 
+Removing 1 duplicates for numeric Num_parcel: 0522010205927 
+Removing 1 duplicates for numeric Num_parcel: 0522010204664 
+Removing 1 duplicates for numeric Num_parcel: 0522010201939 
+Removing 1 duplicates for numeric Num_parcel: 0522010201650 
+Removing 1 duplicates for numeric Num_parcel: 0522010200330 
+Removing 1 duplicates for numeric Num_parcel: 0522010201768 
+Removing 1 duplicates for numeric Num_parcel: 0522010203089 
+Removing 1 duplicates for numeric Num_parcel: 0522010201846 
+Removing 1 duplicates for numeric Num_parcel: 0522010201748 
+Removing 2 duplicates for numeric Num_parcel: 0522010200572 
+Removing 1 duplicates for numeric Num_parcel: 0522010200563 
+Removing 1 duplicates for numeric Num_parcel: 0522010201020 
+Removing 1 duplicates for numeric Num_parcel: 0522010200571 
+Removing 1 duplicates for numeric Num_parcel: 0522010200383 
+Removing 1 duplicates for numeric Num_parcel: 0522010204821 
+Removing 2 duplicates for numeric Num_parcel: 052201020 
+Removing 1 duplicates for numeric Num_parcel: 0522010205442 
+Removing 1 duplicates for numeric Num_parcel: 0522010203137 
+Removing 1 duplicates for numeric Num_parcel: 0522010203095 
+Removing 1 duplicates for numeric Num_parcel: 0522010202473 
+Removing 1 duplicates for numeric Num_parcel: 0522010202489 
+Removing 2 duplicates for numeric Num_parcel: 0522010202497 
+Removing 1 duplicates for numeric Num_parcel: 0522010202505 
+Removing 1 duplicates for numeric Num_parcel: 0522010203203 
+Removing 1 duplicates for numeric Num_parcel: 0522010203179 
+Removing 1 duplicates for numeric Num_parcel: 0522010203563 
+Removing 1 duplicates for numeric Num_parcel: 0522010203547 
+Removing 1 duplicates for numeric Num_parcel: 0522010203129 
+Removing 1 duplicates for numeric Num_parcel: 0522010203539 
+Removing 1 duplicates for numeric Num_parcel: 0522010203195 
+Removing 1 duplicates for numeric Num_parcel: 0522010203530 
+Removing 1 duplicates for numeric Num_parcel: 0522010203169 
+Removing 1 duplicates for numeric Num_parcel: 0522010203454 
+Removing 1 duplicates for numeric Num_parcel: 0522010203522 
+Removing 1 duplicates for numeric Num_parcel: 0522010203514 
+Removing 1 duplicates for numeric Num_parcel: 0522010203523 
+Removing 1 duplicates for numeric Num_parcel: 0522010203506 
+Removing 1 duplicates for numeric Num_parcel: 0522010203518 
+Removing 1 duplicates for numeric Num_parcel: 0522010203510 
+Removing 1 duplicates for numeric Num_parcel: 0522010200738 
+Removing 1 duplicates for numeric Num_parcel: 0522010200746 
+Removing 1 duplicates for numeric Num_parcel: 0522010203161 
+Removing 1 duplicates for numeric Num_parcel: 0522010203546 
+Removing 1 duplicates for numeric Num_parcel: 0522010202283 
+Removing 1 duplicates for numeric Num_parcel: 0522010200722 
+Removing 1 duplicates for numeric Num_parcel: 0522010203511 
+Removing 1 duplicates for numeric Num_parcel: 0522010200651 
+Removing 1 duplicates for numeric Num_parcel: 0522010200582 
+Removing 1 duplicates for numeric Num_parcel: 0522010200518 
+Removing 1 duplicates for numeric Num_parcel: 0522010200598 
+Removing 1 duplicates for numeric Num_parcel: 0522010203555 
+Removing 1 duplicates for numeric Num_parcel: 0522010203507 
+Removing 1 duplicates for numeric Num_parcel: 0522010203150 
+Removing 2 duplicates for numeric Num_parcel: 0522010200239 
+Removing 1 duplicates for numeric Num_parcel: 0522010205165 
+Removing 1 duplicates for numeric Num_parcel: 0522010202089 
+Removing 1 duplicates for numeric Num_parcel: 0522010204364 
+Removing 1 duplicates for numeric Num_parcel: 0522010203051 
+Removing 1 duplicates for numeric Num_parcel: 0522010202015 
+Removing 2 duplicates for numeric Num_parcel: 0522010200002 
+Removing 1 duplicates for numeric Num_parcel: 0522010203536 
+Removing 1 duplicates for numeric Num_parcel: 0522010205666 
+Removing 1 duplicates for numeric Num_parcel: 0522010205541 
+Removing 1 duplicates for numeric Num_parcel: 0522010205509 
+Removing 1 duplicates for numeric Num_parcel: 0522010201217 
+Removing 1 duplicates for numeric Num_parcel: 0522010201304 
+Removing 1 duplicates for numeric Num_parcel: 0522010201332 
+Removing 1 duplicates for numeric Num_parcel: 0522010205268 
+Removing 2 duplicates for numeric Num_parcel: 0522010204610 
+Removing 2 duplicates for numeric Num_parcel: 0522010205490 
+Removing 1 duplicates for numeric Num_parcel: 0522010205530 
+Removing 2 duplicates for numeric Num_parcel: 0522010205941 
+Removing 1 duplicates for numeric Num_parcel: 0522010202485 
+Removing 1 duplicates for numeric Num_parcel: 0522010205822 
+Removing 1 duplicates for numeric Num_parcel: 0522010200267 
+Removing 1 duplicates for numeric Num_parcel: 0522010200288 
+Removing 1 duplicates for numeric Num_parcel: 0522010201560 
+Removing 1 duplicates for numeric Num_parcel: 0522010204271 
+Removing 1 duplicates for numeric Num_parcel: 0522010204730 
+Removing 1 duplicates for numeric Num_parcel: 0522010204708 
+Removing 1 duplicates for numeric Num_parcel: 0522010204995 
+Removing 1 duplicates for numeric Num_parcel: 0522010200225 
+Removing 1 duplicates for numeric Num_parcel: 0522010200361 
+Removing 1 duplicates for numeric Num_parcel: 0522010200938 
+Removing 1 duplicates for numeric Num_parcel: 0522010200980 
+Removing 1 duplicates for numeric Num_parcel: 0522010200976 
+Removing 1 duplicates for numeric Num_parcel: 0522010200474 
+Removing 1 duplicates for numeric Num_parcel: 0522010203875 
+Removing 1 duplicates for numeric Num_parcel: 0522010202278 
+Removing 1 duplicates for numeric Num_parcel: 0522010203995 
+Removing 1 duplicates for numeric Num_parcel: 0522010202809 
+Removing 3 duplicates for numeric Num_parcel: 0522010202903 
+Removing 3 duplicates for numeric Num_parcel: 0522010203270 
+Removing 4 duplicates for numeric Num_parcel: 0522010202008 
+Removing 1 duplicates for numeric Num_parcel: 0522010202527 
+Removing 1 duplicates for numeric Num_parcel: 0522010202803 
+Removing 1 duplicates for numeric Num_parcel: 0522010203363 
+Removing 1 duplicates for numeric Num_parcel: 0522010205650 
+Removing 1 duplicates for numeric Num_parcel: 0522010201484 
+Removing 1 duplicates for numeric Num_parcel: 0522010201531 
+Removing 1 duplicates for numeric Num_parcel: 0522010201515 
+Removing 1 duplicates for numeric Num_parcel: 0522010201729 
+Removing 1 duplicates for numeric Num_parcel: 0522010200837 
+Removing 1 duplicates for numeric Num_parcel: 0522010200902 
+Removing 1 duplicates for numeric Num_parcel: 0522010203212 
+Removing 1 duplicates for numeric Num_parcel: 0522010201485 
+Removing 1 duplicates for numeric Num_parcel: 0522010204246 
+Removing 1 duplicates for numeric Num_parcel: 0522010200720 
+Removing 1 duplicates for numeric Num_parcel: 0522010202069 
+Removing 1 duplicates for numeric Num_parcel: 0522010202774 
+Removing 1 duplicates for numeric Num_parcel: 0522010202495 
+Removing 1 duplicates for numeric Num_parcel: 0522010202902 
+Removing 1 duplicates for numeric Num_parcel: 0522010202878 
+Removing 1 duplicates for numeric Num_parcel: 0522010203915 
+Removing 1 duplicates for numeric Num_parcel: 0522010203860 
+Removing 1 duplicates for numeric Num_parcel: 0522010202362 
+Removing 1 duplicates for numeric Num_parcel: 0522010202970 
+Removing 1 duplicates for numeric Num_parcel: 0522010201487 
+
+--- CLEANING RESULTS ---
+Features after cleaning: 4606 
+Features removed: 133 
+Reduction: 2.8 %
+Final unique Num_parcel values: 4508 
+Final numeric parcels (no duplicates): 4506 
+Final zero parcels (kept all): 1 
+Final text parcels (kept all): 2 
+✓ Successfully processed and saved: SINTHIOU_MALEME_LineStringZ_final.gpkg 
+Final columns: source_file, layer, Num_parcel, geom 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+Processing file 15 of 15 : TOMBORONKOTO_LineStringZ 
+= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+Original feature count: 9538 
+Available columns: id, source_file, length_2d, start_x, start_y, start_z, end_x, end_y, end_z, min_z, max_z, z_range, point_count, length_3d, dxf_type, layer, color, linetype, lineweight, handle, thickness, elevation, extrusion_x, extrusion_y, extrusion_z, closed, start_width, end_width, geom 
+Created Num_parcel field from 'layer' column
+Kept columns: source_file, layer, Num_parcel 
+
+--- Num_parcel ANALYSIS ---
+Unique Num_parcel values: 8921 
+Sample Num_parcel values: 1312010202231, 1312010202179, 1312010202187, 1312010202334, 1312010202335, 1312010202526, 1312010202219, 1312010202518, 1312010202510, 1312010202502 
+Numeric parcels (excluding 0): 8913 
+Zero parcels: 1 
+Text/character parcels: 8 
+Removing 1 duplicates for numeric Num_parcel: 1312010202335 
+Removing 1 duplicates for numeric Num_parcel: 1312010203235 
+Removing 1 duplicates for numeric Num_parcel: 1312010201345 
+Removing 1 duplicates for numeric Num_parcel: 1312010204605 
+Removing 1 duplicates for numeric Num_parcel: 1312010201803 
+Removing 1 duplicates for numeric Num_parcel: 1312010205587 
+Removing 1 duplicates for numeric Num_parcel: 1312010207914 
+Removing 1 duplicates for numeric Num_parcel: 1312010206186 
+Removing 1 duplicates for numeric Num_parcel: 1312010205166 
+Removing 1 duplicates for numeric Num_parcel: 1312010205795 
+Removing 1 duplicates for numeric Num_parcel: 1312010203978 
+Removing 1 duplicates for numeric Num_parcel: 1312010205818 
+Removing 1 duplicates for numeric Num_parcel: 1312010210025 
+Removing 3 duplicates for numeric Num_parcel: 1312010205610 
+Removing 1 duplicates for numeric Num_parcel: 1312010210007 
+Removing 1 duplicates for numeric Num_parcel: 1312010210015 
+Removing 1 duplicates for numeric Num_parcel: 1312010210014 
+Removing 1 duplicates for numeric Num_parcel: 1312010209975 
+Removing 1 duplicates for numeric Num_parcel: 1312010209983 
+Removing 1 duplicates for numeric Num_parcel: 1312010209999 
+Removing 1 duplicates for numeric Num_parcel: 1312010210468 
+Removing 1 duplicates for numeric Num_parcel: 1312010212931 
+Removing 1 duplicates for numeric Num_parcel: 1312010213008 
+Removing 1 duplicates for numeric Num_parcel: 1312010212984 
+Removing 1 duplicates for numeric Num_parcel: 1312010209674 
+Removing 1 duplicates for numeric Num_parcel: 1312010211442 
+Removing 1 duplicates for numeric Num_parcel: 1312010210023 
+Removing 1 duplicates for numeric Num_parcel: 1312010209974 
+Removing 1 duplicates for numeric Num_parcel: 1312010211482 
+Removing 1 duplicates for numeric Num_parcel: 1312010209990 
+Removing 1 duplicates for numeric Num_parcel: 1312010211435 
+Removing 1 duplicates for numeric Num_parcel: 1312010211490 
+Removing 1 duplicates for numeric Num_parcel: 1312010211551 
+Removing 1 duplicates for numeric Num_parcel: 1312010211535 
+Removing 1 duplicates for numeric Num_parcel: 1312010211537 
+Removing 1 duplicates for numeric Num_parcel: 1312010211545 
+Removing 1 duplicates for numeric Num_parcel: 1312010211529 
+Removing 1 duplicates for numeric Num_parcel: 1312010210086 
+Removing 1 duplicates for numeric Num_parcel: 1312010212939 
+Removing 1 duplicates for numeric Num_parcel: 1312010212947 
+Removing 1 duplicates for numeric Num_parcel: 1312010211467 
+Removing 1 duplicates for numeric Num_parcel: 1312010211459 
+Removing 1 duplicates for numeric Num_parcel: 1312010211475 
+Removing 1 duplicates for numeric Num_parcel: 1312010210041 
+Removing 1 duplicates for numeric Num_parcel: 1312010211477 
+Removing 1 duplicates for numeric Num_parcel: 1312010211469 
+Removing 2 duplicates for numeric Num_parcel: 1312010211485 
+Removing 1 duplicates for numeric Num_parcel: 1312010211483 
+Removing 1 duplicates for numeric Num_parcel: 1312010213179 
+Removing 2 duplicates for numeric Num_parcel: 1312010211474 
+Removing 1 duplicates for numeric Num_parcel: 1312010211543 
+Removing 1 duplicates for numeric Num_parcel: 1312010213192 
+Removing 1 duplicates for numeric Num_parcel: 1312010210290 
+Removing 1 duplicates for numeric Num_parcel: 1312010201133 
+Removing 1 duplicates for numeric Num_parcel: 1312010204253 
+Removing 1 duplicates for numeric Num_parcel: 1312010203832 
+Removing 1 duplicates for numeric Num_parcel: 1312010204262 
+Removing 1 duplicates for numeric Num_parcel: 1312010207675 
+Removing 1 duplicates for numeric Num_parcel: 1312010201150 
+Removing 1 duplicates for numeric Num_parcel: 1312010201142 
+Removing 1 duplicates for numeric Num_parcel: 1312010201134 
+Removing 1 duplicates for numeric Num_parcel: 1312010206429 
+Removing 2 duplicates for numeric Num_parcel: 1312010206436 
+Removing 1 duplicates for numeric Num_parcel: 1312010205233 
+Removing 1 duplicates for numeric Num_parcel: 1312010201512 
+Removing 1 duplicates for numeric Num_parcel: 1312010208313 
+Removing 1 duplicates for numeric Num_parcel: 1312010205218 
+Removing 1 duplicates for numeric Num_parcel: 1312010208322 
+Removing 1 duplicates for numeric Num_parcel: 1312010207725 
+Removing 1 duplicates for numeric Num_parcel: 1312010207771 
+Removing 1 duplicates for numeric Num_parcel: 1312010204724 
+Removing 1 duplicates for numeric Num_parcel: 1312010204694 
+Removing 2 duplicates for numeric Num_parcel: 1312010205285 
+Removing 1 duplicates for numeric Num_parcel: 1312010208277 
+Removing 1 duplicates for numeric Num_parcel: 1312010207780 
+Removing 1 duplicates for numeric Num_parcel: 1312010207808 
+Removing 2 duplicates for numeric Num_parcel: 1312010206434 
+Removing 1 duplicates for numeric Num_parcel: 1312010207740 
+Removing 2 duplicates for numeric Num_parcel: 1312010207748 
+Removing 1 duplicates for numeric Num_parcel: 1312010207794 
+Removing 2 duplicates for numeric Num_parcel: 1312010207756 
+Removing 1 duplicates for numeric Num_parcel: 1312010207448 
+Removing 1 duplicates for numeric Num_parcel: 1312010203740 
+Removing 1 duplicates for numeric Num_parcel: 1312010203034 
+Removing 1 duplicates for numeric Num_parcel: 1312010207946 
+Removing 1 duplicates for numeric Num_parcel: 1312010204501 
+Removing 1 duplicates for numeric Num_parcel: 1312010205850 
+Removing 1 duplicates for numeric Num_parcel: 1312010204988 
+Removing 1 duplicates for numeric Num_parcel: 1312010205763 
+Removing 1 duplicates for numeric Num_parcel: 1312010210632 
+Removing 1 duplicates for numeric Num_parcel: 1312010211102 
+Removing 1 duplicates for numeric Num_parcel: 1312010211577 
+Removing 1 duplicates for numeric Num_parcel: 1312010211396 
+Removing 1 duplicates for numeric Num_parcel: 1312010211308 
+Removing 1 duplicates for numeric Num_parcel: 1312010203036 
+Removing 1 duplicates for numeric Num_parcel: 1312010206176 
+Removing 1 duplicates for numeric Num_parcel: 1312010205804 
+Removing 1 duplicates for numeric Num_parcel: 1312010204767 
+Removing 1 duplicates for numeric Num_parcel: 1312010205909 
+Removing 3 duplicates for numeric Num_parcel: 1312010206326 
+Removing 1 duplicates for numeric Num_parcel: 1312010204696 
+Removing 1 duplicates for numeric Num_parcel: 1312010204713 
+Removing 1 duplicates for numeric Num_parcel: 1312010204691 
+Removing 3 duplicates for numeric Num_parcel: 1312010208148 
+Removing 1 duplicates for numeric Num_parcel: 1312010208116 
+Removing 1 duplicates for numeric Num_parcel: 1312010208156 
+Removing 1 duplicates for numeric Num_parcel: 1312010208129 
+Removing 1 duplicates for numeric Num_parcel: 1312010208101 
+Removing 1 duplicates for numeric Num_parcel: 1312010208125 
+Removing 1 duplicates for numeric Num_parcel: 1312010208109 
+Removing 1 duplicates for numeric Num_parcel: 1312010208113 
+Removing 2 duplicates for numeric Num_parcel: 1312010206241 
+Removing 2 duplicates for numeric Num_parcel: 1312010206273 
+Removing 2 duplicates for numeric Num_parcel: 1312010204689 
+Removing 1 duplicates for numeric Num_parcel: 1312010206572 
+Removing 1 duplicates for numeric Num_parcel: 1312010206375 
+Removing 1 duplicates for numeric Num_parcel: 1312010206458 
+Removing 1 duplicates for numeric Num_parcel: 1312010204940 
+Removing 1 duplicates for numeric Num_parcel: 1312010206297 
+Removing 1 duplicates for numeric Num_parcel: 1312010204908 
+Removing 1 duplicates for numeric Num_parcel: 1312010205537 
+Removing 1 duplicates for numeric Num_parcel: 1312010205529 
+Removing 1 duplicates for numeric Num_parcel: 1312010206334 
+Removing 1 duplicates for numeric Num_parcel: 1312010205406 
+Removing 2 duplicates for numeric Num_parcel: 1312010207742 
+Removing 1 duplicates for numeric Num_parcel: 1312010205322 
+Removing 1 duplicates for numeric Num_parcel: 1312010205637 
+Removing 1 duplicates for numeric Num_parcel: 1312010205447 
+Removing 1 duplicates for numeric Num_parcel: 1312010204983 
+Removing 1 duplicates for numeric Num_parcel: 1312010212588 
+Removing 1 duplicates for numeric Num_parcel: 1312010200895 
+Removing 2 duplicates for numeric Num_parcel: 1312010203319 
+Removing 1 duplicates for numeric Num_parcel: 1312010206167 
+Removing 1 duplicates for numeric Num_parcel: 1312010206038 
+Removing 3 duplicates for numeric Num_parcel: 1312010204016 
+Removing 1 duplicates for numeric Num_parcel: 1312010206041 
+Removing 1 duplicates for numeric Num_parcel: 1312010206033 
+Removing 1 duplicates for numeric Num_parcel: 1312010206066 
+Removing 1 duplicates for numeric Num_parcel: 1312010206057 
+Removing 1 duplicates for numeric Num_parcel: 1312010203012 
+Removing 1 duplicates for numeric Num_parcel: 1312010201119 
+Removing 2 duplicates for numeric Num_parcel: 1312010202718 
+Removing 1 duplicates for numeric Num_parcel: 1312010202742 
+Removing 2 duplicates for numeric Num_parcel: 1312010202730 
+Removing 2 duplicates for numeric Num_parcel: 1312010202746 
+Removing 2 duplicates for numeric Num_parcel: 1312010203217 
+Removing 2 duplicates for numeric Num_parcel: 1312010205516 
+Removing 1 duplicates for numeric Num_parcel: 1312010202701 
+Removing 1 duplicates for numeric Num_parcel: 1312010206778 
+Removing 1 duplicates for numeric Num_parcel: 1312010200901 
+Removing 1 duplicates for numeric Num_parcel: 1312010204443 
+Removing 1 duplicates for numeric Num_parcel: 1312010205435 
+Removing 2 duplicates for numeric Num_parcel: 1312010206262 
+Removing 1 duplicates for numeric Num_parcel: 1312010206410 
+Removing 2 duplicates for numeric Num_parcel: 1312010205683 
+Removing 2 duplicates for numeric Num_parcel: 1312010206411 
+Removing 1 duplicates for numeric Num_parcel: 1312010206433 
+Removing 1 duplicates for numeric Num_parcel: 1312010204412 
+Removing 1 duplicates for numeric Num_parcel: 1312010207040 
+Removing 1 duplicates for numeric Num_parcel: 1312010206960 
+Removing 2 duplicates for numeric Num_parcel: 1312010207048 
+Removing 2 duplicates for numeric Num_parcel: 1312010204541 
+Removing 2 duplicates for numeric Num_parcel: 1312010204533 
+Removing 1 duplicates for numeric Num_parcel: 1312010202457 
+Removing 2 duplicates for numeric Num_parcel: 1312010204669 
+Removing 1 duplicates for numeric Num_parcel: 1312010204738 
+Removing 1 duplicates for numeric Num_parcel: 1312010207012 
+Removing 1 duplicates for numeric Num_parcel: 1312010207022 
+Removing 1 duplicates for numeric Num_parcel: 1312010207046 
+Removing 1 duplicates for numeric Num_parcel: 1312010207006 
+Removing 1 duplicates for numeric Num_parcel: 1312010206283 
+Removing 1 duplicates for numeric Num_parcel: 1312010206194 
+Removing 3 duplicates for numeric Num_parcel: 1312010205682 
+Removing 1 duplicates for numeric Num_parcel: 1312010205445 
+Removing 2 duplicates for numeric Num_parcel: 1312010207849 
+Removing 2 duplicates for numeric Num_parcel: 1312010207325 
+Removing 2 duplicates for numeric Num_parcel: 1312010207360 
+Removing 2 duplicates for numeric Num_parcel: 1312010206136 
+Removing 1 duplicates for numeric Num_parcel: 1312010207356 
+Removing 2 duplicates for numeric Num_parcel: 1312010205801 
+Removing 1 duplicates for numeric Num_parcel: 1312010205798 
+Removing 1 duplicates for numeric Num_parcel: 1312010204504 
+Removing 2 duplicates for numeric Num_parcel: 1312010205793 
+Removing 2 duplicates for numeric Num_parcel: 1312010205526 
+Removing 1 duplicates for numeric Num_parcel: 1312010206073 
+Removing 1 duplicates for numeric Num_parcel: 1312010205569 
+Removing 1 duplicates for numeric Num_parcel: 1312010205805 
+Removing 2 duplicates for numeric Num_parcel: 1312010206144 
+Removing 1 duplicates for numeric Num_parcel: 1312010206427 
+Removing 1 duplicates for numeric Num_parcel: 1312010206207 
+Removing 1 duplicates for numeric Num_parcel: 1312010207655 
+Removing 1 duplicates for numeric Num_parcel: 1312010204649 
+Removing 1 duplicates for numeric Num_parcel: 1312010206611 
+Removing 1 duplicates for numeric Num_parcel: 1312010210790 
+Removing 1 duplicates for numeric Num_parcel: 1312010212246 
+Removing 1 duplicates for numeric Num_parcel: 1312010212718 
+Removing 1 duplicates for numeric Num_parcel: 1312010210826 
+Removing 1 duplicates for numeric Num_parcel: 1312010212238 
+Removing 1 duplicates for numeric Num_parcel: 1312010212022 
+Removing 1 duplicates for numeric Num_parcel: 1312010212055 
+Removing 1 duplicates for numeric Num_parcel: 1312010212006 
+Removing 2 duplicates for numeric Num_parcel: 1312010212035 
+Removing 1 duplicates for numeric Num_parcel: 1312010206827 
+Removing 1 duplicates for numeric Num_parcel: 1312010205590 
+Removing 3 duplicates for numeric Num_parcel: 1312010208003 
+Removing 2 duplicates for numeric Num_parcel: 1312010208017 
+Removing 1 duplicates for numeric Num_parcel: 1312010207862 
+Removing 1 duplicates for numeric Num_parcel: 1312010201718 
+Removing 1 duplicates for numeric Num_parcel: 1312010207364 
+Removing 1 duplicates for numeric Num_parcel: 1312010201757 
+Removing 1 duplicates for numeric Num_parcel: 1312010207117 
+Removing 2 duplicates for numeric Num_parcel: 1312010207181 
+Removing 1 duplicates for numeric Num_parcel: 1312010207089 
+Removing 1 duplicates for numeric Num_parcel: 1312010206852 
+Removing 4 duplicates for numeric Num_parcel: 1312010206929 
+Removing 3 duplicates for numeric Num_parcel: 1312010206951 
+Removing 4 duplicates for numeric Num_parcel: 1312010205783 
+Removing 2 duplicates for numeric Num_parcel: 1312010206601 
+Removing 1 duplicates for numeric Num_parcel: 1312010204445 
+Removing 1 duplicates for numeric Num_parcel: 1312010207393 
+Removing 1 duplicates for numeric Num_parcel: 1312010206851 
+Removing 2 duplicates for numeric Num_parcel: 1312010207217 
+Removing 2 duplicates for numeric Num_parcel: 1312010206892 
+Removing 3 duplicates for numeric Num_parcel: 1312010207670 
+Removing 2 duplicates for numeric Num_parcel: 1312010206597 
+Removing 1 duplicates for numeric Num_parcel: 1312010207637 
+Removing 1 duplicates for numeric Num_parcel: 1312010207646 
+Removing 1 duplicates for numeric Num_parcel: 1312010200043 
+Removing 1 duplicates for numeric Num_parcel: 1312010206000 
+Removing 1 duplicates for numeric Num_parcel: 1312010205647 
+Removing 1 duplicates for numeric Num_parcel: 1312010205687 
+Removing 3 duplicates for numeric Num_parcel: 1312010207431 
+Removing 1 duplicates for numeric Num_parcel: 1312010205735 
+Removing 3 duplicates for numeric Num_parcel: 1312010205597 
+Removing 2 duplicates for numeric Num_parcel: 1312010205644 
+Removing 1 duplicates for numeric Num_parcel: 1312010206613 
+Removing 1 duplicates for numeric Num_parcel: 1312010205692 
+Removing 1 duplicates for numeric Num_parcel: 1312010205703 
+Removing 1 duplicates for numeric Num_parcel: 1312010207271 
+Removing 2 duplicates for numeric Num_parcel: 1312010207992 
+Removing 1 duplicates for numeric Num_parcel: 1312010207994 
+Removing 2 duplicates for numeric Num_parcel: 1312010208011 
+Removing 1 duplicates for numeric Num_parcel: 1312010207612 
+Removing 1 duplicates for numeric Num_parcel: 1312010207384 
+Removing 1 duplicates for numeric Num_parcel: 1312010207668 
+Removing 1 duplicates for numeric Num_parcel: 1312010207800 
+Removing 1 duplicates for numeric Num_parcel: 1312010207220 
+Removing 1 duplicates for numeric Num_parcel: 1312010204609 
+Removing 1 duplicates for numeric Num_parcel: 1312010207864 
+Removing 1 duplicates for numeric Num_parcel: 1312010204897 
+Removing 1 duplicates for numeric Num_parcel: 1312010204830 
+Removing 2 duplicates for numeric Num_parcel: 1312010207842 
+Removing 1 duplicates for numeric Num_parcel: 1312010207818 
+Removing 1 duplicates for numeric Num_parcel: 1312010207371 
+Removing 1 duplicates for numeric Num_parcel: 1312010206400 
+Removing 1 duplicates for numeric Num_parcel: 1312010205009 
+Removing 1 duplicates for numeric Num_parcel: 1312010205025 
+Removing 2 duplicates for numeric Num_parcel: 1312010206117 
+Removing 1 duplicates for numeric Num_parcel: 1312010208231 
+Removing 1 duplicates for numeric Num_parcel: 1312010207995 
+Removing 1 duplicates for numeric Num_parcel: 1312010204668 
+Removing 1 duplicates for numeric Num_parcel: 1312010210024 
+Removing 1 duplicates for numeric Num_parcel: 1312010210048 
+Removing 1 duplicates for numeric Num_parcel: 1312010212613 
+Removing 1 duplicates for numeric Num_parcel: 1312010210389 
+Removing 1 duplicates for numeric Num_parcel: 1312010204889 
+Removing 1 duplicates for numeric Num_parcel: 1312010211058 
+Removing 1 duplicates for numeric Num_parcel: 1312010205694 
+Removing 1 duplicates for numeric Num_parcel: 1312010207244 
+Removing 1 duplicates for numeric Num_parcel: 1312010205159 
+Removing 1 duplicates for numeric Num_parcel: 1312010209461 
+Removing 1 duplicates for numeric Num_parcel: 1312010209472 
+Removing 1 duplicates for numeric Num_parcel: 1312010209553 
+Removing 2 duplicates for numeric Num_parcel: 1312010206471 
+Removing 1 duplicates for numeric Num_parcel: 1312010212114 
+Removing 1 duplicates for numeric Num_parcel: 1312010207213 
+Removing 1 duplicates for numeric Num_parcel: 1312010210796 
+Removing 1 duplicates for numeric Num_parcel: 1312010201580 
+Removing 1 duplicates for numeric Num_parcel: 1312010201684 
+Removing 1 duplicates for numeric Num_parcel: 1312010202820 
+Removing 1 duplicates for numeric Num_parcel: 1312010202804 
+Removing 1 duplicates for numeric Num_parcel: 1312010202816 
+Removing 1 duplicates for numeric Num_parcel: 1312010201646 
+Removing 2 duplicates for numeric Num_parcel: 1312010203920 
+Removing 1 duplicates for numeric Num_parcel: 1312010203471 
+Removing 1 duplicates for numeric Num_parcel: 1312010202868 
+Removing 1 duplicates for numeric Num_parcel: 1312010200380 
+Removing 1 duplicates for numeric Num_parcel: 1312010203583 
+Removing 1 duplicates for numeric Num_parcel: 1312010203599 
+Removing 1 duplicates for numeric Num_parcel: 1312010213332 
+Removing 1 duplicates for numeric Num_parcel: 1312010212240 
+Removing 1 duplicates for numeric Num_parcel: 1312010203772 
+Removing 1 duplicates for numeric Num_parcel: 1312010201028 
+Removing 1 duplicates for numeric Num_parcel: 1312010211109 
+Removing 1 duplicates for numeric Num_parcel: 1312010203432 
+Removing 1 duplicates for numeric Num_parcel: 1312010203878 
+Removing 1 duplicates for numeric Num_parcel: 1312010202620 
+Removing 1 duplicates for numeric Num_parcel: 1312010203362 
+Removing 1 duplicates for numeric Num_parcel: 1312010203724 
+Removing 1 duplicates for numeric Num_parcel: 1312010200349 
+Removing 1 duplicates for numeric Num_parcel: 1312010200603 
+Removing 1 duplicates for numeric Num_parcel: 1312010202126 
+Removing 1 duplicates for numeric Num_parcel: 1312010212943 
+Removing 1 duplicates for numeric Num_parcel: 1312010202599 
+Removing 1 duplicates for numeric Num_parcel: 1312010202119 
+Removing 1 duplicates for numeric Num_parcel: 1312010200543 
+Removing 1 duplicates for numeric Num_parcel: 1312010202793 
+Removing 1 duplicates for numeric Num_parcel: 1312010204232 
+Removing 2 duplicates for numeric Num_parcel: 1312010203900 
+Removing 1 duplicates for numeric Num_parcel: 1312010203908 
+Removing 2 duplicates for numeric Num_parcel: 1312010203995 
+Removing 1 duplicates for numeric Num_parcel: 1312010203988 
+Removing 2 duplicates for numeric Num_parcel: 1312010203962 
+Removing 2 duplicates for numeric Num_parcel: 1312010201664 
+Removing 1 duplicates for numeric Num_parcel: 1312010203922 
+Removing 1 duplicates for numeric Num_parcel: 1312010203482 
+Removing 2 duplicates for numeric Num_parcel: 1312010201618 
+Removing 1 duplicates for numeric Num_parcel: 1312010201396 
+Removing 1 duplicates for numeric Num_parcel: 1312010201372 
+Removing 3 duplicates for numeric Num_parcel: 1312010203526 
+Removing 2 duplicates for numeric Num_parcel: 1312010203493 
+Removing 1 duplicates for numeric Num_parcel: 1312010200556 
+Removing 1 duplicates for numeric Num_parcel: 1312010203461 
+Removing 2 duplicates for numeric Num_parcel: 1312010200540 
+Removing 1 duplicates for numeric Num_parcel: 1312010201425 
+Removing 1 duplicates for numeric Num_parcel: 1312010203592 
+Removing 1 duplicates for numeric Num_parcel: 1312010204059 
+Removing 1 duplicates for numeric Num_parcel: 1312010201812 
+Removing 1 duplicates for numeric Num_parcel: 1312010204762 
+Removing 1 duplicates for numeric Num_parcel: 1312010206090 
+Removing 2 duplicates for numeric Num_parcel: 1312010206084 
+Removing 1 duplicates for numeric Num_parcel: 1312010206124 
+Removing 1 duplicates for numeric Num_parcel: 1312010206114 
+Removing 1 duplicates for numeric Num_parcel: 1312010203704 
+Removing 1 duplicates for numeric Num_parcel: 1312010204764 
+Removing 1 duplicates for numeric Num_parcel: 1312010211842 
+Removing 1 duplicates for numeric Num_parcel: 1312010200679 
+Removing 2 duplicates for numeric Num_parcel: 1312010201656 
+Removing 1 duplicates for numeric Num_parcel: 1312010203430 
+Removing 1 duplicates for numeric Num_parcel: 1312010202778 
+Removing 1 duplicates for numeric Num_parcel: 1312010202465 
+Removing 1 duplicates for numeric Num_parcel: 1312010201590 
+Removing 1 duplicates for numeric Num_parcel: 1312010201599 
+Removing 1 duplicates for numeric Num_parcel: 1312010200640 
+Removing 2 duplicates for numeric Num_parcel: 1312010200676 
+Removing 1 duplicates for numeric Num_parcel: 1312010200860 
+Removing 1 duplicates for numeric Num_parcel: 1312010201180 
+Removing 1 duplicates for numeric Num_parcel: 1312010201076 
+Removing 1 duplicates for numeric Num_parcel: 1312010201008 
+Removing 1 duplicates for numeric Num_parcel: 1312010200660 
+Removing 1 duplicates for numeric Num_parcel: 1312010201191 
+Removing 1 duplicates for numeric Num_parcel: 1312010201214 
+Removing 1 duplicates for numeric Num_parcel: 1312010200652 
+Removing 1 duplicates for numeric Num_parcel: 1312010200696 
+Removing 1 duplicates for numeric Num_parcel: 1312010200891 
+Removing 1 duplicates for numeric Num_parcel: 1312010203767 
+Removing 2 duplicates for numeric Num_parcel: 1312010203711 
+Removing 2 duplicates for numeric Num_parcel: 1312010203687 
+Removing 1 duplicates for numeric Num_parcel: 1312010200415 
+Removing 1 duplicates for numeric Num_parcel: 1312010203715 
+Removing 2 duplicates for numeric Num_parcel: 1312010203731 
+Removing 1 duplicates for numeric Num_parcel: 1312010200438 
+Removing 1 duplicates for numeric Num_parcel: 1312010202819 
+Removing 1 duplicates for numeric Num_parcel: 1312010200406 
+Removing 1 duplicates for numeric Num_parcel: 1312010202015 
+Removing 1 duplicates for numeric Num_parcel: 1312010202783 
+Removing 1 duplicates for numeric Num_parcel: 1312010200430 
+Removing 1 duplicates for numeric Num_parcel: 1312010202512 
+Removing 1 duplicates for numeric Num_parcel: 1312010202080 
+Removing 1 duplicates for numeric Num_parcel: 1312010202096 
+Removing 1 duplicates for numeric Num_parcel: 1312010202798 
+Removing 1 duplicates for numeric Num_parcel: 1312010202495 
+Removing 1 duplicates for numeric Num_parcel: 1312010202531 
+Removing 1 duplicates for numeric Num_parcel: 1312010203187 
+Removing 1 duplicates for numeric Num_parcel: 1312010200259 
+Removing 1 duplicates for numeric Num_parcel: 1312010200267 
+Removing 1 duplicates for numeric Num_parcel: 1312010203102 
+Removing 1 duplicates for numeric Num_parcel: 1312010200616 
+Removing 1 duplicates for numeric Num_parcel: 1312010200298 
+Removing 1 duplicates for numeric Num_parcel: 1312010202018 
+Removing 1 duplicates for numeric Num_parcel: 1312010202634 
+Removing 1 duplicates for numeric Num_parcel: 1312010202960 
+Removing 1 duplicates for numeric Num_parcel: 1312010207428 
+Removing 2 duplicates for numeric Num_parcel: 1312010203625 
+Removing 1 duplicates for numeric Num_parcel: 1312010200957 
+Removing 1 duplicates for numeric Num_parcel: 1312010200925 
+Removing 1 duplicates for numeric Num_parcel: 1312010201972 
+Removing 1 duplicates for numeric Num_parcel: 1312010207519 
+Removing 1 duplicates for numeric Num_parcel: 1312010202952 
+Removing 1 duplicates for numeric Num_parcel: 1312010207558 
+Removing 1 duplicates for numeric Num_parcel: 1312010207534 
+Removing 1 duplicates for numeric Num_parcel: 1312010208209 
+Removing 1 duplicates for numeric Num_parcel: 1312010207494 
+Removing 1 duplicates for numeric Num_parcel: 1312010208198 
+Removing 1 duplicates for numeric Num_parcel: 1312010208215 
+Removing 2 duplicates for numeric Num_parcel: 1312010208241 
+Removing 1 duplicates for numeric Num_parcel: 1312010208194 
+Removing 1 duplicates for numeric Num_parcel: 1312010205564 
+Removing 1 duplicates for numeric Num_parcel: 1312010206864 
+Removing 1 duplicates for numeric Num_parcel: 1312010206887 
+Removing 1 duplicates for numeric Num_parcel: 1312010205612 
+Removing 1 duplicates for numeric Num_parcel: 1312010208233 
+Removing 1 duplicates for numeric Num_parcel: 1312010206880 
+Removing 1 duplicates for numeric Num_parcel: 1312010205688 
+Removing 1 duplicates for numeric Num_parcel: 1312010205640 
+Removing 1 duplicates for numeric Num_parcel: 1312010208332 
+Removing 1 duplicates for numeric Num_parcel: 1312010205261 
+Removing 1 duplicates for numeric Num_parcel: 1312010207130 
+Removing 1 duplicates for numeric Num_parcel: 1312010207151 
+Removing 1 duplicates for numeric Num_parcel: 1312010206162 
+Removing 1 duplicates for numeric Num_parcel: 1312010205350 
+Removing 1 duplicates for numeric Num_parcel: 1312010205965 
+Removing 1 duplicates for numeric Num_parcel: 1312010205957 
+Removing 1 duplicates for numeric Num_parcel: 1312010204939 
+Removing 1 duplicates for numeric Num_parcel: 1312010206731 
+Removing 1 duplicates for numeric Num_parcel: 1312010206550 
+Removing 1 duplicates for numeric Num_parcel: 1312010207555 
+Removing 1 duplicates for numeric Num_parcel: 1312010206569 
+Removing 1 duplicates for numeric Num_parcel: 1312010207539 
+Removing 1 duplicates for numeric Num_parcel: 1312010206577 
+Removing 1 duplicates for numeric Num_parcel: 1312010204009 
+Removing 1 duplicates for numeric Num_parcel: 1312010201087 
+Removing 1 duplicates for numeric Num_parcel: 1312010201079 
+Removing 1 duplicates for numeric Num_parcel: 1312010201095 
+Removing 1 duplicates for numeric Num_parcel: 1312010202154 
+Removing 1 duplicates for numeric Num_parcel: 1312010202048 
+Removing 1 duplicates for numeric Num_parcel: 1312010206607 
+Removing 1 duplicates for numeric Num_parcel: 1312010206608 
+Removing 1 duplicates for numeric Num_parcel: 1312010204401 
+Removing 1 duplicates for numeric Num_parcel: 1312010203776 
+Removing 1 duplicates for numeric Num_parcel: 1312010205928 
+Removing 1 duplicates for numeric Num_parcel: 1312010201809 
+Removing 1 duplicates for numeric Num_parcel: 1312010202940 
+Removing 1 duplicates for numeric Num_parcel: 1312010202541 
+Removing 1 duplicates for numeric Num_parcel: 1312010202444 
+Removing 1 duplicates for numeric Num_parcel: 1312010203802 
+Removing 1 duplicates for numeric Num_parcel: 1312010201663 
+Removing 1 duplicates for numeric Num_parcel: 1312010202054 
+Removing 1 duplicates for numeric Num_parcel: 1312010201595 
+Removing 1 duplicates for numeric Num_parcel: 1312010201610 
+Removing 1 duplicates for numeric Num_parcel: 1312010200620 
+Removing 1 duplicates for numeric Num_parcel: 1312010200304 
+Removing 1 duplicates for numeric Num_parcel: 1312010200361 
+Removing 1 duplicates for numeric Num_parcel: 1312010202506 
+Removing 2 duplicates for numeric Num_parcel: 1312010203605 
+Removing 1 duplicates for numeric Num_parcel: 1312010208027 
+Removing 1 duplicates for numeric Num_parcel: 1312010205837 
+Removing 1 duplicates for numeric Num_parcel: 1312010205411 
+Removing 1 duplicates for numeric Num_parcel: 1312010204936 
+Removing 1 duplicates for numeric Num_parcel: 1312010204944 
+Removing 1 duplicates for numeric Num_parcel: 1312010205395 
+Removing 1 duplicates for numeric Num_parcel: 1312010204895 
+Removing 1 duplicates for numeric Num_parcel: 1312010206277 
+Removing 1 duplicates for numeric Num_parcel: 1312010205869 
+Removing 1 duplicates for numeric Num_parcel: 1312010205578 
+Removing 1 duplicates for numeric Num_parcel: 1312010205570 
+Removing 1 duplicates for numeric Num_parcel: 1312010208052 
+Removing 1 duplicates for numeric Num_parcel: 1312010204107 
+Removing 1 duplicates for numeric Num_parcel: 1312010204145 
+Removing 1 duplicates for numeric Num_parcel: 1312010202877 
+Removing 1 duplicates for numeric Num_parcel: 1312010204049 
+Removing 1 duplicates for numeric Num_parcel: 1312010204146 
+Removing 1 duplicates for numeric Num_parcel: 1312010200624 
+Removing 1 duplicates for numeric Num_parcel: 1312010200728 
+Removing 1 duplicates for numeric Num_parcel: 1312010204091 
+Removing 1 duplicates for numeric Num_parcel: 131201020058 
+Removing 1 duplicates for numeric Num_parcel: 1312010203500 
+Removing 1 duplicates for numeric Num_parcel: 1312010203492 
+Removing 1 duplicates for numeric Num_parcel: 1312010203865 
+Removing 1 duplicates for numeric Num_parcel: 1312010200889 
+Removing 1 duplicates for numeric Num_parcel: 1312010202108 
+Removing 1 duplicates for numeric Num_parcel: 1312010202041 
+Removing 1 duplicates for numeric Num_parcel: 1312010203806 
+Removing 1 duplicates for numeric Num_parcel: 1312010202112 
+Removing 1 duplicates for numeric Num_parcel: 1312010202128 
+Removing 1 duplicates for numeric Num_parcel: 1312010203304 
+Removing 1 duplicates for numeric Num_parcel: 1312010200645 
+Removing 1 duplicates for numeric Num_parcel: 1312010200141 
+Removing 2 duplicates for numeric Num_parcel: 1312010201976 
+Removing 1 duplicates for numeric Num_parcel: 1312010201880 
+Removing 1 duplicates for numeric Num_parcel: 1312010201872 
+Removing 3 duplicates for numeric Num_parcel: 1312010202901 
+Removing 1 duplicates for numeric Num_parcel: 1312010202832 
+Removing 1 duplicates for numeric Num_parcel: 1312010203402 
+Removing 1 duplicates for numeric Num_parcel: 1312010201177 
+Removing 1 duplicates for numeric Num_parcel: 1312010200744 
+Removing 2 duplicates for numeric Num_parcel: 1312010201462 
+Removing 1 duplicates for numeric Num_parcel: 1312010201407 
+Removing 1 duplicates for numeric Num_parcel: 1312010201899 
+Removing 1 duplicates for numeric Num_parcel: 1312010201874 
+Removing 1 duplicates for numeric Num_parcel: 1312010211106 
+Removing 1 duplicates for numeric Num_parcel: 1312010204109 
+Removing 1 duplicates for numeric Num_parcel: 1312010204110 
+Removing 1 duplicates for numeric Num_parcel: 1312010204042 
+Removing 1 duplicates for numeric Num_parcel: 1312010204026 
+Removing 1 duplicates for numeric Num_parcel: 1312010204106 
+Removing 1 duplicates for numeric Num_parcel: 1312010204096 
+Removing 1 duplicates for numeric Num_parcel: 1312010204105 
+Removing 1 duplicates for numeric Num_parcel: 1312010201073 
+Removing 1 duplicates for numeric Num_parcel: 1312010201058 
+Removing 1 duplicates for numeric Num_parcel: 1312010201050 
+Removing 1 duplicates for numeric Num_parcel: 1312010201068 
+Removing 1 duplicates for numeric Num_parcel: 1312010201067 
+Removing 1 duplicates for numeric Num_parcel: 1312010201021 
+Removing 1 duplicates for numeric Num_parcel: 1312010201029 
+Removing 1 duplicates for numeric Num_parcel: 1312010202433 
+Removing 1 duplicates for numeric Num_parcel: 1312010200555 
+Removing 1 duplicates for numeric Num_parcel: 1312010202294 
+Removing 1 duplicates for numeric Num_parcel: 1312010200578 
+Removing 1 duplicates for numeric Num_parcel: 1312010202979 
+Removing 1 duplicates for numeric Num_parcel: 1312010202636 
+
+--- CLEANING RESULTS ---
+Features after cleaning: 8933 
+Features removed: 605 
+Reduction: 6.3 %
+Final unique Num_parcel values: 8921 
+Final numeric parcels (no duplicates): 8913 
+Final zero parcels (kept all): 1 
+Final text parcels (kept all): 8 
+✓ Successfully processed and saved: TOMBORONKOTO_LineStringZ_final.gpkg 
+Final columns: source_file, layer, Num_parcel, geom 
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+ATTRIBUTE CLEANING SUMMARY
+= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+Input folder: C:/Users/USER/Documents/Raw_Data/Levés topo-enquetes/Données LineStringZ Amélioré/Geopackages_Polygons_Clean 
+Output folder: C:/Users/USER/Documents/Raw_Data/Levés topo-enquetes/Données LineStringZ Amélioré/Geopackages_Final_Clean 
+Total files found: 15 
+Successfully processed: 15 
+Failed processes: 0 
+Final files created: 15 
+
+Final cleaned files:
+  ✓ BALA_LineStringZ_final.gpkg 
+    Features: 1190 | Unique parcels: 1188 
+  ✓ BALLOU_LineStringZ_final.gpkg 
+    Features: 1366 | Unique parcels: 637 
+  ✓ BANDAFASSI_LineStringZ_final.gpkg 
+    Features: 3506 | Unique parcels: 3457 
+  ✓ BEMBOU_LineStringZ_final.gpkg 
+    Features: 1992 | Unique parcels: 1991 
+  ✓ DIMBOLI_LineStringZ_final.gpkg 
+    Features: 2950 | Unique parcels: 2850 
+  ✓ DINDEFELLO_LineStringZ_final.gpkg 
+    Features: 1766 | Unique parcels: 1765 
+  ✓ FONGOLEMBI_LineStringZ_final.gpkg 
+    Features: 1429 | Unique parcels: 1429 
+  ✓ GABOU_LineStringZ_final.gpkg 
+    Features: 1581 | Unique parcels: 908 
+  ✓ KOAR_LineStringZ_final.gpkg 
+    Features: 98 | Unique parcels: 91 
+  ✓ MISSIRAH_LineStringZ_final.gpkg 
+    Features: 6580 | Unique parcels: 5087 
+  ✓ MOUDERY_LineStringZ_final.gpkg 
+    Features: 1049 | Unique parcels: 895 
+  ✓ NDOGA_BABACAR_LineStringZ_final.gpkg 
+    Features: 1272 | Unique parcels: 816 
+  ✓ NETTEBOULOU_LineStringZ_final.gpkg 
+    Features: 3272 | Unique parcels: 1804 
+  ✓ SINTHIOU_MALEME_LineStringZ_final.gpkg 
+    Features: 4606 | Unique parcels: 4508 
+  ✓ TOMBORONKOTO_LineStringZ_final.gpkg 
+    Features: 8933 | Unique parcels: 8921 
+
+Attribute cleaning process completed!
+
+Process Summary:
+1. Created 'Num_parcel' field by removing '_line' from 'layer' field
+2. Kept only: source_file, layer, Num_parcel columns
+3. Removed duplicates based on Num_parcel (numeric only, kept 0 and text)
+4. Saved final clean files with '_final' suffix
+

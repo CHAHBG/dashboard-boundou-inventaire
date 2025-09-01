@@ -106,46 +106,7 @@ const realData = {
     cleaningRate: 9.93,
     jointuresIndividuelles: 14,
     jointuresCollectives: 14,
-    memeIDUP: 9
-  },
-  communes: [
-    { nom: 'BALA', brutes: 912, individuelles: 718, collectives: 144, conflits: 0, qualite: 96, statut: 'SUCCÈS' },
-    { nom: 'BALLOU', brutes: 1551, individuelles: 359, collectives: 277, conflits: 0, qualite: 70, statut: 'SUCCÈS' },
-    { nom: 'BANDAFASSI', brutes: 11731, individuelles: 2681, collectives: 736, conflits: 15, qualite: 92, statut: 'SUCCÈS' },
-    { nom: 'BEMBOU', brutes: 5885, individuelles: 1542, collectives: 407, conflits: 5, qualite: 93, statut: 'SUCCÈS' },
-    { nom: 'DIMBOLI', brutes: 6474, individuelles: 2409, collectives: 410, conflits: 2, qualite: 90, statut: 'SUCCÈS' },
-    { nom: 'DINDEFELLO', brutes: 5725, individuelles: 1492, collectives: 249, conflits: 10, qualite: 95, statut: 'SUCCÈS' },
-    { nom: 'FONGOLEMBI', brutes: 5001, individuelles: 870, collectives: 541, conflits: 1, qualite: 94, statut: 'SUCCÈS' },
-    { nom: 'GABOU', brutes: 2003, individuelles: 601, collectives: 301, conflits: 0, qualite: 75, statut: 'SUCCÈS' },
-    { nom: 'KOAR', brutes: 101, individuelles: 58, collectives: 30, conflits: 0, qualite: 92, statut: 'SUCCÈS' },
-    { nom: 'MISSIRAH', brutes: 6844, individuelles: 3548, collectives: 781, conflits: 34, qualite: 88, statut: 'SUCCÈS' },
-    { nom: 'MOUDERY', brutes: 1009, individuelles: 419, collectives: 310, conflits: 3, qualite: 80, statut: 'SUCCÈS' },
-    { nom: 'NDOGA_BABACAR', brutes: 4759, individuelles: 0, collectives: 0, conflits: 0, qualite: 50, statut: 'ERREUR' },
-    { nom: 'NETTEBOULOU', brutes: 3919, individuelles: 840, collectives: 538, conflits: 56, qualite: 65, statut: 'SUCCÈS' },
-    { nom: 'SINTHIOU_MALEME', brutes: 2778, individuelles: 1348, collectives: 103, conflits: 0, qualite: 85, statut: 'SUCCÈS' },
-    { nom: 'TOMBORONKOTO', brutes: 56834, individuelles: 8205, collectives: 539, conflits: 9, qualite: 98, statut: 'SUCCÈS' }
-  ],
-  quality: {
-    validationRate: 93.3,
-    criticalErrors: 9,
-    consistency: 92.87,
-    completude: 92.1,
-    precision: 87.5,
-    integrite: 91.3
-  },
-  reportsHistory: [], // Données fictives supprimées
-  iaAnalysis: {
-    correlation: {
-      brutes_conflits: 0.067,
-      indiv_conflits: 0.186,
-      coll_conflits: 0.587
-    },
-    regression: {
-      slope: 0.0000765,
-      intercept: 8.41,
-      r_value: 0.067,
-      p_value: 0.812
-    },
+    memeIDUP: 9,
     forecast: 9.18,
     quality: {
       validation: 93.3,
@@ -196,60 +157,71 @@ const realData = {
 // Fetch JSON data from data folder
 async function fetchDashboardData() {
   try {
-    // List of all JSON files to load
-    const files = [
-      'Rapport_Post_traitement.json',
-      'communes_data.json',
-      'dashboard_data_complete.json',
-      'dashboard_kpis.json',
-      'duplicate_removal_log.json',
-      'duplicate_removal_summary.json',
-      'nettoyage_doublon_idup.json',
-      'parcel_join_conflicts.json',
-      'problematic_parcels_summary.json',
-      'rapport_jointure.json'
-    ];
-
-    // Fetch all files in parallel
-    const responses = await Promise.all(files.map(f => fetch('data/' + f)));
-    const jsons = await Promise.all(responses.map(r => r.ok ? r.json() : null));
-
-    // Map file names to their data
-    const dataMap = {};
-    files.forEach((f, i) => {
-      dataMap[f.replace('.json', '')] = jsons[i];
-    });
-
-    // Example: extract summary from Rapport_Post_traitement.json if available
-    let summary = {};
-    if (dataMap['Rapport_Post_traitement'] && dataMap['Rapport_Post_traitement']['Rapport sommaire']) {
-      summary = dataMap['Rapport_Post_traitement']['Rapport sommaire'].reduce((acc, item) => {
-        const key = item.date?.toLowerCase().replace(/ /g, '_');
-        let value = item['2025_08_19_19_17_47'];
-        if (typeof value === 'string' && value.includes('%')) {
-          value = parseFloat(value.replace('%', '')) || 0;
-        }
-        if (key) acc[key] = value;
-        return acc;
-      }, {});
+    // Load all required data files from the data folder
+    const [dashboardDataResponse, kpisResponse, communesResponse, duplicateAnalysisResponse, joinAnalysisResponse] = await Promise.all([
+      fetch('data/dashboard_data_complete_new.json'),
+      fetch('data/dashboard_kpis.json'),
+      fetch('data/communes_data.json'),
+      fetch('data/duplicate_analysis.json'),
+      fetch('data/join_analysis.json')
+    ]);
+    
+    if (!dashboardDataResponse.ok || !kpisResponse.ok || !communesResponse.ok || 
+        !duplicateAnalysisResponse.ok || !joinAnalysisResponse.ok) {
+      throw new Error('Failed to fetch one or more JSON files');
     }
-
-    // Merge all data into one object for dashboard use
+    
+    const dashboardMainData = await dashboardDataResponse.json();
+    const kpisData = await kpisResponse.json();
+    const communesData = await communesResponse.json();
+    const duplicateAnalysisData = await duplicateAnalysisResponse.json();
+    const joinAnalysisData = await joinAnalysisResponse.json();
+    
+    console.log("Loaded dashboard data:", dashboardMainData);
+    console.log("Loaded KPIs data:", kpisData);
+    console.log("Loaded communes data:", communesData);
+    
+    // Integrate data from all sources
     return {
       summary: {
         ...realData.summary,
-        ...summary
+        // Use proper data from JSON files
+        totalFiles: kpisData.kpi_summary?.total_files?.value || realData.summary.totalFiles,
+        totalParcels: kpisData.kpi_summary?.total_parcels?.value || realData.summary.totalParcels,
+        indivParcels: kpisData.kpi_summary?.individual_parcels?.value || realData.summary.indivParcels,
+        collParcels: kpisData.kpi_summary?.collective_parcels?.value || realData.summary.collParcels,
+        conflictParcels: kpisData.kpi_summary?.problematic_parcels?.value || realData.summary.conflictParcels,
+        noJoinParcels: kpisData.kpi_summary?.unjoined_parcels?.value || realData.summary.noJoinParcels,
+        cleaningRate: kpisData.kpi_summary?.duplicate_removal_rate?.value || realData.summary.cleaningRate,
+        
+        // Calculate rates from kpi data
+        indivRate: kpisData.kpi_summary?.individual_parcels?.percent_of_total || realData.summary.indivRate,
+        collRate: kpisData.kpi_summary?.collective_parcels?.percent_of_total || realData.summary.collRate,
+        conflictRate: kpisData.kpi_summary?.problematic_parcels?.percent_of_total || realData.summary.conflictRate,
+        noJoinRate: kpisData.kpi_summary?.unjoined_parcels?.percent_of_total || realData.summary.noJoinRate,
+        
+        // Additional KPIs
+        success: kpisData.kpi_summary?.success_files?.value || realData.summary.success,
+        failures: kpisData.kpi_summary?.failed_files?.value || realData.summary.failures,
+        dataQuality: kpisData.kpi_summary?.data_quality?.value || 100 - realData.summary.cleaningRate,
+        jointuresIndividuelles: joinAnalysisData.summary?.individual_joins || realData.summary.jointuresIndividuelles,
+        jointuresCollectives: joinAnalysisData.summary?.collective_joins || realData.summary.jointuresCollectives,
+        memeIDUP: joinAnalysisData.summary?.same_idup_files || realData.summary.memeIDUP,
+        successRate: kpisData.kpi_summary?.success_rate?.value || realData.summary.successRate,
+        globalConflicts: kpisData.kpi_summary?.problematic_parcels?.value || realData.summary.globalConflicts,
+        
+        // Add commune-specific data
+        communes: communesData,
+        
+        // Add analysis details
+        duplicateAnalysis: duplicateAnalysisData,
+        joinAnalysis: joinAnalysisData,
+        
+        // Processing efficiency
+        processingEfficiency: kpisData.kpi_summary?.processing_efficiency?.value || 95
       },
-      communes_data: dataMap['communes_data'],
-      dashboard_data_complete: dataMap['dashboard_data_complete'],
-      dashboard_kpis: dataMap['dashboard_kpis'],
-      duplicate_removal_log: dataMap['duplicate_removal_log'],
-      duplicate_removal_summary: dataMap['duplicate_removal_summary'],
-      nettoyage_doublon_idup: dataMap['nettoyage_doublon_idup'],
-      parcel_join_conflicts: dataMap['parcel_join_conflicts'],
-      problematic_parcels_summary: dataMap['problematic_parcels_summary'],
-      rapport_jointure: dataMap['rapport_jointure'],
-      ...realData
+      quality: dashboardMainData.quality || realData.quality,
+      iaAnalysis: dashboardMainData.iaAnalysis || realData.iaAnalysis
     };
   } catch (error) {
     console.error('Error fetching JSON, using fallback data:', error);
@@ -399,124 +371,8 @@ async function initCharts() {
     commune: document.getElementById('communePerformanceChart'),
     trend: document.getElementById('trendChart'),
     duplicate: document.getElementById('duplicateChart'),
-    join: document.getElementById('joinChart'),
-    heatmap: document.getElementById('heatmapChart'),
-    problemPie: document.getElementById('problemPieChart'),
-    topUnjoined: document.getElementById('topUnjoinedChart'),
-    topDuplicate: document.getElementById('topDuplicateChart')
+    join: document.getElementById('joinChart')
   };
-  // --- NEW: Heatmap for duplicate rates by commune ---
-  if (canvases.heatmap && data.dashboard_kpis && data.dashboard_kpis.top_communes) {
-    if (charts.heatmap) charts.heatmap.destroy();
-    const labels = data.dashboard_kpis.top_communes.by_duplicate_rate.map(c => c.commune);
-    const values = data.dashboard_kpis.top_communes.by_duplicate_rate.map(c => c.value);
-    charts.heatmap = new Chart(canvases.heatmap, {
-      type: 'bar',
-      data: {
-        labels: labels,
-        datasets: [{
-          label: 'Taux de doublons (%)',
-          data: values,
-          backgroundColor: labels.map(() => createGradient(canvases.heatmap, themeColors.gradients.warning)),
-          borderRadius: 8,
-          borderSkipped: false
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { grid: { display: false }, border: { display: false } },
-          y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.1)' }, border: { display: false } }
-        },
-        animation: { duration: 1200 }
-      }
-    });
-  }
-
-  // --- NEW: Pie chart for problematic/unjoined/conflicted parcels ---
-  if (canvases.problemPie && data.dashboard_kpis) {
-    if (charts.problemPie) charts.problemPie.destroy();
-    const kpi = data.dashboard_kpis.kpi_summary;
-    charts.problemPie = new Chart(canvases.problemPie, {
-      type: 'pie',
-      data: {
-        labels: ['Parcelles Problématiques', 'Parcelles Sans Jointure', 'Parcelles Conflituelles'],
-        datasets: [{
-          data: [kpi.problematic_parcels.value, kpi.unjoined_parcels.value, kpi.problematic_parcels.value],
-          backgroundColor: ['#F44336', '#9CA3AF', '#FFC107'],
-          borderWidth: 2,
-          borderColor: '#FFFFFF'
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { position: 'bottom' } }
-      }
-    });
-  }
-
-  // --- NEW: Top communes by unjoined parcels ---
-  if (canvases.topUnjoined && data.dashboard_kpis && data.dashboard_kpis.top_communes) {
-    if (charts.topUnjoined) charts.topUnjoined.destroy();
-    const labels = data.dashboard_kpis.top_communes.by_unjoined_parcels.map(c => c.commune);
-    const values = data.dashboard_kpis.top_communes.by_unjoined_parcels.map(c => c.value);
-    charts.topUnjoined = new Chart(canvases.topUnjoined, {
-      type: 'bar',
-      data: {
-        labels: labels,
-        datasets: [{
-          label: 'Parcelles sans jointure',
-          data: values,
-          backgroundColor: labels.map(() => createGradient(canvases.topUnjoined, themeColors.gradients.danger)),
-          borderRadius: 8,
-          borderSkipped: false
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { grid: { display: false }, border: { display: false } },
-          y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.1)' }, border: { display: false } }
-        },
-        animation: { duration: 1200 }
-      }
-    });
-  }
-
-  // --- NEW: Top communes by duplicate rate ---
-  if (canvases.topDuplicate && data.dashboard_kpis && data.dashboard_kpis.top_communes) {
-    if (charts.topDuplicate) charts.topDuplicate.destroy();
-    const labels = data.dashboard_kpis.top_communes.by_duplicate_rate.map(c => c.commune);
-    const values = data.dashboard_kpis.top_communes.by_duplicate_rate.map(c => c.value);
-    charts.topDuplicate = new Chart(canvases.topDuplicate, {
-      type: 'bar',
-      data: {
-        labels: labels,
-        datasets: [{
-          label: 'Taux de doublons (%)',
-          data: values,
-          backgroundColor: labels.map(() => createGradient(canvases.topDuplicate, themeColors.gradients.warning)),
-          borderRadius: 8,
-          borderSkipped: false
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { grid: { display: false }, border: { display: false } },
-          y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.1)' }, border: { display: false } }
-        },
-        animation: { duration: 1200 }
-      }
-    });
-  }
   
   // Update total parcels count in the UI
   if (document.getElementById('totalParcelsCount')) {
@@ -588,15 +444,34 @@ async function initCharts() {
   // Commune Performance Chart
   if (canvases.commune) {
     if (charts.communePerformance) charts.communePerformance.destroy();
-    const communes = data.communes.map(c => c.nom);
+    
+    // Use commune data from the new structure
+    let communeData;
+    if (Array.isArray(data.communes)) {
+      communeData = data.communes;
+    } else if (data.summary.communes && Array.isArray(data.summary.communes)) {
+      communeData = data.summary.communes;
+    } else {
+      communeData = [];
+    }
+    
+    const communes = communeData.map(c => c.nom || c.name || c.commune);
     const metric = document.getElementById('metricSelector')?.value || 'individuelles';
+    
     charts.communePerformance = new Chart(canvases.commune, {
       type: 'bar',
       data: {
         labels: communes,
         datasets: [{
           label: getMetricLabel(metric),
-          data: data.communes.map(c => c[metric]),
+          data: communeData.map(c => {
+            // Support different data structures
+            if (metric === 'individuelles') return c.individuelles || c.individual_parcels;
+            if (metric === 'collectives') return c.collectives || c.collective_parcels;
+            if (metric === 'conflits') return c.conflits || c.conflict_parcels;
+            if (metric === 'qualite') return c.qualite || c.quality || c.data_quality;
+            return c[metric];
+          }),
           backgroundColor: communes.map(() => createGradient(canvases.commune, themeColors.gradients.primary)),
           borderRadius: 8,
           borderSkipped: false
@@ -1222,9 +1097,7 @@ async function initializeDashboard() {
     // Mettre à jour les éléments du tableau de bord
     updateHeaderStats();
     await updateKPIs();
-  await initCharts();
-  // Show insight banner
-  showInsightBanner();
+    await initCharts();
     await generateDataInsights();
     
     // Créer les visualisations avancées
@@ -1256,22 +1129,6 @@ async function initializeDashboard() {
 
 // Afficher un message de bienvenue avec des insights clés
 function showWelcomeMessage() {
-// Show a beautiful insight banner at the top of the dashboard
-function showInsightBanner() {
-  if (document.getElementById('insightBanner')) return;
-  const banner = document.createElement('div');
-  banner.id = 'insightBanner';
-  banner.className = 'insight-banner';
-  banner.innerHTML = `
-    <div class="insight-banner-content">
-      <i class="fas fa-lightbulb"></i>
-      <span><strong>Progression:</strong> 78% des parcelles traitées, <strong>9.93%</strong> de doublons éliminés, <strong>211</strong> parcelles conflictuelles à surveiller. <span class="insight-tip">Survolez les graphiques pour plus de détails.</span></span>
-      <button class="insight-close"><i class="fas fa-times"></i></button>
-    </div>
-  `;
-  document.body.prepend(banner);
-  banner.querySelector('.insight-close').addEventListener('click', () => banner.remove());
-}
   const welcomeEl = document.createElement('div');
   welcomeEl.className = 'welcome-toast';
   welcomeEl.innerHTML = `

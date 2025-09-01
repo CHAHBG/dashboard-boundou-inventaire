@@ -1,0 +1,48 @@
+2025-08-19 09:43:41,608 - INFO - Output folder: C:\Users\USER\Documents\Raw_Data\Levés topo-enquetes\Données brutes en polygone\POLYGONES\NETTOYE
+2025-08-19 09:43:41,609 - INFO - Found 15 geopackage files
+2025-08-19 09:43:41,609 - INFO - Processing: BALA_SANS_DOUBLON.gpkg
+2025-08-19 09:43:41,725 - INFO - Created 878 records
+2025-08-19 09:43:41,731 - INFO - Removed 33 duplicate records from BALA_SANS_DOUBLON.gpkg
+2025-08-19 09:43:41,731 - INFO - Processing: BALLOU_SANS_DOUBLON.gpkg
+2025-08-19 09:43:41,756 - INFO - Created 1,397 records
+2025-08-19 09:43:41,762 - INFO - Removed 20 duplicate records from BALLOU_SANS_DOUBLON.gpkg
+2025-08-19 09:43:41,762 - INFO - Processing: BANDAFASSI_SANS_DOUBLON.gpkg
+2025-08-19 09:43:41,920 - INFO - Created 3,531 records
+2025-08-19 09:43:41,930 - INFO - Removed 369 duplicate records from BANDAFASSI_SANS_DOUBLON.gpkg
+2025-08-19 09:43:41,930 - INFO - Processing: BEMBOU_SANS_DOUBLON.gpkg
+2025-08-19 09:43:41,975 - INFO - Created 1,992 records
+2025-08-19 09:43:41,982 - INFO - Removed 91 duplicate records from BEMBOU_SANS_DOUBLON.gpkg
+2025-08-19 09:43:41,982 - INFO - Processing: DIMBOLI_SANS_DOUBLON.gpkg
+2025-08-19 09:43:42,091 - INFO - Created 3,049 records
+2025-08-19 09:43:42,099 - INFO - Removed 219 duplicate records from DIMBOLI_SANS_DOUBLON.gpkg
+2025-08-19 09:43:42,099 - INFO - Processing: DINDEFELLO_SANS_DOUBLON.gpkg
+2025-08-19 09:43:42,140 - INFO - Created 1,773 records
+2025-08-19 09:43:42,148 - INFO - Removed 72 duplicate records from DINDEFELLO_SANS_DOUBLON.gpkg
+2025-08-19 09:43:42,148 - INFO - Processing: FONGOLEMBI_SANS_DOUBLON.gpkg
+2025-08-19 09:43:42,198 - INFO - Created 1,436 records
+2025-08-19 09:43:42,206 - INFO - Removed 110 duplicate records from FONGOLEMBI_SANS_DOUBLON.gpkg
+2025-08-19 09:43:42,206 - INFO - Processing: GABOU_SANS_DOUBLON.gpkg
+2025-08-19 09:43:42,233 - INFO - Created 1,625 records
+2025-08-19 09:43:42,240 - INFO - Removed 37 duplicate records from GABOU_SANS_DOUBLON.gpkg
+2025-08-19 09:43:42,240 - INFO - Processing: KOAR_SANS_DOUBLON.gpkg
+2025-08-19 09:43:42,250 - INFO - Created 98 records
+2025-08-19 09:43:42,254 - INFO - Removed 3 duplicate records from KOAR_SANS_DOUBLON.gpkg
+2025-08-19 09:43:42,254 - INFO - Processing: MISSIRAH_SANS_DOUBLON.gpkg
+2025-08-19 09:43:42,441 - INFO - Created 5,996 records
+2025-08-19 09:43:42,455 - INFO - Removed 450 duplicate records from MISSIRAH_SANS_DOUBLON.gpkg
+2025-08-19 09:43:42,455 - INFO - Processing: MOUDERY_SANS_DOUBLON.gpkg
+2025-08-19 09:43:42,475 - INFO - Created 984 records
+2025-08-19 09:43:42,481 - INFO - Removed 20 duplicate records from MOUDERY_SANS_DOUBLON.gpkg
+2025-08-19 09:43:42,481 - INFO - Processing: NDOGA_BABACAR_SANS_DOUBLON.gpkg
+2025-08-19 09:43:42,598 - INFO - Created 2,359 records
+2025-08-19 09:43:42,607 - INFO - Removed 798 duplicate records from NDOGA_BABACAR_SANS_DOUBLON.gpkg
+2025-08-19 09:43:42,607 - INFO - Processing: NETTEBOULOU_SANS_DOUBLON.gpkg
+2025-08-19 09:43:42,720 - INFO - Created 3,060 records
+2025-08-19 09:43:42,734 - INFO - Removed 322 duplicate records from NETTEBOULOU_SANS_DOUBLON.gpkg
+2025-08-19 09:43:42,734 - INFO - Processing: SINTHIOU_MALEME_SANS_DOUBLON.gpkg
+2025-08-19 09:43:42,770 - INFO - Created 1,656 records
+2025-08-19 09:43:42,776 - INFO - Removed 44 duplicate records from SINTHIOU_MALEME_SANS_DOUBLON.gpkg
+2025-08-19 09:43:42,776 - INFO - Processing: TOMBORONKOTO_SANS_DOUBLON.gpkg
+2025-08-19 09:43:43,645 - INFO - Created 8,996 records
+2025-08-19 09:43:43,662 - INFO - Removed 1692 duplicate records from TOMBORONKOTO_SANS_DOUBLON.gpkg
+2025-08-19 09:43:43,665 - INFO - Report saved to: duplicate_removal_report.txt

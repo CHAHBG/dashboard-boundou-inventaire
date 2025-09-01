@@ -1,0 +1,191 @@
+/* Insights Card Styles */
+.insights-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.insights-chart-wrapper {
+  position: relative;
+  height: 180px;
+  margin: 0 auto;
+  max-width: 180px;
+}
+
+.donut-center-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.donut-percentage {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.donut-label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.key-insights {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.key-insight-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 0.8rem;
+  background-color: var(--background-light);
+  border-radius: var(--border-radius-sm);
+  transition: transform 0.2s ease;
+}
+
+.key-insight-item:hover {
+  transform: translateX(5px);
+}
+
+.insight-indicator {
+  width: 8px;
+  height: 40px;
+  margin-right: 1rem;
+  border-radius: 4px;
+}
+
+.insight-indicator.success {
+  background-color: var(--success);
+}
+
+.insight-indicator.warning {
+  background-color: var(--warning);
+}
+
+.insight-indicator.info {
+  background-color: var(--info);
+}
+
+.insight-content h4 {
+  margin: 0 0 0.3rem 0;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.insight-content p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* Mini Chart Styles for Anomalies */
+.anomaly-chart-mini {
+  position: relative;
+  height: 40px;
+  width: 100%;
+  margin-top: 0.75rem;
+  background: linear-gradient(to bottom, rgba(var(--background-light-rgb), 0.3), rgba(var(--background-light-rgb), 0.1));
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+/* Beautiful Data Visualization Enhancements */
+.chart-container {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.chart-container:hover {
+  transform: scale(1.01);
+}
+
+/* Enhance chart tooltips */
+.chart-tooltip {
+  background-color: var(--background-card);
+  border-radius: var(--border-radius-sm);
+  box-shadow: var(--shadow-medium);
+  color: var(--text-primary);
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
+  border-left: 3px solid var(--primary);
+}
+
+.chart-tooltip-title {
+  font-weight: bold;
+  margin-bottom: 0.3rem;
+}
+
+.chart-tooltip-value {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tooltip-color-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+/* Chart Legend Enhancements */
+.enhanced-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  padding: 0.3rem 0.7rem;
+  border-radius: 20px;
+  background-color: var(--background-light);
+  transition: all 0.2s ease;
+}
+
+.legend-item:hover {
+  background-color: rgba(var(--primary-rgb), 0.1);
+  transform: translateY(-2px);
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+}
+
+.legend-label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* Media queries for responsive design */
+@media (max-width: 992px) {
+  .insights-container {
+    flex-direction: column;
+  }
+  
+  .insights-chart-wrapper {
+    margin-bottom: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .key-insight-item {
+    flex-direction: column;
+  }
+  
+  .insight-indicator {
+    width: 40px;
+    height: 6px;
+    margin-bottom: 0.5rem;
+    margin-right: 0;
+  }
+}
