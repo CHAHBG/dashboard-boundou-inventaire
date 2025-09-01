@@ -192,20 +192,6 @@
       }, 1000);
       
       return false;
-        initializeDashboard();
-        console.log('Dashboard initialization completed');
-        return true;
-      } else if (window.dashboardInitFunctions && typeof window.dashboardInitFunctions.initialize === 'function') {
-        window.dashboardInitFunctions.initialize();
-        console.log('Dashboard initialization completed using backup reference');
-        return true;
-      } else if (typeof window.initializeDashboardImpl === 'function') {
-        window.initializeDashboardImpl();
-        console.log('Dashboard initialization completed using implementation function');
-        return true;
-      } else {
-        console.error('Could not find initialization function');
-        return false;
       }
     } catch (error) {
       console.error('Error during initialization fix:', error);

@@ -28,6 +28,255 @@ if (typeof window !== 'undefined') {
   window.EDL_DASHBOARD.loadTime = new Date();
 }
 
+// Loading indicator functions
+function showLoadingIndicator(message = 'Chargement en cours...') {
+  let overlay = document.getElementById('loading-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'loading-overlay';
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100%';
+    overlay.style.height = '100%';
+    overlay.style.backgroundColor = 'rgba(0,0,0,0.5)';
+    overlay.style.display = 'flex';
+    overlay.style.justifyContent = 'center';
+    overlay.style.alignItems = 'center';
+    overlay.style.zIndex = '9999';
+    overlay.style.transition = 'opacity 0.3s ease';
+    
+    const loaderContainer = document.createElement('div');
+    loaderContainer.style.backgroundColor = 'white';
+    loaderContainer.style.padding = '20px';
+    loaderContainer.style.borderRadius = '10px';
+    loaderContainer.style.textAlign = 'center';
+    loaderContainer.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+    
+    const loader = document.createElement('div');
+    loader.style.border = '5px solid #f3f3f3';
+    loader.style.borderTop = '5px solid #3498db';
+    loader.style.borderRadius = '50%';
+    loader.style.width = '40px';
+    loader.style.height = '40px';
+    loader.style.margin = '0 auto 10px auto';
+    loader.style.animation = 'spin 2s linear infinite';
+    
+    const messageElem = document.createElement('p');
+    messageElem.textContent = message;
+    messageElem.style.margin = '10px 0 0 0';
+    messageElem.style.fontFamily = 'sans-serif';
+    
+    loaderContainer.appendChild(loader);
+    loaderContainer.appendChild(messageElem);
+    overlay.appendChild(loaderContainer);
+    
+    // Add spin animation
+    const style = document.createElement('style');
+    style.textContent = '@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }';
+    document.head.appendChild(style);
+    
+    document.body.appendChild(overlay);
+  } else {
+    const messageElem = overlay.querySelector('p');
+    if (messageElem) {
+      messageElem.textContent = message;
+    }
+    overlay.style.display = 'flex';
+  }
+  overlay.style.opacity = '1';
+  
+  console.log('Loading indicator shown:', message);
+}
+
+function hideLoadingIndicator() {
+  const overlay = document.getElementById('loading-overlay');
+  if (overlay) {
+    overlay.style.opacity = '0';
+    setTimeout(() => {
+      overlay.style.display = 'none';
+    }, 300);
+    console.log('Loading indicator hidden');
+  }
+}
+
+// Show welcome message function
+function showWelcomeMessage() {
+  console.log('Showing welcome message');
+  
+  // Check if welcome message already shown
+  if (localStorage.getItem('welcomeShown')) {
+    return;
+  }
+  
+  // Create welcome message element
+  const welcomeEl = document.createElement('div');
+  welcomeEl.id = 'welcome-message';
+  welcomeEl.style.position = 'fixed';
+  welcomeEl.style.top = '20px';
+  welcomeEl.style.right = '20px';
+  welcomeEl.style.backgroundColor = '#fff';
+  welcomeEl.style.padding = '15px 20px';
+  welcomeEl.style.borderRadius = '5px';
+  welcomeEl.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
+  welcomeEl.style.zIndex = '1000';
+  welcomeEl.style.maxWidth = '300px';
+  welcomeEl.style.animation = 'slideIn 0.5s ease-out forwards';
+  
+  welcomeEl.innerHTML = `
+    <h3 style="margin-top:0;color:#1E40AF">Bienvenue au Tableau de Bord</h3>
+    <p>Données chargées avec succès. Explorez les visualisations et analyses disponibles.</p>
+    <button id="welcome-close" style="background:#3B82F6;color:#fff;border:none;padding:5px 10px;border-radius:3px;cursor:pointer;float:right">Fermer</button>
+  `;
+  
+  // Add animation
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+  `;
+  document.head.appendChild(style);
+  
+  // Add to DOM
+  document.body.appendChild(welcomeEl);
+  
+  // Add close button handler
+  document.getElementById('welcome-close').addEventListener('click', function() {
+    welcomeEl.style.display = 'none';
+    localStorage.setItem('welcomeShown', 'true');
+  });
+  
+  // Auto-hide after 8 seconds
+  setTimeout(() => {
+    if (welcomeEl.parentNode) {
+      welcomeEl.style.animation = 'slideIn 0.5s ease-out reverse forwards';
+      setTimeout(() => {
+        if (welcomeEl.parentNode) welcomeEl.parentNode.removeChild(welcomeEl);
+      }, 500);
+    }
+  }, 8000);
+}
+
+// Show error message
+function showErrorMessage(message) {
+  console.error('ERROR:', message);
+  
+  // Create error message element
+  const errorEl = document.createElement('div');
+  errorEl.id = 'error-message';
+  errorEl.style.position = 'fixed';
+  errorEl.style.top = '20px';
+  errorEl.style.left = '50%';
+  errorEl.style.transform = 'translateX(-50%)';
+  errorEl.style.backgroundColor = '#FEF2F2';
+  errorEl.style.color = '#B91C1C';
+  errorEl.style.padding = '15px 20px';
+  errorEl.style.borderRadius = '5px';
+  errorEl.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
+  errorEl.style.zIndex = '9999';
+  errorEl.style.maxWidth = '80%';
+  
+  errorEl.innerHTML = `
+    <div style="display:flex;align-items:center">
+      <i class="fas fa-exclamation-triangle" style="margin-right:10px;font-size:20px"></i>
+      <div>
+        <h3 style="margin-top:0;margin-bottom:5px">Erreur</h3>
+        <p style="margin:0">${message}</p>
+      </div>
+      <button id="error-close" style="background:transparent;border:none;margin-left:15px;cursor:pointer;font-size:20px;color:#B91C1C">&times;</button>
+    </div>
+  `;
+  
+  // Add to DOM
+  document.body.appendChild(errorEl);
+  
+  // Add close button handler
+  document.getElementById('error-close').addEventListener('click', function() {
+    errorEl.style.display = 'none';
+  });
+  
+  // Auto-hide after 10 seconds
+  setTimeout(() => {
+    if (errorEl.parentNode) {
+      errorEl.style.opacity = '0';
+      errorEl.style.transition = 'opacity 0.5s';
+      setTimeout(() => {
+        if (errorEl.parentNode) errorEl.parentNode.removeChild(errorEl);
+      }, 500);
+    }
+  }, 10000);
+}
+
+// Setup event listeners
+function setupEventListeners() {
+  console.log('Setting up event listeners');
+  // Implementation can be expanded later
+}
+
+// Load dashboard data from JSON files
+async function loadDashboardData() {
+  console.log('Loading dashboard data...');
+  try {
+    // First try to load from data/ directory
+    const response = await fetch('data/dashboard_data_complete.json');
+    if (response.ok) {
+      const data = await response.json();
+      dashboardData = data;
+      return data;
+    } else {
+      throw new Error('Could not load dashboard_data_complete.json');
+    }
+  } catch (error) {
+    console.error('Error loading dashboard data:', error);
+    
+    // Try fallback data from dashboard_json directory
+    try {
+      const fallbackResponse = await fetch('dashboard_json/dashboard_data_complete.json');
+      if (fallbackResponse.ok) {
+        const data = await fallbackResponse.json();
+        dashboardData = data;
+        return data;
+      } else {
+        throw new Error('Could not load fallback data');
+      }
+    } catch (fallbackError) {
+      console.error('Error loading fallback data:', fallbackError);
+      
+      // Use hardcoded data as last resort
+      console.log('Using hardcoded data as fallback');
+      dashboardData = realData;
+      return realData;
+    }
+  }
+}
+
+// Initialize main dashboard view
+function initializeMainDashboard() {
+  console.log('Initializing main dashboard view');
+  try {
+    // If dashboard data is available, update UI components
+    if (dashboardData) {
+      // Update KPIs if the function exists
+      if (typeof updateKPIs === 'function') {
+        updateKPIs();
+      }
+      
+      // Initialize charts if the function exists
+      if (typeof initCharts === 'function') {
+        initCharts();
+      }
+      
+      console.log('Dashboard components initialized successfully');
+    } else {
+      console.warn('No dashboard data available for initialization');
+    }
+  } catch (error) {
+    console.error('Error in initializeMainDashboard:', error);
+  }
+}
+
 // Variables globales
 let dashboardData = null;
 let charts = {};
@@ -1863,13 +2112,24 @@ async function initializeDashboard() {
     showLoadingIndicator('Chargement des données du tableau de bord...');
     
     // Load dashboard data
-    await loadDashboardData();
+    try {
+      await loadDashboardData();
+      console.log('Dashboard data loaded successfully');
+    } catch (dataError) {
+      console.error('Error loading dashboard data:', dataError);
+      // Use fallback data
+      dashboardData = realData || {};
+    }
     
     // Setup event listeners and UI components
     setupEventListeners();
     
     // Initialize views
-    initializeMainDashboard();
+    try {
+      initializeMainDashboard();
+    } catch (viewError) {
+      console.error('Error initializing dashboard views:', viewError);
+    }
     
     // Show welcome message
     showWelcomeMessage();
