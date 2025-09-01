@@ -275,9 +275,14 @@ function initializeMainDashboard() {
       // Initialize charts if the function exists
       if (typeof initCharts === 'function') {
         try {
-          initCharts().catch(err => {
-            console.error('Error in initCharts:', err);
-          });
+          // Ensure redraw after charts initialize to handle hidden->visible canvases
+          initCharts()
+            .then(() => {
+              try { if (typeof redrawCharts === 'function') redrawCharts(); } catch(e) { console.warn('redrawCharts after initCharts failed', e); }
+            })
+            .catch(err => {
+              console.error('Error in initCharts:', err);
+            });
         } catch (chartError) {
           console.error('Error initializing charts:', chartError);
         }
