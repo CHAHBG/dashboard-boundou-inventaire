@@ -1365,11 +1365,10 @@ function showInsightBanner() {
 
 // Show welcome message and insights
 function showWelcomeMessage() {
-  `;
-  document.body.prepend(banner);
-  banner.querySelector('.insight-close').addEventListener('click', () => banner.remove());
-}
+  if (document.getElementById('welcomeToast')) return;
+  
   const welcomeEl = document.createElement('div');
+  welcomeEl.id = 'welcomeToast';
   welcomeEl.className = 'welcome-toast';
   welcomeEl.innerHTML = `
     <div class="welcome-toast-header">
