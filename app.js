@@ -759,12 +759,33 @@ async function updateKPIs() {
   });
 
 // Create gradient for chart backgrounds (for Chart.js)
-function createGradient(ctx, colors) {
-  if (!ctx) return colors[0];
+function createGradient(canvasOrCtx, colors) {
+  // Accept either a canvas element or a 2D context
+  let ctx = canvasOrCtx;
+  try {
+    if (canvasOrCtx && typeof canvasOrCtx.getContext === 'function') {
+      ctx = canvasOrCtx.getContext('2d');
+    }
+  } catch (e) {
+    // ignore and fallback
+  }
+  if (!ctx || typeof ctx.createLinearGradient !== 'function') {
+    // Fallback to the first color if we can't create a gradient
+    return (colors && colors[0]) || '#BBBBBB';
+  }
   const gradient = ctx.createLinearGradient(0, 0, 0, 400);
   gradient.addColorStop(0, colors[0]);
   gradient.addColorStop(1, colors[1] || colors[0]);
   return gradient;
+}
+
+// Ensure arrays contain numeric values (replace non-numeric with 0)
+function sanitizeArray(arr) {
+  if (!Array.isArray(arr)) return [];
+  return arr.map(v => {
+    const n = typeof v === 'number' ? v : parseFloat(v);
+    return Number.isFinite(n) ? n : 0;
+  });
 }
 
 // Initialize and update all charts with performance optimizations (data slicing, lazy loading)
@@ -794,8 +815,8 @@ async function initCharts() {
   // --- NEW: Heatmap for duplicate rates by commune ---
   if (canvases.heatmap && data.dashboard_kpis && data.dashboard_kpis.top_communes) {
     if (charts.heatmap) charts.heatmap.destroy();
-    const labels = data.dashboard_kpis.top_communes.by_duplicate_rate.map(c => c.commune);
-    const values = data.dashboard_kpis.top_communes.by_duplicate_rate.map(c => c.value);
+  const labels = (data.dashboard_kpis.top_communes.by_duplicate_rate || []).map(c => c.commune || '');
+  const values = sanitizeArray((data.dashboard_kpis.top_communes.by_duplicate_rate || []).map(c => c.value));
     charts.heatmap = new Chart(canvases.heatmap, {
       type: 'bar',
       data: {
@@ -825,12 +846,12 @@ async function initCharts() {
   if (canvases.problemPie && data.dashboard_kpis) {
     if (charts.problemPie) charts.problemPie.destroy();
     const kpi = data.dashboard_kpis.kpi_summary;
-    charts.problemPie = new Chart(canvases.problemPie, {
+  charts.problemPie = new Chart(canvases.problemPie, {
       type: 'pie',
       data: {
         labels: ['Parcelles Problématiques', 'Parcelles Sans Jointure', 'Parcelles Conflituelles'],
         datasets: [{
-          data: [kpi.problematic_parcels.value, kpi.unjoined_parcels.value, kpi.problematic_parcels.value],
+      data: sanitizeArray([kpi?.problematic_parcels?.value, kpi?.unjoined_parcels?.value, kpi?.problematic_parcels?.value]),
           backgroundColor: ['#F44336', '#9CA3AF', '#FFC107'],
           borderWidth: 2,
           borderColor: '#FFFFFF'
@@ -847,8 +868,8 @@ async function initCharts() {
   // --- NEW: Top communes by unjoined parcels ---
   if (canvases.topUnjoined && data.dashboard_kpis && data.dashboard_kpis.top_communes) {
     if (charts.topUnjoined) charts.topUnjoined.destroy();
-    const labels = data.dashboard_kpis.top_communes.by_unjoined_parcels.map(c => c.commune);
-    const values = data.dashboard_kpis.top_communes.by_unjoined_parcels.map(c => c.value);
+  const labels = (data.dashboard_kpis.top_communes.by_unjoined_parcels || []).map(c => c.commune || '');
+  const values = sanitizeArray((data.dashboard_kpis.top_communes.by_unjoined_parcels || []).map(c => c.value));
     charts.topUnjoined = new Chart(canvases.topUnjoined, {
       type: 'bar',
       data: {
@@ -877,8 +898,8 @@ async function initCharts() {
   // --- NEW: Top communes by duplicate rate ---
   if (canvases.topDuplicate && data.dashboard_kpis && data.dashboard_kpis.top_communes) {
     if (charts.topDuplicate) charts.topDuplicate.destroy();
-    const labels = data.dashboard_kpis.top_communes.by_duplicate_rate.map(c => c.commune);
-    const values = data.dashboard_kpis.top_communes.by_duplicate_rate.map(c => c.value);
+  const labels = (data.dashboard_kpis.top_communes.by_duplicate_rate || []).map(c => c.commune || '');
+  const values = sanitizeArray((data.dashboard_kpis.top_communes.by_duplicate_rate || []).map(c => c.value));
     charts.topDuplicate = new Chart(canvases.topDuplicate, {
       type: 'bar',
       data: {
@@ -914,8 +935,8 @@ async function initCharts() {
     if (charts.parcelDistribution) charts.parcelDistribution.destroy();
     
     const chartType = document.getElementById('chartTypeSelector')?.value || 'doughnut';
-    const labels = ['Individuelles', 'Collectives', 'Conflictuelles', 'Sans jointure'];
-    const values = [summary.indivParcels, summary.collParcels, summary.conflictParcels, summary.noJoinParcels];
+  const labels = ['Individuelles', 'Collectives', 'Conflictuelles', 'Sans jointure'];
+  const values = sanitizeArray([summary.indivParcels, summary.collParcels, summary.conflictParcels, summary.noJoinParcels]);
     
     // Colors for the different parcel types
     const backgroundColors = chartType === 'bar' ? 
@@ -925,13 +946,13 @@ async function initCharts() {
        createGradient(canvases.parcelDistribution, ['#9CA3AF', '#6B7280'])] :
       ['#4CAF50', '#1E40AF', '#F44336', '#9CA3AF'];
       
-    charts.parcelDistribution = new Chart(canvases.parcelDistribution, {
+  charts.parcelDistribution = new Chart(canvases.parcelDistribution, {
       type: chartType,
       data: {
         labels: labels,
         datasets: [{
           label: 'Parcelles',
-          data: values,
+      data: values,
           backgroundColor: backgroundColors,
           borderWidth: chartType === 'bar' ? 0 : 2,
           borderColor: '#FFFFFF',
@@ -974,16 +995,17 @@ async function initCharts() {
   // Commune Performance Chart
   if (canvases.commune) {
     if (charts.communePerformance) charts.communePerformance.destroy();
-    const communes = data.communes.map(c => c.nom);
-    const metric = document.getElementById('metricSelector')?.value || 'individuelles';
-    charts.communePerformance = new Chart(canvases.commune, {
+  const communes = (data.communes || []).map(c => c.nom || '');
+  const metric = document.getElementById('metricSelector')?.value || 'individuelles';
+  const metricData = sanitizeArray((data.communes || []).map(c => c[metric]));
+  charts.communePerformance = new Chart(canvases.commune, {
       type: 'bar',
       data: {
         labels: communes,
         datasets: [{
           label: getMetricLabel(metric),
-          data: data.communes.map(c => c[metric]),
-          backgroundColor: communes.map(() => createGradient(canvases.commune, themeColors.gradients.primary)),
+      data: metricData,
+      backgroundColor: communes.map(() => createGradient(canvases.commune, themeColors.gradients.primary)),
           borderRadius: 8,
           borderSkipped: false
         }]
@@ -1010,14 +1032,14 @@ async function initCharts() {
     const totalProgress = [5000, 8500, 12000, 15500, 19000, 21500, 24000, 26500, 28000, 31000, 33500, 36000, 39500, 43110];
     const cleanedData = [4800, 8000, 11000, 14000, 17500, 19800, 22000, 24000, 25500, 28000, 30500, 32800, 35500, 38830];
     
-    charts.trend = new Chart(canvases.trend, {
+  charts.trend = new Chart(canvases.trend, {
       type: 'line',
       data: {
         labels: dates,
         datasets: [
           {
             label: 'Données brutes',
-            data: totalProgress,
+      data: sanitizeArray(totalProgress),
             borderColor: '#1E40AF',
             backgroundColor: 'rgba(30, 64, 175, 0.1)',
             borderWidth: 2,
@@ -1026,7 +1048,7 @@ async function initCharts() {
           },
           {
             label: 'Données nettoyées',
-            data: cleanedData,
+            data: sanitizeArray(cleanedData),
             borderColor: '#10B981',
             backgroundColor: 'rgba(16, 185, 129, 0.05)',
             borderWidth: 2,
@@ -1107,9 +1129,9 @@ async function initCharts() {
       type: 'bar',
       data: {
         labels: labels,
-        datasets: [{
-          label: 'Taux de doublons (%)',
-          data: values,
+      datasets: [{
+      label: 'Taux de doublons (%)',
+      data: sanitizeArray(values),
           backgroundColor: colors,
           borderRadius: 6,
           borderWidth: 0
@@ -1161,12 +1183,12 @@ async function initCharts() {
       data: [summary.indivParcels, summary.collParcels, summary.conflictParcels, summary.noJoinParcels]
     };
     
-    charts.join = new Chart(canvases.join, {
+  charts.join = new Chart(canvases.join, {
       type: 'pie',
       data: {
         labels: joinData.labels,
         datasets: [{
-          data: joinData.data,
+      data: sanitizeArray(joinData.data),
           backgroundColor: ['#4CAF50', '#1E40AF', '#F44336', '#9CA3AF'],
           borderWidth: 2,
           borderColor: '#FFFFFF'
@@ -1759,7 +1781,11 @@ function setupEventListeners() {
 
       // Trigger a resize event shortly after activation so charts recalculate sizes
       setTimeout(() => {
-        try { window.dispatchEvent(new Event('resize')); } catch(e) { console.warn('Resize dispatch failed', e); }
+        try { 
+          window.dispatchEvent(new Event('resize'));
+          // Also force Chart.js instances to resize and update
+          if (typeof redrawCharts === 'function') redrawCharts();
+        } catch(e) { console.warn('Resize dispatch failed', e); }
       }, 120);
 
       // Analytics tracking
@@ -1839,6 +1865,25 @@ function setupEventListeners() {
   document.querySelectorAll('button[data-action="generateReport"]').forEach(btn => {
     btn.addEventListener('click', () => generateReport());
   });
+}
+
+// Force all existing Chart.js instances to resize and update
+function redrawCharts() {
+  try {
+    Object.keys(charts || {}).forEach(key => {
+      const c = charts[key];
+      if (!c) return;
+      try {
+        if (typeof c.resize === 'function') c.resize();
+        if (typeof c.update === 'function') c.update();
+      } catch (err) {
+        // ignore individual chart errors
+        console.warn('Chart redraw failed for', key, err);
+      }
+    });
+  } catch (err) {
+    console.warn('redrawCharts failed', err);
+  }
 }
 
 // Configuration des interactions avancées
