@@ -26,82 +26,248 @@
   <link rel="stylesheet" href="insights_styles.css">
   <link rel="stylesheet" href="temp_css_additions.css">
   
-  <!-- Initialization script (loads first) -->
+  <!-- Core initialization script (loads first) -->
   <script>
-    // Pre-define global objects and functions to ensure availability
-    window.dashboardInitFunctions = {};
-    window.initializeDashboard = function() {
-      console.log('Using pre-defined initialization function');
-      if (window.dashboardInitFunctions && typeof window.dashboardInitFunctions.initialize === 'function') {
-        return window.dashboardInitFunctions.initialize();
-      } else {
-        console.warn('Full initialization function not yet available');
-        // Attempt to load app.js again to ensure it's available
-        var script = document.createElement('script');
-        script.src = 'app.js';
-        document.head.appendChild(script);
-        return new Promise(resolve => setTimeout(resolve, 500));
+    console.log('EDL Dashboard initialization sequence started');
+    
+    // Global state tracker
+    window.EDL_DASHBOARD = {
+      loaded: false,
+      scriptsLoaded: {},
+      ready: false,
+      init: null,
+      errors: [],
+      startTime: new Date(),
+      loadTime: null
+    };
+    
+    // Error tracking
+    window.onerror = function(msg, url, lineNo, columnNo, error) {
+      if (window.EDL_DASHBOARD) {
+        window.EDL_DASHBOARD.errors.push({
+          time: new Date(),
+          message: msg,
+          url: url,
+          line: lineNo,
+          column: columnNo,
+          error: error ? error.stack : null
+        });
+        console.warn('Error caught by global handler:', msg, 'at', url, ':', lineNo);
       }
+      return false; // Let default error handler run as well
+    };
+    
+    // Load script helper function with better error handling
+    function loadScript(src, id, isAsync = false) {
+      return new Promise((resolve, reject) => {
+        console.log(`Loading script: ${src}${id ? ' ('+id+')' : ''}`);
+        
+        // Check if already loaded
+        if (window.EDL_DASHBOARD.scriptsLoaded[src]) {
+          console.log(`Script already loaded: ${src}`);
+          resolve();
+          return;
+        }
+        
+        // Create script element
+        const script = document.createElement('script');
+        script.src = src;
+        if (id) script.id = id;
+        if (isAsync) script.async = true;
+        
+        // Handle success
+        script.onload = () => {
+          window.EDL_DASHBOARD.scriptsLoaded[src] = true;
+          console.log(`✓ Script loaded successfully: ${src}`);
+          resolve();
+        };
+        
+        // Handle error
+        script.onerror = (err) => {
+          console.error(`✗ Failed to load script: ${src}`, err);
+          window.EDL_DASHBOARD.errors.push({
+            type: 'script-load-error', 
+            src, 
+            time: new Date(),
+            error: err
+          });
+          
+          // Try to load the script again with a timeout
+          setTimeout(() => {
+            console.log(`Retrying script load: ${src}`);
+            const retryScript = document.createElement('script');
+            retryScript.src = src + '?retry=' + Date.now(); // Cache busting
+            if (id) retryScript.id = id + '-retry';
+            retryScript.onload = () => {
+              window.EDL_DASHBOARD.scriptsLoaded[src] = true;
+              console.log(`✓ Retry successful: ${src}`);
+              resolve();
+            };
+            retryScript.onerror = () => {
+              console.error(`✗ Retry failed for script: ${src}`);
+              reject(new Error(`Failed to load script: ${src} (after retry)`));
+            };
+            document.head.appendChild(retryScript);
+          }, 1000);
+        };
+        
+        // Add to document
+        document.head.appendChild(script);
+      });
+    }
+    
+    // Dashboard initialization stub - acts as a placeholder until the real function loads
+    window.initializeDashboard = function() {
+      console.log('Initialization requested before app.js is fully loaded');
+      return new Promise((resolve, reject) => {
+        // Try to find the real init function
+        const checkInit = () => {
+          if (window.EDL_DASHBOARD && window.EDL_DASHBOARD.init && typeof window.EDL_DASHBOARD.init === 'function') {
+            console.log('Found proper initialization function, executing now');
+            try {
+              window.EDL_DASHBOARD.init().then(resolve).catch(reject);
+            } catch (e) {
+              console.error('Error during initialization:', e);
+              reject(e);
+            }
+          } else {
+            console.log('Waiting for initialization function to be available...');
+            setTimeout(checkInit, 300);
+          }
+        };
+        checkInit();
+      });
     };
   </script>
   
-  <!-- Scripts -->
+  <!-- Load recovery script first to ensure it's available if anything goes wrong -->
+  <script src="dashboard-recovery.js" id="dashboard-recovery-script"></script>
+  
+  <!-- Load critical scripts immediately -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
-  <script src="app.js"></script>
-  <!-- Recovery script - loads only if needed -->
+  
+  <!-- Primary application script -->
+  <script src="app.js" id="main-app-script"></script>
+  
+  <!-- Secondary scripts loaded async -->
   <script>
-    function loadRecoveryScript() {
-      console.warn('Loading recovery script...');
-      var script = document.createElement('script');
-      script.src = 'dashboard-recovery.js';
-      document.head.appendChild(script);
-      return new Promise((resolve) => {
-        script.onload = () => {
-          console.log('Recovery script loaded');
-          resolve();
-        };
-      });
-    }
-
-    // Proactively load the recovery script
+    // Once DOM is ready, load non-critical scripts in parallel
     document.addEventListener('DOMContentLoaded', function() {
-      setTimeout(function() {
-        loadRecoveryScript();
-      }, 1000);
+      console.log('DOM content loaded, loading secondary scripts');
+      
+      Promise.all([
+        loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js', 'jspdf-script', true),
+        loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js', 'jspdf-autotable-script', true)
+      ]).then(() => {
+        console.log('All secondary scripts loaded successfully');
+      }).catch(err => {
+        console.warn('Some secondary scripts failed to load:', err);
+      });
     });
   </script>
   
-  <!-- Error handler -->
+  <!-- Recovery and initialization management -->
   <script>
-    window.onerror = function(message, source, lineno, colno, error) {
-      console.error('Error caught:', message, 'at', source, ':', lineno);
-      // If initialization failed, try to recover
-      if (message.includes('initializeDashboard') || message.includes('not defined') || message.includes('undefined')) {
-        console.warn('Attempting to recover from initialization error...');
-        loadRecoveryScript().then(() => {
-          setTimeout(() => {
-            try {
-              if (typeof window.fixDashboard === 'function') {
-                window.fixDashboard();
-              } else if (typeof window.dashboardInitFunctions?.initialize === 'function') {
-                window.dashboardInitFunctions.initialize();
-              } else if (typeof window.initializeDashboard === 'function') {
-                window.initializeDashboard();
-              } else {
-                console.error('Could not recover, initialization functions not available');
-                alert('Une erreur est survenue lors du chargement. Essayez de rafraîchir la page.');
-              }
-            } catch (err) {
-              console.error('Recovery attempt failed:', err);
+    // Initialize dashboard when ready
+    // Add initialization check when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('DOM content loaded, initializing dashboard');
+      
+      // Ensure dashboard is initialized (with timeout)
+      setTimeout(() => {
+        try {
+          if (!window.EDL_DASHBOARD.ready) {
+            console.log('Initializing dashboard after DOM content loaded');
+            if (typeof initializeDashboard === 'function') {
+              initializeDashboard().catch(err => {
+                console.error('Dashboard initialization failed:', err);
+              });
             }
-          }, 1000);
+          }
+        } catch (err) {
+          console.error('Error during initialization check:', err);
+        }
+      }, 500); // Give some time for scripts to parse and execute
+      
+      // Backup check for dashboard data
+      setTimeout(() => {
+        if ((typeof dashboardData === 'undefined' || !dashboardData) && !window.EDL_DASHBOARD.ready) {
+          console.warn('Dashboard data not loaded after timeout, trying recovery');
+          triggerRecovery();
+        }
+      }, 3000);
+    });
+    
+    // Primary recovery function
+    function triggerRecovery() {
+      console.warn('Triggering dashboard recovery sequence');
+      
+      if (typeof window.fixDashboard === 'function') {
+        console.log('Using fixDashboard recovery function');
+        window.fixDashboard();
+      } else if (window.EDL_DASHBOARD && window.EDL_DASHBOARD.init && typeof window.EDL_DASHBOARD.init === 'function') {
+        console.log('Using EDL_DASHBOARD init function');
+        window.EDL_DASHBOARD.init();
+      } else if (typeof initializeDashboard === 'function') {
+        console.log('Using global initializeDashboard function');
+        initializeDashboard();
+      } else {
+        console.error('Recovery failed - no initialization functions available');
+        alert('Erreur de chargement du tableau de bord. Veuillez actualiser la page.');
+      }
+    }
+    
+    // Global error handler
+    window.onerror = function(message, source, lineno, colno, error) {
+      // Log error details
+      console.error('Error caught:', message, 'at', source, ':', lineno);
+      if (window.EDL_DASHBOARD) {
+        window.EDL_DASHBOARD.errors.push({
+          message, source, lineno, time: new Date(), 
+          stack: error?.stack || 'No stack available'
         });
       }
-      return true; // prevents the default error handling
+      
+      // If initialization related, trigger recovery
+      if (message.includes('initializeDashboard') || 
+          message.includes('not defined') || 
+          message.includes('undefined') ||
+          message.includes('null')) {
+        console.warn('Detected initialization-related error, triggering recovery');
+        triggerRecovery();
+      }
+      
+      return false; // allows default error handling too
     };
+    
+    // Set load timestamp
+    if (window.EDL_DASHBOARD) {
+      window.EDL_DASHBOARD.loadTime = new Date();
+      console.log('Dashboard load time:', 
+        (window.EDL_DASHBOARD.loadTime - window.EDL_DASHBOARD.startTime), 'ms');
+    }
+    
+    // Run initialization when window is fully loaded
+    window.addEventListener('load', function() {
+      console.log('Window load event fired, checking dashboard state');
+      
+      // Final check to ensure dashboard is initialized
+      setTimeout(() => {
+        if (!window.EDL_DASHBOARD || !window.EDL_DASHBOARD.ready) {
+          console.log('Dashboard not ready after window load, initializing now');
+          if (typeof initializeDashboard === 'function') {
+            initializeDashboard().catch(err => {
+              console.error('Dashboard initialization failed after window load:', err);
+              triggerRecovery();
+            });
+          } else {
+            console.error('No initialization function available after window load');
+            triggerRecovery();
+          }
+        }
+      }, 1000);
+    });
   </script>
   
   <!-- Add this script to handle animations and enhancements -->

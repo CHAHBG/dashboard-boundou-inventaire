@@ -2,37 +2,30 @@
 /* This file contains template literals with HTML that TypeScript analyzer 
    might misinterpret. Disable TypeScript checking for this file. */
 
-// Global reference for critical initialization function
-window.dashboardInitFunctions = {};
-
-// Ensure we're in a browser environment
+// Ensure we're in a browser environment and initialize global state
 if (typeof window !== 'undefined') {
+  // If global state not initialized yet, create it
+  if (!window.EDL_DASHBOARD) {
+    window.EDL_DASHBOARD = {
+      loaded: false,
+      scriptsLoaded: {},
+      ready: false,
+      init: null,
+      errors: []
+    };
+  }
+  
+  console.log('App.js loading, setting up environment...');
+  
   // Fix for Favicon 404 error
   const link = document.createElement('link');
   link.rel = 'shortcut icon';
   link.href = 'data:image/x-icon;,';
   document.head.appendChild(link);
-
-  // Pre-define initialization function to ensure it's globally available
-  window.initializeDashboard = async function() {
-    console.log('Using globally defined initialization function');
-    if (typeof window.dashboardInitFunctions.initialize === 'function') {
-      return window.dashboardInitFunctions.initialize();
-    } else {
-      console.warn('Main initialization not yet available, trying again in 500ms');
-      return new Promise((resolve) => {
-        setTimeout(async () => {
-          if (typeof window.dashboardInitFunctions.initialize === 'function') {
-            await window.dashboardInitFunctions.initialize();
-            resolve();
-          } else {
-            console.error('Dashboard initialization function still not available after delay');
-            resolve();
-          }
-        }, 500);
-      });
-    }
-  };
+  
+  // Mark app.js as loaded
+  window.EDL_DASHBOARD.loaded = true;
+  window.EDL_DASHBOARD.loadTime = new Date();
 }
 
 // Variables globales
@@ -1854,38 +1847,92 @@ if (typeof showInsightBanner !== 'function') {
   };
 }
 
-// Ensure the dashboard initializes even if there are issues with DOMContentLoaded
-window.addEventListener('load', function() {
-  console.log('Window load event fired, checking if dashboard is initialized...');
-  setTimeout(() => {
-    try {
-      if (!dashboardData) {
-        console.log('Dashboard not initialized by DOMContentLoaded, initializing now...');
-        if (typeof window.initializeDashboard === 'function') {
-          window.initializeDashboard();
-        } else if (typeof initializeDashboard === 'function') {
-          initializeDashboard();
-        } else {
-          console.error('Could not find initializeDashboard function');
-          alert('Dashboard initialization failed. Please refresh the page or check console for errors.');
-        }
-      }
-    } catch (error) {
-      console.error('Error during backup initialization:', error);
+/**
+ * Main dashboard initialization function
+ * This function will be exposed globally through the EDL_DASHBOARD object
+ */
+async function initializeDashboard() {
+  console.log('Dashboard initialization started');
+  try {
+    // Check if already initialized
+    if (dashboardData) {
+      console.log('Dashboard already initialized, skipping');
+      return;
     }
-  }, 500);
+
+    showLoadingIndicator('Chargement des données du tableau de bord...');
+    
+    // Load dashboard data
+    await loadDashboardData();
+    
+    // Setup event listeners and UI components
+    setupEventListeners();
+    
+    // Initialize views
+    initializeMainDashboard();
+    
+    // Show welcome message
+    showWelcomeMessage();
+    
+    // Hide loading indicator when complete
+    hideLoadingIndicator();
+    
+    console.log('Dashboard initialization complete');
+    
+    // Mark dashboard as ready in global state
+    if (window.EDL_DASHBOARD) {
+      window.EDL_DASHBOARD.ready = true;
+    }
+    
+  } catch (error) {
+    console.error('Error during dashboard initialization:', error);
+    hideLoadingIndicator();
+    showErrorMessage('Une erreur est survenue lors de l\'initialisation du tableau de bord.');
+    
+    // Record error in global state
+    if (window.EDL_DASHBOARD) {
+      window.EDL_DASHBOARD.errors.push({
+        time: new Date(),
+        message: error.message,
+        stack: error.stack
+      });
+    }
+  }
+}
+
+// Expose initialization function globally
+window.addEventListener('load', function() {
+  console.log('Window load event fired, registering global initialization function');
+  
+  // Register the initialization function in the global state
+  if (window.EDL_DASHBOARD) {
+    window.EDL_DASHBOARD.init = initializeDashboard;
+    window.initializeDashboard = initializeDashboard;
+    console.log('Dashboard initialization function registered globally');
+    
+    // Auto-initialize if not already done
+    setTimeout(() => {
+      if (!dashboardData && window.EDL_DASHBOARD && window.EDL_DASHBOARD.ready === false) {
+        console.log('Auto-initializing dashboard');
+        initializeDashboard();
+      }
+    }, 500);
+  } else {
+    console.error('Global state object not found');
+  }
 });
 
-// Final global exports to ensure functions are available
-(function() {
-  // Wait for all script parsing to complete
-  setTimeout(() => {
-    // Re-export critical functions to global scope
-    if (typeof initializeDashboardImpl === 'function') {
-      window.initializeDashboardImpl = initializeDashboardImpl;
-      window.initializeDashboard = initializeDashboardImpl;
-      window.dashboardInitFunctions.initialize = initializeDashboardImpl;
-      console.log('Dashboard initialization function globally exposed');
+// Provide a global recovery function in case initialization fails
+window.recoverDashboard = function() {
+  try {
+    console.log('Dashboard recovery triggered');
+    if (typeof initializeDashboard === 'function') {
+      initializeDashboard();
+    } else {
+      console.error('Recovery failed: initialization function not available');
+      alert('Dashboard recovery failed. Please refresh the page.');
     }
-  }, 0);
-})();
+  } catch (error) {
+    console.error('Error during dashboard recovery:', error);
+  }
+};
