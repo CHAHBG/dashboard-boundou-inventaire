@@ -66,11 +66,24 @@
   function checkDashboardStatus() {
     console.log('Recovery module: Checking dashboard status');
     
-    // Check if content is loaded
-    const dashboardContent = document.getElementById('dashboard-content');
+    // If global ready flag is set, cleanup any recovery UI and exit
+    const isReady = window.EDL_DASHBOARD && window.EDL_DASHBOARD.ready;
+    if (isReady) {
+      console.log('Recovery module: Dashboard is already ready; removing recovery UI');
+      const btn = document.getElementById('dashboard-recovery-btn');
+      if (btn) btn.remove();
+      const notice = document.getElementById('dashboard-recovery-notice');
+      if (notice) notice.remove();
+      return;
+    }
+
+    // Check if content is loaded (be permissive: check several anchors)
+    const dashboardContent = document.getElementById('dashboard-content') || document.querySelector('.main-content') || document.getElementById('kpiGrid');
     const dataLoaded = window.dashboardData !== null && window.dashboardData !== undefined;
-    
-    if ((!dashboardContent || !dashboardContent.children.length) && !dataLoaded) {
+
+    // If no visible anchors and no data, show the recovery notice
+    const noVisibleContent = !dashboardContent || (dashboardContent.children && dashboardContent.children.length === 0);
+    if (noVisibleContent && !dataLoaded) {
       console.warn('Recovery module: Dashboard appears to be not initialized properly');
       
       // Add recovery notice
